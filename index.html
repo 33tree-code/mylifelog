@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>iライフログ</title>
+<title>ライフログ</title>
 <style>
   :root {
     --bg: #0b1120;
@@ -27,9 +27,10 @@
   }
   
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.5px; }
-  .header-btns { display: flex; gap: 5px; }
-  .btn-sm { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; cursor: pointer; }
+  .header h1 { font-size: 1.15rem; font-weight: 700; letter-spacing: -0.5px; white-space: nowrap; }
+  .header-btns { display: flex; gap: 6px; }
+  .btn-sm { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .btn-evernote { background: #2563eb; color: #fff; border: none; font-weight: 600; }
   
   /* 最上部：記録中エリア */
   .active-section { margin-bottom: 12px; display: none; }
@@ -72,12 +73,13 @@
   .btn-danger { background: #ef4444; color: #fff; }
   .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text-sub); }
   
-  /* ⚙ 設定モーダル項目 */
-  .sort-item { display: flex; align-items: center; gap: 6px; background: #0b1120; padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border); }
-  .sort-icon-input { width: 42px !important; text-align: center; margin: 0 !important; padding: 6px 2px !important; font-size: 1.1rem !important; }
+  /* ドラッグ対応の設定項目 */
+  .sort-item { display: flex; align-items: center; gap: 6px; background: #0b1120; padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border); touch-action: none; }
+  .sort-item.dragging { opacity: 0.4; border: 1px dashed var(--accent); }
+  .drag-handle { color: var(--text-sub); font-size: 1.1rem; cursor: grab; padding: 0 4px; user-select: none; }
+  .sort-icon-input { width: 40px !important; text-align: center; margin: 0 !important; padding: 6px 2px !important; font-size: 1.1rem !important; }
   .sort-name-input { flex: 1; margin: 0 !important; padding: 6px 8px !important; font-size: 0.85rem !important; }
-  .sort-btns { display: flex; gap: 4px; }
-  .sort-btn { background: #334155; border: none; color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+  .btn-del-cat { background: #ef4444; border: none; color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
   
   .preview-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
   .preview-img-wrap { position: relative; }
@@ -88,10 +90,9 @@
 <body>
 
 <div class="header">
-  <h1>⚡ iライフログ</h1>
+  <h1>⌚ ライフログ</h1>
   <div class="header-btns">
-    <button class="btn-sm" onclick="exportEvernote('yesterday')">前日</button>
-    <button class="btn-sm" style="background:#2563eb;color:#fff;border:none;" onclick="exportEvernote('today')">Evernote</button>
+    <button class="btn-sm btn-evernote" onclick="exportEvernoteYesterday()">Evernote出力 (前日)</button>
     <button class="btn-sm" onclick="openSettingModal()">⚙</button>
     <button class="btn-sm" onclick="openCatModal()">＋</button>
   </div>
@@ -99,7 +100,7 @@
 
 <!-- 最上部：記録中エリア -->
 <div class="active-section" id="activeSection">
-  <div style="font-size:0.75rem;color:var(--running);font-weight:bold;margin-bottom:4px;">⚡ 現在記録中</div>
+  <div style="font-size:0.75rem;color:var(--running);font-weight:bold;margin-bottom:4px;">⌚ 現在記録中</div>
   <div id="activeList"></div>
 </div>
 
@@ -126,11 +127,11 @@
   </div>
 </div>
 
-<!-- ⚙ カテゴリ設定・並替モーダル -->
+<!-- ⚙ カテゴリ設定モーダル（ドラッグ並び替え対応） -->
 <div class="modal" id="settingModal">
   <div class="modal-box">
     <h3 style="margin-bottom:6px;font-size:1rem;">カテゴリ設定・並び替え</h3>
-    <div style="font-size:0.7rem;color:var(--text-sub);margin-bottom:10px;">名前・アイコンの直接編集や並び替えができます</div>
+    <div style="font-size:0.7rem;color:var(--text-sub);margin-bottom:10px;">≡を長押しドラッグで並び替え、文字を直接編集できます</div>
     <div id="settingList" style="max-height:55vh;overflow-y:auto;margin-bottom:12px;"></div>
     <div class="modal-btns">
       <button class="btn-action btn-submit" onclick="closeSettingModal()">完了</button>
@@ -316,7 +317,7 @@
     save();
   }
 
-  /* ⚙ 設定モーダル（直接編集・並び替え） */
+  /* ⚙ 設定モーダル（ドラッグ並び替え対応） */
   function openSettingModal() {
     renderSettingList();
     document.getElementById('settingModal').style.display = 'flex';
@@ -326,19 +327,81 @@
     render();
   }
   
+  let draggedIndex = null;
+
   function renderSettingList() {
     const el = document.getElementById('settingList');
     el.innerHTML = cats.map((c, i) => `
-      <div class="sort-item">
+      <div class="sort-item" draggable="true" data-index="${i}">
+        <span class="drag-handle">≡</span>
         <input type="text" class="sort-icon-input" value="${c.icon}" maxlength="2" onchange="updateCatItem('${c.id}', 'icon', this.value)">
         <input type="text" class="sort-name-input" value="${c.name}" onchange="updateCatItem('${c.id}', 'name', this.value)">
-        <div class="sort-btns">
-          <button type="button" class="sort-btn" onclick="moveCat(${i}, -1)" ${i === 0 ? 'disabled style="opacity:0.25;"' : ''}>↑</button>
-          <button type="button" class="sort-btn" onclick="moveCat(${i}, 1)" ${i === cats.length - 1 ? 'disabled style="opacity:0.25;"' : ''}>↓</button>
-          <button type="button" class="sort-btn" style="background:#ef4444;" onclick="deleteCat('${c.id}')">✕</button>
-        </div>
+        <button type="button" class="btn-del-cat" onclick="deleteCat('${c.id}')">✕</button>
       </div>
     `).join('');
+
+    // ドラッグ＆ドロップイベント設定
+    const items = el.querySelectorAll('.sort-item');
+    items.forEach(item => {
+      item.addEventListener('dragstart', handleDragStart);
+      item.addEventListener('dragover', handleDragOver);
+      item.addEventListener('drop', handleDrop);
+      item.addEventListener('dragend', handleDragEnd);
+
+      // スマホ用タッチ操作
+      item.addEventListener('touchstart', handleTouchStart, {passive: true});
+      item.addEventListener('touchmove', handleTouchMove, {passive: false});
+      item.addEventListener('touchend', handleTouchEnd);
+    });
+  }
+
+  function handleDragStart(e) {
+    draggedIndex = parseInt(this.getAttribute('data-index'));
+    this.classList.add('dragging');
+  }
+  function handleDragOver(e) {
+    e.preventDefault();
+  }
+  function handleDrop(e) {
+    e.preventDefault();
+    const targetIndex = parseInt(this.getAttribute('data-index'));
+    if (draggedIndex !== null && draggedIndex !== targetIndex) {
+      const movedItem = cats.splice(draggedIndex, 1)[0];
+      cats.splice(targetIndex, 0, movedItem);
+      saveOnly();
+      renderSettingList();
+      render();
+    }
+  }
+  function handleDragEnd() {
+    this.classList.remove('dragging');
+  }
+
+  // タッチデバイス用ドラッグ処理
+  let touchTarget = null;
+  function handleTouchStart(e) {
+    touchTarget = this;
+    draggedIndex = parseInt(this.getAttribute('data-index'));
+  }
+  function handleTouchMove(e) {
+    if (!touchTarget) return;
+    const touch = e.touches[0];
+    const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+    const item = elem ? elem.closest('.sort-item') : null;
+    if (item && item !== touchTarget) {
+      const targetIndex = parseInt(item.getAttribute('data-index'));
+      const movedItem = cats.splice(draggedIndex, 1)[0];
+      cats.splice(targetIndex, 0, movedItem);
+      draggedIndex = targetIndex;
+      saveOnly();
+      renderSettingList();
+      render();
+    }
+    e.preventDefault();
+  }
+  function handleTouchEnd() {
+    touchTarget = null;
+    draggedIndex = null;
   }
   
   function updateCatItem(id, key, val) {
@@ -346,17 +409,6 @@
     if (!cat) return;
     cat[key] = val.trim();
     saveOnly();
-    render();
-  }
-
-  function moveCat(i, dir) {
-    const target = i + dir;
-    if (target < 0 || target >= cats.length) return;
-    const temp = cats[i];
-    cats[i] = cats[target];
-    cats[target] = temp;
-    saveOnly();
-    renderSettingList();
     render();
   }
   
@@ -460,14 +512,11 @@
     save();
   }
 
-  /* Evernote出力 */
-  async function exportEvernote(mode = 'today') {
+  /* Evernote出力（前日分を抽出） */
+  async function exportEvernoteYesterday() {
     const now = new Date();
-    let targetDate = new Date(now);
-
-    if (mode === 'yesterday' || (mode === 'today' && now.getHours() < 5)) {
-      targetDate.setDate(targetDate.getDate() - 1);
-    }
+    const targetDate = new Date(now);
+    targetDate.setDate(targetDate.getDate() - 1); // 常に前日を対象
 
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const y = targetDate.getFullYear();
@@ -480,7 +529,7 @@
     const tl = logs.filter(l => l.endAt && new Date(l.startAt).toDateString() === targetDateStr).reverse();
     
     if (tl.length === 0) {
-      alert(`${dateTitle} の記録はありません`);
+      alert(`前日（${dateTitle}）の記録はありません`);
       return;
     }
 
@@ -515,10 +564,10 @@
       const bp = new Blob([plain], { type: 'text/plain' });
       const item = [new ClipboardItem({ 'text/html': bh, 'text/plain': bp })];
       await navigator.clipboard.write(item);
-      alert(`${dateTitle} のログをコピーしました！\nEvernoteに貼り付けてください。`);
+      alert(`前日（${dateTitle}）のログをコピーしました！\nEvernoteに貼り付けてください。`);
     } catch (err) {
       navigator.clipboard.writeText(plain).then(() => {
-        alert(`${dateTitle} のテキストをコピーしました`);
+        alert(`前日（${dateTitle}）のテキストをコピーしました`);
       });
     }
   }
