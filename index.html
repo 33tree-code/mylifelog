@@ -2,13 +2,13 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>iライフログ</title>
 <style>
   :root {
-    --bg: #0f172a;
+    --bg: #0b1120;
     --card-bg: #1e293b;
     --text: #f8fafc;
     --text-sub: #94a3b8;
@@ -16,57 +16,65 @@
     --running: #ef4444;
     --border: #334155;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, sans-serif; -webkit-tap-highlight-color: transparent; }
-  body { background: var(--bg); color: var(--text); padding: 16px; padding-bottom: 60px; max-width: 600px; margin: 0 auto; }
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+  body { 
+    background: var(--bg); 
+    color: var(--text); 
+    padding: env(safe-area-inset-top, 12px) 12px env(safe-area-inset-bottom, 24px) 12px; 
+    max-width: 480px; 
+    margin: 0 auto; 
+    user-select: none;
+  }
   
-  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-  .header h1 { font-size: 1.2rem; font-weight: bold; }
-  .header-btns { display: flex; gap: 8px; }
-  .btn-sm { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 6px 10px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; }
+  .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.5px; }
+  .header-btns { display: flex; gap: 6px; }
+  .btn-sm { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; cursor: pointer; }
   
   /* 最上部：記録中エリア */
-  .active-section { margin-bottom: 16px; display: none; }
-  .active-card { background: rgba(239, 68, 68, 0.15); border: 2px solid var(--running); border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; cursor: pointer; }
-  .active-left { display: flex; align-items: center; gap: 12px; }
-  .active-icon { font-size: 1.8rem; }
-  .active-title { font-weight: bold; font-size: 1.1rem; }
-  .active-badge { font-size: 0.75rem; color: var(--running); font-weight: bold; }
-  .active-timer { font-size: 1.2rem; font-weight: bold; color: var(--running); }
+  .active-section { margin-bottom: 12px; display: none; }
+  .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; cursor: pointer; }
+  .active-left { display: flex; align-items: center; gap: 10px; }
+  .active-icon { font-size: 1.4rem; }
+  .active-title { font-weight: bold; font-size: 0.95rem; }
+  .active-badge { font-size: 0.7rem; color: var(--running); }
+  .active-timer { font-size: 1.05rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
 
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 24px; }
-  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 14px; cursor: pointer; display: flex; flex-direction: column; gap: 6px; }
-  .card.running { border: 2px solid var(--running); background: rgba(239, 68, 68, 0.1); }
+  /* グリッド一覧：スマホでタップしやすい適度なサイズ */
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
+  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; }
+  .card.running { border: 1.5px solid var(--running); background: rgba(239, 68, 68, 0.1); }
   .card-top { display: flex; justify-content: space-between; align-items: center; }
-  .card-icon { font-size: 1.5rem; }
-  .card-status { font-size: 0.75rem; font-weight: bold; color: var(--text-sub); }
+  .card-icon { font-size: 1.3rem; }
+  .card-status { font-size: 0.7rem; font-weight: 600; color: var(--text-sub); }
   .card.running .card-status { color: var(--running); }
-  .card-name { font-weight: bold; font-size: 1rem; }
-  .card-timer { font-size: 0.85rem; color: var(--text-sub); }
-  .card.running .card-timer { color: var(--running); font-weight: bold; }
+  .card-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-timer { font-size: 0.75rem; color: var(--text-sub); font-variant-numeric: tabular-nums; }
+  .card.running .card-timer { color: var(--running); font-weight: 600; }
   
-  h2 { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-  .history-list { display: flex; flex-direction: column; gap: 8px; }
-  .history-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-  .history-left { display: flex; align-items: center; gap: 10px; }
-  .history-meta { font-size: 0.75rem; color: var(--text-sub); }
-  .history-dur { font-size: 0.9rem; font-weight: bold; color: var(--accent); }
+  h2 { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  .history-list { display: flex; flex-direction: column; gap: 6px; }
+  .history-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+  .history-left { display: flex; align-items: center; gap: 8px; }
+  .history-meta { font-size: 0.7rem; color: var(--text-sub); }
+  .history-dur { font-size: 0.85rem; font-weight: 700; color: var(--accent); }
   .history-thumbs { display: flex; gap: 4px; }
-  .history-img-thumb { width: 32px; height: 32px; border-radius: 4px; object-fit: cover; }
+  .history-img-thumb { width: 28px; height: 28px; border-radius: 4px; object-fit: cover; }
   
-  .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.7); align-items: center; justify-content: center; padding: 20px; z-index: 100; }
-  .modal-box { background: var(--card-bg); padding: 20px; border-radius: 12px; width: 100%; max-width: 380px; border: 1px solid var(--border); max-height: 90vh; overflow-y: auto; }
-  .modal-box input, .modal-box textarea { width: 100%; padding: 8px; margin: 4px 0 12px; background: #0f172a; border: 1px solid var(--border); color: #fff; border-radius: 6px; }
-  .modal-btns { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
-  .btn-action { padding: 8px 14px; border-radius: 6px; font-weight: bold; cursor: pointer; border: none; font-size: 0.85rem; }
-  .btn-submit { background: #3b82f6; color: #fff; }
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+  .modal-box { background: var(--card-bg); padding: 16px; border-radius: 12px; width: 100%; max-width: 360px; border: 1px solid var(--border); max-height: 85vh; overflow-y: auto; }
+  .modal-box input, .modal-box textarea { width: 100%; padding: 8px; margin: 4px 0 10px; background: #0b1120; border: 1px solid var(--border); color: #fff; border-radius: 6px; font-size: 0.9rem; }
+  .modal-btns { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
+  .btn-action { padding: 7px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 0.8rem; }
+  .btn-submit { background: #2563eb; color: #fff; }
   .btn-danger { background: #ef4444; color: #fff; }
   .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text-sub); }
   .del-tag { background: #334155; border: none; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; margin: 2px; cursor: pointer; }
   
-  .preview-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+  .preview-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
   .preview-img-wrap { position: relative; }
   .preview-img-wrap img { width: 100%; border-radius: 6px; }
-  .preview-img-wrap button { position: absolute; top: 4px; right: 4px; background: rgba(0, 0, 0, 0.6); color: #fff; border: none; border-radius: 4px; padding: 2px 6px; cursor: pointer; }
+  .preview-img-wrap button { position: absolute; top: 4px; right: 4px; background: rgba(0, 0, 0, 0.7); color: #fff; border: none; border-radius: 4px; padding: 2px 6px; font-size: 0.75rem; }
 </style>
 </head>
 <body>
@@ -74,14 +82,15 @@
 <div class="header">
   <h1>⚡ iライフログ</h1>
   <div class="header-btns">
-    <button class="btn-sm" onclick="exportEvernote()">Evernote出力</button>
-    <button class="btn-sm" onclick="openCatModal()">＋ カテゴリ</button>
+    <button class="btn-sm" onclick="exportEvernote('yesterday')">前日出力</button>
+    <button class="btn-sm" style="background:#2563eb;color:#fff;border:none;" onclick="exportEvernote('today')">Evernote出力</button>
+    <button class="btn-sm" onclick="openCatModal()">＋</button>
   </div>
 </div>
 
-<!-- 最上部に固定される「記録中」表示枠 -->
+<!-- 最上部：記録中エリア -->
 <div class="active-section" id="activeSection">
-  <div style="font-size:0.8rem;color:var(--running);font-weight:bold;margin-bottom:6px;">⚡ 現在記録中（タップして停止）</div>
+  <div style="font-size:0.75rem;color:var(--running);font-weight:bold;margin-bottom:4px;">⚡ 現在記録中（タップで停止）</div>
   <div id="activeList"></div>
 </div>
 
@@ -89,24 +98,24 @@
 
 <h2>
   <span>本日の履歴</span>
-  <span style="font-size:0.75rem;color:var(--accent);">※タップして修正・写真追加</span>
+  <span style="font-size:0.7rem;color:var(--accent);">※タップで編集・写真追加</span>
 </h2>
 <div class="history-list" id="history"></div>
 
 <!-- カテゴリ追加モーダル -->
 <div class="modal" id="catModal">
   <div class="modal-box">
-    <h3 style="margin-bottom:12px;">カテゴリ追加</h3>
-    <label style="font-size:0.8rem;color:var(--text-sub);">アイコン（絵文字）</label>
+    <h3 style="margin-bottom:10px;font-size:1rem;">カテゴリ追加</h3>
+    <label style="font-size:0.75rem;color:var(--text-sub);">アイコン（絵文字）</label>
     <input type="text" id="catIcon" value="📌" maxlength="2">
-    <label style="font-size:0.8rem;color:var(--text-sub);">カテゴリ名</label>
+    <label style="font-size:0.75rem;color:var(--text-sub);">カテゴリ名</label>
     <input type="text" id="catName">
     <div class="modal-btns">
       <button class="btn-action btn-cancel" onclick="closeCatModal()">閉じる</button>
       <button class="btn-action btn-submit" onclick="addCategory()">追加</button>
     </div>
-    <div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px;">
-      <div style="font-size:0.75rem;color:var(--text-sub);margin-bottom:6px;">タップしてカテゴリ削除:</div>
+    <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:10px;">
+      <div style="font-size:0.7rem;color:var(--text-sub);margin-bottom:6px;">タップして削除:</div>
       <div id="delList"></div>
     </div>
   </div>
@@ -115,25 +124,25 @@
 <!-- ログ編集・写真モーダル -->
 <div class="modal" id="editModal">
   <div class="modal-box">
-    <h3 style="margin-bottom:12px;" id="editModalTitle">ログ編集</h3>
+    <h3 style="margin-bottom:10px;font-size:1rem;" id="editModalTitle">ログ編集</h3>
     <input type="hidden" id="editLogId">
     
-    <label style="font-size:0.8rem;color:var(--text-sub);">開始時刻</label>
+    <label style="font-size:0.75rem;color:var(--text-sub);">開始時刻</label>
     <input type="time" id="editStartTime">
     
-    <label style="font-size:0.8rem;color:var(--text-sub);">終了時刻</label>
+    <label style="font-size:0.75rem;color:var(--text-sub);">終了時刻</label>
     <input type="time" id="editEndTime">
     
-    <label style="font-size:0.8rem;color:var(--text-sub);">メモ</label>
-    <textarea id="editMemo" rows="3"></textarea>
+    <label style="font-size:0.75rem;color:var(--text-sub);">メモ</label>
+    <textarea id="editMemo" rows="2"></textarea>
     
-    <label style="font-size:0.8rem;color:var(--text-sub);">写真の追加（複数選択可）</label>
+    <label style="font-size:0.75rem;color:var(--text-sub);">写真追加（複数可）</label>
     <input type="file" id="editPhoto" accept="image/*" multiple onchange="handlePhotoUpload(event)">
     <div id="imagePreviewContainer" class="preview-grid"></div>
 
     <div class="modal-btns">
       <button class="btn-action btn-danger" onclick="deleteCurrentLog()">削除</button>
-      <button class="btn-action btn-cancel" onclick="closeEditModal()">キャンセル</button>
+      <button class="btn-action btn-cancel" onclick="closeEditModal()">閉じる</button>
       <button class="btn-action btn-submit" onclick="saveLogEdit()">保存</button>
     </div>
   </div>
@@ -184,7 +193,7 @@
     const sec = Math.max(0, Math.floor(((e ? new Date(e) : new Date()) - new Date(s)) / 1000));
     const m = Math.floor(sec / 60);
     if (m < 60) return `${m}分`;
-    return `${Math.floor(m / 60)}時間 ${m % 60}分`;
+    return `${Math.floor(m / 60)}h ${m % 60}m`;
   }
 
   function formatTimeSingleDigit(s) {
@@ -200,7 +209,6 @@
   }
 
   function render() {
-    // 記録中ログの最上部抽出
     const runningLogs = logs.filter(l => !l.endAt);
     const activeSection = document.getElementById('activeSection');
     const activeList = document.getElementById('activeList');
@@ -215,7 +223,7 @@
               <span class="active-icon">${r.icon}</span>
               <div>
                 <div class="active-title">${r.name}</div>
-                <div class="active-badge">記録中 (開始: ${formatTimeSingleDigit(r.startAt)})</div>
+                <div class="active-badge">記録中 (${formatTimeSingleDigit(r.startAt)}〜)</div>
               </div>
             </div>
             <div class="active-timer">${formatDuration(r.startAt)}</div>
@@ -226,7 +234,6 @@
       activeSection.style.display = 'none';
     }
 
-    // グリッド一覧
     const g = document.getElementById('grid');
     g.innerHTML = cats.map(c => {
       const r = logs.find(l => l.catId === c.id && !l.endAt);
@@ -242,26 +249,25 @@
       `;
     }).join('');
 
-    // 本日の履歴
     const h = document.getElementById('history');
     const t = new Date().toDateString();
     const tl = logs.filter(l => l.endAt && new Date(l.startAt).toDateString() === t);
     
     if (tl.length === 0) {
-      h.innerHTML = '<div style="color:var(--text-sub);font-size:0.85rem;">本日の記録はありません</div>';
+      h.innerHTML = '<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:12px 0;">本日の記録はありません</div>';
     } else {
       h.innerHTML = tl.map(l => {
         const p = l.photos || (l.photo ? [l.photo] : []);
         return `
           <div class="history-item" onclick="openEditModal('${l.id}')">
             <div class="history-left">
-              <span style="font-size:1.2rem;">${l.icon}</span>
+              <span style="font-size:1.1rem;">${l.icon}</span>
               <div>
-                <div style="font-weight:bold;font-size:0.9rem;">${l.name} ${l.memo ? '📝' : ''}</div>
+                <div style="font-weight:600;font-size:0.85rem;">${l.name} ${l.memo ? '📝' : ''}</div>
                 <div class="history-meta">${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)}</div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;gap:8px;">
+            <div style="display:flex;align-items:center;gap:6px;">
               <div class="history-thumbs">
                 ${p.map(x => `<img src="${x}" class="history-img-thumb">`).join('')}
               </div>
@@ -272,7 +278,6 @@
       }).join('');
     }
 
-    // カテゴリ削除用リスト
     document.getElementById('delList').innerHTML = cats.map(c => `
       <button class="del-tag" onclick="deleteCat('${c.id}')">${c.icon} ${c.name} ✕</button>
     `).join('');
@@ -373,35 +378,49 @@
     save();
   }
 
-  async function exportEvernote() {
-    const td = new Date().toISOString().slice(0, 10);
-    const tl = logs.filter(l => l.endAt && l.startAt.startsWith(td)).reverse();
+  async function exportEvernote(mode = 'today') {
+    const now = new Date();
+    let targetDate = new Date(now);
+
+    if (mode === 'yesterday' || (mode === 'today' && now.getHours() < 5)) {
+      targetDate.setDate(targetDate.getDate() - 1);
+    }
+
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const y = targetDate.getFullYear();
+    const m = String(targetDate.getMonth() + 1).padStart(2, '0');
+    const d = String(targetDate.getDate()).padStart(2, '0');
+    const w = days[targetDate.getDay()];
+    const dateTitle = `${y}/${m}/${d}(${w})`;
+
+    const targetDateStr = targetDate.toDateString();
+    const tl = logs.filter(l => l.endAt && new Date(l.startAt).toDateString() === targetDateStr).reverse();
     
     if (tl.length === 0) {
-      alert('本日の記録がありません');
+      alert(`${dateTitle} の記録はありません`);
       return;
     }
 
-    let html = '<div>';
-    let plain = '';
+    let html = `<div><h1 style="font-size:22px;font-weight:bold;margin-bottom:12px;">${dateTitle}</h1><hr style="border:0;border-top:1px solid #ccc;margin-bottom:12px;">`;
+    let plain = `${dateTitle}\n====================\n\n`;
 
     tl.forEach(l => {
       const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${formatDuration(l.startAt, l.endAt)})`;
       const p = l.photos || (l.photo ? [l.photo] : []);
       
       html += `
-        <h1 style="font-size:36px;margin:0;padding:0;"><font size="7">${l.icon}</font></h1>
-        <h2 style="font-size:24px;margin:2px 0 0 0;padding:0;"><font size="5"><b>${l.name}</b></font></h2>
-        <p style="font-size:14px;color:#888888;margin:2px 0 4px 0;"><font size="2">${tr}</font></p>
+        <h2 style="font-size:28px;margin:0;padding:0;"><font size="6">${l.icon}</font></h2>
+        <h3 style="font-size:18px;margin:2px 0 0 0;padding:0;"><font size="4"><b>${l.name}</b></font></h3>
+        <p style="font-size:13px;color:#888888;margin:2px 0 4px 0;"><font size="2">${tr}</font></p>
       `;
       plain += `${l.icon}\n${l.name}\n${tr}\n`;
 
       if (l.memo) {
-        html += `<p style="font-size:15px;margin:4px 0 8px 0;white-space:pre-wrap;">${l.memo}</p>`;
+        html += `<p style="font-size:14px;margin:4px 0 8px 0;white-space:pre-wrap;">${l.memo}</p>`;
         plain += `${l.memo}\n`;
       }
       p.forEach(x => {
-        html += `<p style="margin:8px 0;"><img src="${x}" style="max-width:100%;border-radius:4px;display:block;"></p>`;
+        html += `<p style="margin:6px 0;"><img src="${x}" style="max-width:100%;border-radius:4px;display:block;"></p>`;
       });
       html += '<p><br></p>';
       plain += '\n\n';
@@ -411,12 +430,12 @@
     try {
       const bh = new Blob([html], { type: 'text/html' });
       const bp = new Blob([plain], { type: 'text/plain' });
-      const d = [new ClipboardItem({ 'text/html': bh, 'text/plain': bp })];
-      await navigator.clipboard.write(d);
-      alert('Evernote用ログをコピーしました！\nEvernoteに貼り付けてください。');
+      const item = [new ClipboardItem({ 'text/html': bh, 'text/plain': bp })];
+      await navigator.clipboard.write(item);
+      alert(`${dateTitle} のログをコピーしました！\nEvernoteに貼り付けてください。`);
     } catch (err) {
       navigator.clipboard.writeText(plain).then(() => {
-        alert('テキストをコピーしました');
+        alert(`${dateTitle} のテキストをコピーしました`);
       });
     }
   }
