@@ -28,19 +28,21 @@
   
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.5px; }
-  .header-btns { display: flex; gap: 6px; }
-  .btn-sm { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; cursor: pointer; }
+  .header-btns { display: flex; gap: 5px; }
+  .btn-sm { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 5px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 500; cursor: pointer; }
   
   /* 最上部：記録中エリア */
   .active-section { margin-bottom: 12px; display: none; }
-  .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; cursor: pointer; }
+  .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
   .active-left { display: flex; align-items: center; gap: 10px; }
   .active-icon { font-size: 1.4rem; }
   .active-title { font-weight: bold; font-size: 0.95rem; }
   .active-badge { font-size: 0.7rem; color: var(--running); }
+  .active-right { display: flex; align-items: center; gap: 8px; }
   .active-timer { font-size: 1.05rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
+  .btn-active-edit { background: var(--running); color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
 
-  /* グリッド一覧：スマホでタップしやすい適度なサイズ */
+  /* グリッド一覧 */
   .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; }
   .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; }
   .card.running { border: 1.5px solid var(--running); background: rgba(239, 68, 68, 0.1); }
@@ -64,12 +66,14 @@
   .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
   .modal-box { background: var(--card-bg); padding: 16px; border-radius: 12px; width: 100%; max-width: 360px; border: 1px solid var(--border); max-height: 85vh; overflow-y: auto; }
   .modal-box input, .modal-box textarea { width: 100%; padding: 8px; margin: 4px 0 10px; background: #0b1120; border: 1px solid var(--border); color: #fff; border-radius: 6px; font-size: 0.9rem; }
-  .modal-btns { display: flex; justify-content: flex-end; gap: 8px; margin-top: 8px; }
-  .btn-action { padding: 7px 12px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 0.8rem; }
+  .modal-btns { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px; margin-top: 8px; }
+  .btn-action { padding: 7px 10px; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 0.78rem; }
   .btn-submit { background: #2563eb; color: #fff; }
   .btn-danger { background: #ef4444; color: #fff; }
   .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text-sub); }
-  .del-tag { background: #334155; border: none; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; margin: 2px; cursor: pointer; }
+  
+  .sort-item { display: flex; justify-content: space-between; align-items: center; background: #0b1120; padding: 8px 10px; border-radius: 6px; margin-bottom: 6px; border: 1px solid var(--border); }
+  .sort-btn { background: #334155; border: none; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
   
   .preview-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
   .preview-img-wrap { position: relative; }
@@ -82,15 +86,16 @@
 <div class="header">
   <h1>⚡ iライフログ</h1>
   <div class="header-btns">
-    <button class="btn-sm" onclick="exportEvernote('yesterday')">前日出力</button>
-    <button class="btn-sm" style="background:#2563eb;color:#fff;border:none;" onclick="exportEvernote('today')">Evernote出力</button>
+    <button class="btn-sm" onclick="exportEvernote('yesterday')">前日</button>
+    <button class="btn-sm" style="background:#2563eb;color:#fff;border:none;" onclick="exportEvernote('today')">Evernote</button>
+    <button class="btn-sm" onclick="openSortModal()">⚙ 並替</button>
     <button class="btn-sm" onclick="openCatModal()">＋</button>
   </div>
 </div>
 
 <!-- 最上部：記録中エリア -->
 <div class="active-section" id="activeSection">
-  <div style="font-size:0.75rem;color:var(--running);font-weight:bold;margin-bottom:4px;">⚡ 現在記録中（タップで停止）</div>
+  <div style="font-size:0.75rem;color:var(--running);font-weight:bold;margin-bottom:4px;">⚡ 現在記録中</div>
   <div id="activeList"></div>
 </div>
 
@@ -98,7 +103,7 @@
 
 <h2>
   <span>本日の履歴</span>
-  <span style="font-size:0.7rem;color:var(--accent);">※タップで編集・写真追加</span>
+  <span style="font-size:0.7rem;color:var(--accent);">※タップして編集・写真追加</span>
 </h2>
 <div class="history-list" id="history"></div>
 
@@ -114,14 +119,21 @@
       <button class="btn-action btn-cancel" onclick="closeCatModal()">閉じる</button>
       <button class="btn-action btn-submit" onclick="addCategory()">追加</button>
     </div>
-    <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:10px;">
-      <div style="font-size:0.7rem;color:var(--text-sub);margin-bottom:6px;">タップして削除:</div>
-      <div id="delList"></div>
+  </div>
+</div>
+
+<!-- カテゴリ並び替え・削除モーダル -->
+<div class="modal" id="sortModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:10px;font-size:1rem;">カテゴリの並び替え・削除</h3>
+    <div id="sortList" style="max-height:55vh;overflow-y:auto;margin-bottom:10px;"></div>
+    <div class="modal-btns">
+      <button class="btn-action btn-submit" onclick="closeSortModal()">完了</button>
     </div>
   </div>
 </div>
 
-<!-- ログ編集・写真モーダル -->
+<!-- ログ編集・写真モーダル（記録中／終了後 共通） -->
 <div class="modal" id="editModal">
   <div class="modal-box">
     <h3 style="margin-bottom:10px;font-size:1rem;" id="editModalTitle">ログ編集</h3>
@@ -130,11 +142,13 @@
     <label style="font-size:0.75rem;color:var(--text-sub);">開始時刻</label>
     <input type="time" id="editStartTime">
     
-    <label style="font-size:0.75rem;color:var(--text-sub);">終了時刻</label>
-    <input type="time" id="editEndTime">
+    <div id="endTimeWrap">
+      <label style="font-size:0.75rem;color:var(--text-sub);">終了時刻</label>
+      <input type="time" id="editEndTime">
+    </div>
     
     <label style="font-size:0.75rem;color:var(--text-sub);">メモ</label>
-    <textarea id="editMemo" rows="2"></textarea>
+    <textarea id="editMemo" rows="2" placeholder="メモを入力..."></textarea>
     
     <label style="font-size:0.75rem;color:var(--text-sub);">写真追加（複数可）</label>
     <input type="file" id="editPhoto" accept="image/*" multiple onchange="handlePhotoUpload(event)">
@@ -143,7 +157,8 @@
     <div class="modal-btns">
       <button class="btn-action btn-danger" onclick="deleteCurrentLog()">削除</button>
       <button class="btn-action btn-cancel" onclick="closeEditModal()">閉じる</button>
-      <button class="btn-action btn-submit" onclick="saveLogEdit()">保存</button>
+      <button class="btn-action btn-submit" id="btnStopAndSave" style="background:var(--running);display:none;" onclick="saveLogEdit(true)">終了して保存</button>
+      <button class="btn-action btn-submit" onclick="saveLogEdit(false)">保存</button>
     </div>
   </div>
 </div>
@@ -215,21 +230,21 @@
 
     if (runningLogs.length > 0) {
       activeSection.style.display = 'block';
-      activeList.innerHTML = runningLogs.map(r => {
-        const cat = cats.find(c => c.id === r.catId) || { id: r.catId, name: r.name, icon: r.icon };
-        return `
-          <div class="active-card" onclick="toggleLog(${JSON.stringify(cat).replace(/"/g, '&quot;')})">
-            <div class="active-left">
-              <span class="active-icon">${r.icon}</span>
-              <div>
-                <div class="active-title">${r.name}</div>
-                <div class="active-badge">記録中 (${formatTimeSingleDigit(r.startAt)}〜)</div>
-              </div>
+      activeList.innerHTML = runningLogs.map(r => `
+        <div class="active-card">
+          <div class="active-left" onclick="toggleLog({id:'${r.catId}', name:'${r.name}', icon:'${r.icon}'})">
+            <span class="active-icon">${r.icon}</span>
+            <div>
+              <div class="active-title">${r.name} ${r.memo ? '📝' : ''}</div>
+              <div class="active-badge">タップで停止 (${formatTimeSingleDigit(r.startAt)}〜)</div>
             </div>
-            <div class="active-timer">${formatDuration(r.startAt)}</div>
           </div>
-        `;
-      }).join('');
+          <div class="active-right">
+            <div class="active-timer">${formatDuration(r.startAt)}</div>
+            <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
+          </div>
+        </div>
+      `).join('');
     } else {
       activeSection.style.display = 'none';
     }
@@ -277,15 +292,11 @@
         `;
       }).join('');
     }
-
-    document.getElementById('delList').innerHTML = cats.map(c => `
-      <button class="del-tag" onclick="deleteCat('${c.id}')">${c.icon} ${c.name} ✕</button>
-    `).join('');
   }
 
+  /* カテゴリ追加 */
   function openCatModal() { document.getElementById('catModal').style.display = 'flex'; }
   function closeCatModal() { document.getElementById('catModal').style.display = 'none'; }
-  
   function addCategory() {
     const n = document.getElementById('catName').value.trim();
     const i = document.getElementById('catIcon').value.trim() || '📌';
@@ -296,20 +307,61 @@
     save();
   }
 
+  /* 並び替えモーダル */
+  function openSortModal() {
+    renderSortList();
+    document.getElementById('sortModal').style.display = 'flex';
+  }
+  function closeSortModal() { document.getElementById('sortModal').style.display = 'none'; }
+  function renderSortList() {
+    document.getElementById('sortList').innerHTML = cats.map((c, i) => `
+      <div class="sort-item">
+        <span style="font-size:0.85rem;">${c.icon} ${c.name}</span>
+        <div style="display:flex;gap:4px;">
+          <button class="sort-btn" onclick="moveCat(${i}, -1)" ${i === 0 ? 'disabled style="opacity:0.3;"' : ''}>↑</button>
+          <button class="sort-btn" onclick="moveCat(${i}, 1)" ${i === cats.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>↓</button>
+          <button class="sort-btn" style="background:#ef4444;" onclick="deleteCat('${c.id}')">✕</button>
+        </div>
+      </div>
+    `).join('');
+  }
+  function moveCat(i, dir) {
+    const target = i + dir;
+    if (target < 0 || target >= cats.length) return;
+    const temp = cats[i];
+    cats[i] = cats[target];
+    cats[target] = temp;
+    save();
+    renderSortList();
+  }
   function deleteCat(id) {
+    if (!confirm('このカテゴリを削除しますか？')) return;
     cats = cats.filter(c => c.id !== id);
     save();
+    renderSortList();
   }
 
+  /* ログ編集（記録中・終了後共通） */
   function openEditModal(id) {
     const l = logs.find(x => x.id === id);
     if (!l) return;
     document.getElementById('editLogId').value = l.id;
     document.getElementById('editModalTitle').innerText = `${l.icon} ${l.name} の編集`;
     document.getElementById('editStartTime').value = timeInputFormat(l.startAt);
-    document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
-    document.getElementById('editMemo').value = l.memo || '';
     
+    const endWrap = document.getElementById('endTimeWrap');
+    const btnStopAndSave = document.getElementById('btnStopAndSave');
+    
+    if (l.endAt) {
+      endWrap.style.display = 'block';
+      btnStopAndSave.style.display = 'none';
+      document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
+    } else {
+      endWrap.style.display = 'none'; // 記録中は終了時刻欄を非表示
+      btnStopAndSave.style.display = 'inline-block'; // 「終了して保存」を表示
+    }
+    
+    document.getElementById('editMemo').value = l.memo || '';
     currentPhotos = l.photos ? [...l.photos] : (l.photo ? [l.photo] : []);
     renderPreviewPhotos();
     document.getElementById('editPhoto').value = '';
@@ -343,7 +395,7 @@
 
   function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
-  function saveLogEdit() {
+  function saveLogEdit(stopTimer = false) {
     const id = document.getElementById('editLogId').value;
     const l = logs.find(x => x.id === id);
     if (!l) return;
@@ -357,11 +409,15 @@
       d.setHours(h, m, 0);
       l.startAt = d.toISOString();
     }
-    if (e && l.endAt) {
+    if (l.endAt && e) {
       const d = new Date(l.endAt);
       const [h, m] = e.split(':');
       d.setHours(h, m, 0);
       l.endAt = d.toISOString();
+    }
+    
+    if (stopTimer && !l.endAt) {
+      l.endAt = new Date().toISOString();
     }
     
     l.memo = document.getElementById('editMemo').value.trim();
@@ -378,6 +434,7 @@
     save();
   }
 
+  /* Evernote出力 */
   async function exportEvernote(mode = 'today') {
     const now = new Date();
     let targetDate = new Date(now);
