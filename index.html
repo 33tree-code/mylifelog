@@ -29,7 +29,7 @@
   .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .header h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.5px; }
   .header-btns { display: flex; gap: 5px; }
-  .btn-sm { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 5px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 500; cursor: pointer; }
+  .btn-sm { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 500; cursor: pointer; }
   
   /* 最上部：記録中エリア */
   .active-section { margin-bottom: 12px; display: none; }
@@ -72,10 +72,12 @@
   .btn-danger { background: #ef4444; color: #fff; }
   .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text-sub); }
   
-  /* 並び替え項目 */
-  .sort-item { display: flex; justify-content: space-between; align-items: center; background: #0b1120; padding: 8px 10px; border-radius: 6px; margin-bottom: 6px; border: 1px solid var(--border); }
-  .sort-btns { display: flex; gap: 6px; }
-  .sort-btn { background: #334155; border: none; color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; cursor: pointer; touch-action: manipulation; }
+  /* ⚙ 設定モーダル項目 */
+  .sort-item { display: flex; align-items: center; gap: 6px; background: #0b1120; padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border); }
+  .sort-icon-input { width: 42px !important; text-align: center; margin: 0 !important; padding: 6px 2px !important; font-size: 1.1rem !important; }
+  .sort-name-input { flex: 1; margin: 0 !important; padding: 6px 8px !important; font-size: 0.85rem !important; }
+  .sort-btns { display: flex; gap: 4px; }
+  .sort-btn { background: #334155; border: none; color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
   
   .preview-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
   .preview-img-wrap { position: relative; }
@@ -90,7 +92,7 @@
   <div class="header-btns">
     <button class="btn-sm" onclick="exportEvernote('yesterday')">前日</button>
     <button class="btn-sm" style="background:#2563eb;color:#fff;border:none;" onclick="exportEvernote('today')">Evernote</button>
-    <button class="btn-sm" onclick="openSortModal()">⚙ 並替</button>
+    <button class="btn-sm" onclick="openSettingModal()">⚙</button>
     <button class="btn-sm" onclick="openCatModal()">＋</button>
   </div>
 </div>
@@ -124,13 +126,14 @@
   </div>
 </div>
 
-<!-- カテゴリ並び替え・削除モーダル -->
-<div class="modal" id="sortModal">
+<!-- ⚙ カテゴリ設定・並替モーダル -->
+<div class="modal" id="settingModal">
   <div class="modal-box">
-    <h3 style="margin-bottom:10px;font-size:1rem;">カテゴリの並び替え・削除</h3>
-    <div id="sortList" style="max-height:55vh;overflow-y:auto;margin-bottom:10px;"></div>
+    <h3 style="margin-bottom:6px;font-size:1rem;">カテゴリ設定・並び替え</h3>
+    <div style="font-size:0.7rem;color:var(--text-sub);margin-bottom:10px;">名前・アイコンの直接編集や並び替えができます</div>
+    <div id="settingList" style="max-height:55vh;overflow-y:auto;margin-bottom:12px;"></div>
     <div class="modal-btns">
-      <button class="btn-action btn-submit" onclick="closeSortModal()">完了</button>
+      <button class="btn-action btn-submit" onclick="closeSettingModal()">完了</button>
     </div>
   </div>
 </div>
@@ -181,9 +184,13 @@
   let logs = JSON.parse(localStorage.getItem('ll_logs') || '[]');
   let currentPhotos = [];
 
-  function save() {
+  function saveOnly() {
     localStorage.setItem('ll_cats', JSON.stringify(cats));
     localStorage.setItem('ll_logs', JSON.stringify(logs));
+  }
+
+  function save() {
+    saveOnly();
     render();
   }
 
@@ -309,18 +316,22 @@
     save();
   }
 
-  /* 並び替えモーダル（即座に再描画されるよう修正） */
-  function openSortModal() {
-    renderSortList();
-    document.getElementById('sortModal').style.display = 'flex';
+  /* ⚙ 設定モーダル（直接編集・並び替え） */
+  function openSettingModal() {
+    renderSettingList();
+    document.getElementById('settingModal').style.display = 'flex';
   }
-  function closeSortModal() { document.getElementById('sortModal').style.display = 'none'; }
+  function closeSettingModal() { 
+    document.getElementById('settingModal').style.display = 'none'; 
+    render();
+  }
   
-  function renderSortList() {
-    const el = document.getElementById('sortList');
+  function renderSettingList() {
+    const el = document.getElementById('settingList');
     el.innerHTML = cats.map((c, i) => `
       <div class="sort-item">
-        <span style="font-size:0.85rem;">${c.icon} ${c.name}</span>
+        <input type="text" class="sort-icon-input" value="${c.icon}" maxlength="2" onchange="updateCatItem('${c.id}', 'icon', this.value)">
+        <input type="text" class="sort-name-input" value="${c.name}" onchange="updateCatItem('${c.id}', 'name', this.value)">
         <div class="sort-btns">
           <button type="button" class="sort-btn" onclick="moveCat(${i}, -1)" ${i === 0 ? 'disabled style="opacity:0.25;"' : ''}>↑</button>
           <button type="button" class="sort-btn" onclick="moveCat(${i}, 1)" ${i === cats.length - 1 ? 'disabled style="opacity:0.25;"' : ''}>↓</button>
@@ -330,20 +341,30 @@
     `).join('');
   }
   
+  function updateCatItem(id, key, val) {
+    const cat = cats.find(c => c.id === id);
+    if (!cat) return;
+    cat[key] = val.trim();
+    saveOnly();
+    render();
+  }
+
   function moveCat(i, dir) {
     const target = i + dir;
     if (target < 0 || target >= cats.length) return;
     const temp = cats[i];
     cats[i] = cats[target];
     cats[target] = temp;
-    save();
-    renderSortList();
+    saveOnly();
+    renderSettingList();
+    render();
   }
   
   function deleteCat(id) {
     cats = cats.filter(c => c.id !== id);
-    save();
-    renderSortList();
+    saveOnly();
+    renderSettingList();
+    render();
   }
 
   /* ログ編集 */
