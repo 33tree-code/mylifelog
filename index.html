@@ -95,17 +95,18 @@
 
 <div class="header">
   <div class="header-title-wrap">
-    <!-- 外側・太陽・月は完全維持し、斜線のみ短縮したアイコン -->
+    <!-- 元画像の構成完全維持（太陽・月・正円矢印）＋ 中の斜め線のみ短縮 -->
     <svg class="logo-icon" viewBox="0 0 100 100">
       <rect width="100" height="100" fill="#ffffff" rx="22"/>
       <g fill="none" stroke="#111827" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
-        <!-- 円弧・矢印（そのまま維持） -->
-        <path d="M 18 64 A 38 38 0 0 1 82 28"/>
-        <polyline points="28 20 18 30 14 16"/>
-        <path d="M 82 36 A 38 38 0 0 1 18 72"/>
-        <polyline points="72 80 82 70 86 84"/>
-        <!-- 斜め分割線（両端を短縮して調整） -->
-        <line x1="28" y1="40" x2="72" y2="60"/>
+        <!-- 左側〜上側の円弧＋矢印 -->
+        <path d="M 20 62 A 38 38 0 0 1 80 26"/>
+        <polyline points="10 32 20 22 30 32"/>
+        <!-- 右側〜下側の円弧＋矢印 -->
+        <path d="M 80 38 A 38 38 0 0 1 20 74"/>
+        <polyline points="90 68 80 78 70 68"/>
+        <!-- 中央の斜め線（両端を短縮） -->
+        <line x1="32" y1="41" x2="68" y2="59"/>
         <!-- 太陽本体 -->
         <circle cx="63" cy="35" r="7.5"/>
         <!-- 太陽の光線8本 -->
