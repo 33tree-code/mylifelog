@@ -34,7 +34,7 @@
   /* 最上部：記録中エリア */
   .active-section { margin-bottom: 12px; display: none; }
   .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .active-left { display: flex; align-items: center; gap: 10px; }
+  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; }
   .active-icon { font-size: 1.4rem; }
   .active-title { font-weight: bold; font-size: 0.95rem; }
   .active-badge { font-size: 0.7rem; color: var(--running); }
@@ -72,8 +72,10 @@
   .btn-danger { background: #ef4444; color: #fff; }
   .btn-cancel { background: transparent; border: 1px solid var(--border); color: var(--text-sub); }
   
+  /* 並び替え項目 */
   .sort-item { display: flex; justify-content: space-between; align-items: center; background: #0b1120; padding: 8px 10px; border-radius: 6px; margin-bottom: 6px; border: 1px solid var(--border); }
-  .sort-btn { background: #334155; border: none; color: #fff; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; cursor: pointer; }
+  .sort-btns { display: flex; gap: 6px; }
+  .sort-btn { background: #334155; border: none; color: #fff; padding: 6px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; cursor: pointer; touch-action: manipulation; }
   
   .preview-grid { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
   .preview-img-wrap { position: relative; }
@@ -133,7 +135,7 @@
   </div>
 </div>
 
-<!-- ログ編集・写真モーダル（記録中／終了後 共通） -->
+<!-- ログ編集・写真モーダル -->
 <div class="modal" id="editModal">
   <div class="modal-box">
     <h3 style="margin-bottom:10px;font-size:1rem;" id="editModalTitle">ログ編集</h3>
@@ -307,24 +309,27 @@
     save();
   }
 
-  /* 並び替えモーダル */
+  /* 並び替えモーダル（即座に再描画されるよう修正） */
   function openSortModal() {
     renderSortList();
     document.getElementById('sortModal').style.display = 'flex';
   }
   function closeSortModal() { document.getElementById('sortModal').style.display = 'none'; }
+  
   function renderSortList() {
-    document.getElementById('sortList').innerHTML = cats.map((c, i) => `
+    const el = document.getElementById('sortList');
+    el.innerHTML = cats.map((c, i) => `
       <div class="sort-item">
         <span style="font-size:0.85rem;">${c.icon} ${c.name}</span>
-        <div style="display:flex;gap:4px;">
-          <button class="sort-btn" onclick="moveCat(${i}, -1)" ${i === 0 ? 'disabled style="opacity:0.3;"' : ''}>↑</button>
-          <button class="sort-btn" onclick="moveCat(${i}, 1)" ${i === cats.length - 1 ? 'disabled style="opacity:0.3;"' : ''}>↓</button>
-          <button class="sort-btn" style="background:#ef4444;" onclick="deleteCat('${c.id}')">✕</button>
+        <div class="sort-btns">
+          <button type="button" class="sort-btn" onclick="moveCat(${i}, -1)" ${i === 0 ? 'disabled style="opacity:0.25;"' : ''}>↑</button>
+          <button type="button" class="sort-btn" onclick="moveCat(${i}, 1)" ${i === cats.length - 1 ? 'disabled style="opacity:0.25;"' : ''}>↓</button>
+          <button type="button" class="sort-btn" style="background:#ef4444;" onclick="deleteCat('${c.id}')">✕</button>
         </div>
       </div>
     `).join('');
   }
+  
   function moveCat(i, dir) {
     const target = i + dir;
     if (target < 0 || target >= cats.length) return;
@@ -334,14 +339,14 @@
     save();
     renderSortList();
   }
+  
   function deleteCat(id) {
-    if (!confirm('このカテゴリを削除しますか？')) return;
     cats = cats.filter(c => c.id !== id);
     save();
     renderSortList();
   }
 
-  /* ログ編集（記録中・終了後共通） */
+  /* ログ編集 */
   function openEditModal(id) {
     const l = logs.find(x => x.id === id);
     if (!l) return;
@@ -357,8 +362,8 @@
       btnStopAndSave.style.display = 'none';
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
     } else {
-      endWrap.style.display = 'none'; // 記録中は終了時刻欄を非表示
-      btnStopAndSave.style.display = 'inline-block'; // 「終了して保存」を表示
+      endWrap.style.display = 'none';
+      btnStopAndSave.style.display = 'inline-block';
     }
     
     document.getElementById('editMemo').value = l.memo || '';
