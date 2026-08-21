@@ -17,6 +17,7 @@
     --accent: #38bdf8;
     --running: #ef4444;
     --border: #334155;
+    --evernote-green: #00a82d;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
   body { 
@@ -34,16 +35,58 @@
   .header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; white-space: nowrap; }
   .logo-icon { width: 30px; height: 30px; border-radius: 6px; display: inline-block; vertical-align: middle; object-fit: contain; background: #fff; }
   
-  /* 押しやすくなった右上の大型アイコンボタン */
   .header-btns { display: flex; gap: 8px; align-items: center; }
   .btn-icon-lg { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   
-  /* 下段：Evernote出力エリア */
-  .export-bar { display: flex; gap: 8px; margin-bottom: 12px; background: rgba(30, 41, 59, 0.6); padding: 8px; border-radius: 10px; border: 1px solid var(--border); align-items: center; }
-  .btn-evernote-main { flex: 1.2; background: #2563eb; color: #fff; border: none; font-weight: 600; padding: 8px 10px; border-radius: 6px; font-size: 0.82rem; cursor: pointer; text-align: center; }
-  .date-picker-wrap { flex: 1; display: flex; align-items: center; gap: 4px; position: relative; }
-  .input-export-date { width: 100%; background: #0b1120; border: 1px solid var(--border); color: var(--text); padding: 7px 6px; border-radius: 6px; font-size: 0.75rem; text-align: center; }
-  .btn-export-date { background: #334155; color: #fff; border: none; padding: 8px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  /* 下段：Evernote出力エリア（2分割ボタン） */
+  .export-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+  .btn-evernote-main { 
+    flex: 1.1; 
+    background: var(--evernote-green); 
+    color: #fff; 
+    border: none; 
+    font-weight: 600; 
+    padding: 9px 8px; 
+    border-radius: 8px; 
+    font-size: 0.82rem; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .elephant-icon { width: 18px; height: 18px; fill: #ffffff; }
+
+  .date-picker-wrap { 
+    flex: 1; 
+    position: relative; 
+    display: flex;
+  }
+  .btn-export-date { 
+    width: 100%; 
+    background: var(--card-bg); 
+    border: 1px solid var(--border); 
+    color: var(--text); 
+    padding: 9px 8px; 
+    border-radius: 8px; 
+    font-size: 0.82rem; 
+    font-weight: 600; 
+    cursor: pointer; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    gap: 6px;
+  }
+  /* 見えない日付選択インプット（ボタンタップで開く） */
+  .hidden-date-input { 
+    position: absolute; 
+    inset: 0; 
+    opacity: 0; 
+    width: 100%; 
+    height: 100%; 
+    cursor: pointer; 
+  }
 
   .active-section { margin-bottom: 12px; display: none; }
   .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -113,12 +156,19 @@
   </div>
 </div>
 
-<!-- Evernote出力バー（前日 & 日付指定） -->
+<!-- Evernote出力バー（象アイコン付き緑ボタン ＆ カレンダー直結ボタン） -->
 <div class="export-bar">
-  <button class="btn-evernote-main" onclick="exportEvernoteByDate(getYesterdayStr())">Evernote (前日)</button>
+  <button class="btn-evernote-main" onclick="exportEvernoteByDate(getYesterdayStr())">
+    <svg class="elephant-icon" viewBox="0 0 24 24">
+      <path d="M19.5 4C18.1 4 17 5.1 17 6.5V7H15C13.3 7 12 8.3 12 10V11H10C8.3 11 7 12.3 7 14V17.5C7 18.9 8.1 20 9.5 20H10V16H12V20H15C16.7 20 18 18.7 18 17V15H19.5C20.9 15 22 13.9 22 12.5V6.5C22 5.1 20.9 4 19.5 4ZM19 8C18.4 8 18 7.6 18 7C18 6.4 18.4 6 19 6C19.6 6 20 6.4 20 7C20 7.6 19.6 8 19 8ZM4 13C3.4 13 3 13.4 3 14V17C3 18.7 4.3 20 6 20V18C5.4 18 5 17.6 5 17V15H6V13H4Z"/>
+    </svg>
+    <span>前日log出力</span>
+  </button>
   <div class="date-picker-wrap">
-    <input type="date" id="exportTargetDate" class="input-export-date">
-    <button class="btn-export-date" onclick="exportSelectedDate()">出力</button>
+    <button class="btn-export-date">
+      <span>📅 日付指定出力</span>
+    </button>
+    <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="exportSelectedDate(this.value)">
   </div>
 </div>
 
@@ -219,11 +269,6 @@
   let cats = JSON.parse(localStorage.getItem('ll_cats') || JSON.stringify(DEFAULT_CATS));
   let logs = JSON.parse(localStorage.getItem('ll_logs') || '[]');
   let currentPhotos = [];
-
-  // 日付指定初期値を前日にセット
-  document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('exportTargetDate').value = getYesterdayStr();
-  });
 
   function getYesterdayStr() {
     const d = new Date();
@@ -554,16 +599,13 @@
     save();
   }
 
-  /* 指定日・前日のEvernote共通出力関数 */
-  function exportSelectedDate() {
-    const v = document.getElementById('exportTargetDate').value;
-    if (!v) {
-      alert('日付を選択してください');
-      return;
-    }
-    exportEvernoteByDate(v);
+  /* カレンダーで選ばれたら即時出力 */
+  function exportSelectedDate(val) {
+    if (!val) return;
+    exportEvernoteByDate(val);
   }
 
+  /* Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     const [y, m, d] = dateStringYMD.split('-').map(Number);
     const targetDate = new Date(y, m - 1, d);
@@ -619,7 +661,6 @@
     }
   }
 
-  /* バックアップ保存（JSON書き出し） */
   function exportBackupData() {
     const data = { cats, logs, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -629,7 +670,6 @@
     a.click();
   }
 
-  /* バックアップ復元（JSON読み込み） */
   function importBackupData(e) {
     const file = e.target.files[0];
     if (!file) return;
