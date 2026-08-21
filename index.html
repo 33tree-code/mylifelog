@@ -38,10 +38,16 @@
   .header-btns { display: flex; gap: 8px; align-items: center; }
   .btn-icon-lg { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   
-  /* 下段：Evernote出力エリア（左右均等 50:50） */
-  .export-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+  /* 下段：Evernote出力エリア（完全50:50均等配置） */
+  .export-grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 8px; 
+    margin-bottom: 12px; 
+  }
+  
   .btn-evernote-main { 
-    flex: 1; 
+    width: 100%;
     background: var(--evernote-green); 
     color: #fff; 
     border: none; 
@@ -53,19 +59,19 @@
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    gap: 5px;
+    gap: 6px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     white-space: nowrap;
   }
-  .evernote-local-icon { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; display: inline-block; vertical-align: middle; }
 
   .date-picker-wrap { 
-    flex: 1; 
+    width: 100%;
     position: relative; 
-    display: flex;
+    display: block;
   }
   .btn-export-date { 
     width: 100%; 
+    height: 100%;
     background: var(--evernote-green); 
     color: #fff; 
     border: none; 
@@ -77,18 +83,22 @@
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    gap: 5px;
+    gap: 6px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     white-space: nowrap;
   }
   .hidden-date-input { 
     position: absolute; 
-    inset: 0; 
-    opacity: 0; 
+    top: 0;
+    left: 0;
     width: 100%; 
     height: 100%; 
+    opacity: 0; 
     cursor: pointer; 
+    z-index: 10;
   }
+
+  .evernote-local-icon { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; display: inline-block; vertical-align: middle; flex-shrink: 0; }
 
   .active-section { margin-bottom: 12px; display: none; }
   .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -111,7 +121,7 @@
   .card-timer { font-size: 0.75rem; color: var(--text-sub); font-variant-numeric: tabular-nums; }
   .card.running .card-timer { color: var(--running); font-weight: 600; }
   
-  h2 { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+  h2 { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 8px; }
   .history-list { display: flex; flex-direction: column; gap: 6px; }
   .history-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
   .history-left { display: flex; align-items: center; gap: 8px; }
@@ -158,8 +168,8 @@
   </div>
 </div>
 
-<!-- Evernote出力バー（左右均等 50:50・両方緑背景・両方象アイコン） -->
-<div class="export-bar">
+<!-- Evernote出力バー（完全均等グリッド） -->
+<div class="export-grid">
   <button class="btn-evernote-main" onclick="exportEvernoteByDate(getYesterdayStr())">
     <img src="evernote.png" class="evernote-local-icon" alt="Evernote">
     <span>前日log出力</span>
@@ -167,7 +177,7 @@
   <div class="date-picker-wrap">
     <button class="btn-export-date">
       <img src="evernote.png" class="evernote-local-icon" alt="Evernote">
-      <span>📅 日付指定出力</span>
+      <span>日付指定出力</span>
     </button>
     <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="exportSelectedDate(this.value)">
   </div>
@@ -182,10 +192,7 @@
 
 <div class="grid" id="grid"></div>
 
-<h2>
-  <span>本日の履歴</span>
-  <span style="font-size:0.7rem;color:var(--accent);">※タップして編集・写真追加</span>
-</h2>
+<h2>本日の履歴</h2>
 <div class="history-list" id="history"></div>
 
 <!-- カテゴリ追加モーダル -->
