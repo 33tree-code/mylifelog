@@ -38,26 +38,26 @@
   .header-btns { display: flex; gap: 8px; align-items: center; }
   .btn-icon-lg { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   
-  /* 下段：Evernote出力エリア */
+  /* 下段：Evernote出力エリア（左右均等 50:50） */
   .export-bar { display: flex; gap: 8px; margin-bottom: 12px; }
   .btn-evernote-main { 
-    flex: 1.1; 
+    flex: 1; 
     background: var(--evernote-green); 
     color: #fff; 
     border: none; 
     font-weight: 600; 
-    padding: 8px 8px; 
+    padding: 10px 4px; 
     border-radius: 8px; 
-    font-size: 0.82rem; 
+    font-size: 0.8rem; 
     cursor: pointer; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    gap: 6px;
+    gap: 5px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    white-space: nowrap;
   }
-  /* アップロードした画像を直接表示 */
-  .evernote-local-icon { width: 22px; height: 22px; border-radius: 4px; object-fit: cover; display: inline-block; vertical-align: middle; }
+  .evernote-local-icon { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; display: inline-block; vertical-align: middle; }
 
   .date-picker-wrap { 
     flex: 1; 
@@ -66,18 +66,20 @@
   }
   .btn-export-date { 
     width: 100%; 
-    background: var(--card-bg); 
-    border: 1px solid var(--border); 
-    color: var(--text); 
-    padding: 9px 8px; 
+    background: var(--evernote-green); 
+    color: #fff; 
+    border: none; 
+    padding: 10px 4px; 
     border-radius: 8px; 
-    font-size: 0.82rem; 
+    font-size: 0.8rem; 
     font-weight: 600; 
     cursor: pointer; 
     display: flex; 
     align-items: center; 
     justify-content: center; 
-    gap: 6px;
+    gap: 5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    white-space: nowrap;
   }
   .hidden-date-input { 
     position: absolute; 
@@ -156,7 +158,7 @@
   </div>
 </div>
 
-<!-- Evernote出力バー（アップロード画像 evernote.png を直接読み込み） -->
+<!-- Evernote出力バー（左右均等 50:50・両方緑背景・両方象アイコン） -->
 <div class="export-bar">
   <button class="btn-evernote-main" onclick="exportEvernoteByDate(getYesterdayStr())">
     <img src="evernote.png" class="evernote-local-icon" alt="Evernote">
@@ -164,6 +166,7 @@
   </button>
   <div class="date-picker-wrap">
     <button class="btn-export-date">
+      <img src="evernote.png" class="evernote-local-icon" alt="Evernote">
       <span>📅 日付指定出力</span>
     </button>
     <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="exportSelectedDate(this.value)">
