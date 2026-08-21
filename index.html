@@ -6,9 +6,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>ライフログ</title>
-<!-- 正確な白背景・太陽と月アイコン（PNG Data URI） -->
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23ffffff' rx='110'/%3E%3Cg fill='none' stroke='%23000000' stroke-width='24' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M 120 180 A 180 180 0 0 1 430 160'/%3E%3Cpolyline points='85 200 120 180 125 240' stroke-width='24'/%3E%3Cpath d='M 392 332 A 180 180 0 0 1 82 352'/%3E%3Cpolyline points='427 312 392 332 387 272' stroke-width='24'/%3E%3Cline x1='140' y1='210' x2='372' y2='345' stroke-width='24'/%3E%3Ccircle cx='325' cy='190' r='38' stroke-width='24'/%3E%3Cline x1='325' y1='120' x2='325' y2='136' stroke-width='24'/%3E%3Cline x1='325' y1='244' x2='325' y2='260' stroke-width='24'/%3E%3Cline x1='255' y1='190' x2='271' y2='190' stroke-width='24'/%3E%3Cline x1='379' y1='190' x2='395' y2='190' stroke-width='24'/%3E%3Cline x1='275' y1='140' x2='287' y2='152' stroke-width='24'/%3E%3Cline x1='363' y1='228' x2='375' y2='240' stroke-width='24'/%3E%3Cline x1='275' y1='240' x2='287' y2='228' stroke-width='24'/%3E%3Cline x1='363' y1='152' x2='375' y2='140' stroke-width='24'/%3E%3Cpath d='M 205 285 A 50 50 0 0 1 155 375 A 56 56 0 1 0 205 285 Z' stroke-width='22' fill='%23000000'/%3E%3C/g%3E%3C/svg%3E">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23ffffff' rx='110'/%3E%3Cg fill='none' stroke='%23000000' stroke-width='24' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M 120 180 A 180 180 0 0 1 430 160'/%3E%3Cpolyline points='85 200 120 180 125 240' stroke-width='24'/%3E%3Cpath d='M 392 332 A 180 180 0 0 1 82 352'/%3E%3Cpolyline points='427 312 392 332 387 272' stroke-width='24'/%3E%3Cline x1='140' y1='210' x2='372' y2='345' stroke-width='24'/%3E%3Ccircle cx='325' cy='190' r='38' stroke-width='24'/%3E%3Cline x1='325' y1='120' x2='325' y2='136' stroke-width='24'/%3E%3Cline x1='325' y1='244' x2='325' y2='260' stroke-width='24'/%3E%3Cline x1='255' y1='190' x2='271' y2='190' stroke-width='24'/%3E%3Cline x1='379' y1='190' x2='395' y2='190' stroke-width='24'/%3E%3Cline x1='275' y1='140' x2='287' y2='152' stroke-width='24'/%3E%3Cline x1='363' y1='228' x2='375' y2='240' stroke-width='24'/%3E%3Cline x1='275' y1='240' x2='287' y2='228' stroke-width='24'/%3E%3Cline x1='363' y1='152' x2='375' y2='140' stroke-width='24'/%3E%3Cpath d='M 205 285 A 50 50 0 0 1 155 375 A 56 56 0 1 0 205 285 Z' stroke-width='22' fill='%23000000'/%3E%3C/g%3E%3C/svg%3E">
+<!-- 確実な画像ファイル指定 -->
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="apple-touch-icon-precomposed" href="icon.png">
+<link rel="icon" href="icon.png">
 <style>
   :root {
     --bg: #0b1120;
@@ -96,25 +97,31 @@
 
 <div class="header">
   <div class="header-title-wrap">
-    <!-- 正確な太陽と月 24h アイコン -->
-    <svg class="logo-icon" viewBox="0 0 512 512">
-      <rect width="512" height="512" fill="#ffffff" rx="110"/>
-      <g fill="none" stroke="#000000" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M 120 180 A 180 180 0 0 1 430 160"/>
-        <polyline points="85 200 120 180 125 240" stroke-width="24"/>
-        <path d="M 392 332 A 180 180 0 0 1 82 352"/>
-        <polyline points="427 312 392 332 387 272" stroke-width="24"/>
-        <line x1="140" y1="210" x2="372" y2="345" stroke-width="24"/>
-        <circle cx="325" cy="190" r="38" stroke-width="24"/>
-        <line x1="325" y1="120" x2="325" y2="136" stroke-width="24"/>
-        <line x1="325" y1="244" x2="325" y2="260" stroke-width="24"/>
-        <line x1="255" y1="190" x2="271" y2="190" stroke-width="24"/>
-        <line x1="379" y1="190" x2="395" y2="190" stroke-width="24"/>
-        <line x1="275" y1="140" x2="287" y2="152" stroke-width="24"/>
-        <line x1="363" y1="228" x2="375" y2="240" stroke-width="24"/>
-        <line x1="275" y1="240" x2="287" y2="228" stroke-width="24"/>
-        <line x1="363" y1="152" x2="375" y2="140" stroke-width="24"/>
-        <path d="M 205 285 A 50 50 0 0 1 155 375 A 56 56 0 1 0 205 285 Z" stroke-width="22" fill="#000000"/>
+    <!-- 正確な太陽と月 24h アイコン（黒線・白地・正しい矢印・光線） -->
+    <svg class="logo-icon" viewBox="0 0 100 100">
+      <rect width="100" height="100" fill="#ffffff" rx="22"/>
+      <g fill="none" stroke="#111827" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
+        <!-- 上側矢印（時計回り：左から右上へ） -->
+        <path d="M 22 42 A 38 38 0 0 1 82 28"/>
+        <polyline points="15 32 22 42 32 40" stroke-width="4.5"/>
+        <!-- 下側矢印（時計回り：右から左下へ） -->
+        <path d="M 78 58 A 38 38 0 0 1 18 72"/>
+        <polyline points="85 68 78 58 68 60" stroke-width="4.5"/>
+        <!-- 分割線 -->
+        <line x1="24" y1="36" x2="76" y2="64" stroke-width="4.5"/>
+        <!-- 太陽本体 -->
+        <circle cx="64" cy="36" r="8" stroke-width="4.5"/>
+        <!-- 太陽の8本の光線 -->
+        <line x1="64" y1="22" x2="64" y2="25"/>
+        <line x1="64" y1="47" x2="64" y2="50"/>
+        <line x1="50" y1="36" x2="53" y2="36"/>
+        <line x1="75" y1="36" x2="78" y2="36"/>
+        <line x1="54" y1="26" x2="56" y2="28"/>
+        <line x1="72" y1="44" x2="74" y2="46"/>
+        <line x1="54" y1="46" x2="56" y2="44"/>
+        <line x1="72" y1="28" x2="74" y2="26"/>
+        <!-- 三日月 -->
+        <path d="M 40 56 A 11 11 0 0 1 29 74 A 13 13 0 1 0 40 56 Z" stroke-width="4" fill="#111827"/>
       </g>
     </svg>
     <h1>ライフログ</h1>
@@ -128,27 +135,7 @@
 
 <div class="active-section" id="activeSection">
   <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--running);font-weight:bold;margin-bottom:4px;">
-    <svg class="active-logo-icon" viewBox="0 0 512 512">
-      <rect width="512" height="512" fill="#ffffff" rx="110"/>
-      <g fill="none" stroke="#000000" stroke-width="24" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M 120 180 A 180 180 0 0 1 430 160"/>
-        <polyline points="85 200 120 180 125 240" stroke-width="24"/>
-        <path d="M 392 332 A 180 180 0 0 1 82 352"/>
-        <polyline points="427 312 392 332 387 272" stroke-width="24"/>
-        <line x1="140" y1="210" x2="372" y2="345" stroke-width="24"/>
-        <circle cx="325" cy="190" r="38" stroke-width="24"/>
-        <line x1="325" y1="120" x2="325" y2="136" stroke-width="24"/>
-        <line x1="325" y1="244" x2="325" y2="260" stroke-width="24"/>
-        <line x1="255" y1="190" x2="271" y2="190" stroke-width="24"/>
-        <line x1="379" y1="190" x2="395" y2="190" stroke-width="24"/>
-        <line x1="275" y1="140" x2="287" y2="152" stroke-width="24"/>
-        <line x1="363" y1="228" x2="375" y2="240" stroke-width="24"/>
-        <line x1="275" y1="240" x2="287" y2="228" stroke-width="24"/>
-        <line x1="363" y1="152" x2="375" y2="140" stroke-width="24"/>
-        <path d="M 205 285 A 50 50 0 0 1 155 375 A 56 56 0 1 0 205 285 Z" stroke-width="22" fill="#000000"/>
-      </g>
-    </svg>
-    <span>現在記録中</span>
+    <span>⚡ 現在記録中</span>
   </div>
   <div id="activeList"></div>
 </div>
@@ -183,6 +170,7 @@
     <div style="font-size:0.7rem;color:var(--text-sub);margin-bottom:10px;">「≡」を長押しドラッグで移動、他はスクロールできます</div>
     <div id="settingList"></div>
     <div class="modal-btns">
+      <button class="btn-action" style="background:#475569;color:#fff;" onclick="downloadAppIcon()">📥 アイコン画像保存</button>
       <button class="btn-action btn-submit" onclick="closeSettingModal()">完了</button>
     </div>
   </div>
@@ -219,26 +207,28 @@
 </div>
 
 <script>
-  // 高精度PNGアイコン生成（iOS Safariホーム画面登録用）
-  window.addEventListener('DOMContentLoaded', () => {
-    const svgString = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><rect width="512" height="512" fill="#ffffff" rx="110"/><g fill="none" stroke="#000000" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"><path d="M 120 180 A 180 180 0 0 1 430 160"/><polyline points="85 200 120 180 125 240" stroke-width="24"/><path d="M 392 332 A 180 180 0 0 1 82 352"/><polyline points="427 312 392 332 387 272" stroke-width="24"/><line x1="140" y1="210" x2="372" y2="345" stroke-width="24"/><circle cx="325" cy="190" r="38" stroke-width="24"/><line x1="325" y1="120" x2="325" y2="136" stroke-width="24"/><line x1="325" y1="244" x2="325" y2="260" stroke-width="24"/><line x1="255" y1="190" x2="271" y2="190" stroke-width="24"/><line x1="379" y1="190" x2="395" y2="190" stroke-width="24"/><line x1="275" y1="140" x2="287" y2="152" stroke-width="24"/><line x1="363" y1="228" x2="375" y2="240" stroke-width="24"/><line x1="275" y1="240" x2="287" y2="228" stroke-width="24"/><line x1="363" y1="152" x2="375" y2="140" stroke-width="24"/><path d="M 205 285 A 50 50 0 0 1 155 375 A 56 56 0 1 0 205 285 Z" stroke-width="22" fill="#000000"/></g></svg>`;
+  function downloadAppIcon() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+    
+    // 背景完全ホワイト
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 512, 512);
+
+    const svgData = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 100 100"><rect width="100" height="100" fill="#ffffff" rx="22"/><g fill="none" stroke="#111827" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path d="M 22 42 A 38 38 0 0 1 82 28"/><polyline points="15 32 22 42 32 40" stroke-width="4.5"/><path d="M 78 58 A 38 38 0 0 1 18 72"/><polyline points="85 68 78 58 68 60" stroke-width="4.5"/><line x1="24" y1="36" x2="76" y2="64" stroke-width="4.5"/><circle cx="64" cy="36" r="8" stroke-width="4.5"/><line x1="64" y1="22" x2="64" y2="25"/><line x1="64" y1="47" x2="64" y2="50"/><line x1="50" y1="36" x2="53" y2="36"/><line x1="75" y1="36" x2="78" y2="36"/><line x1="54" y1="26" x2="56" y2="28"/><line x1="72" y1="44" x2="74" y2="46"/><line x1="54" y1="46" x2="56" y2="44"/><line x1="72" y1="28" x2="74" y2="26"/><path d="M 40 56 A 11 11 0 0 1 29 74 A 13 13 0 1 0 40 56 Z" stroke-width="4" fill="#111827"/></g></svg>`;
 
     const img = new Image();
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
     img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 512;
-      canvas.height = 512;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(img, 0, 0);
-      const pngData = canvas.toDataURL('image/png');
-      
-      let link = document.querySelector("link[rel='apple-touch-icon']");
-      if (link) {
-        link.href = pngData;
-      }
+      ctx.drawImage(img, 0, 0, 512, 512);
+      const a = document.createElement('a');
+      a.download = 'icon.png';
+      a.href = canvas.toDataURL('image/png');
+      a.click();
     };
-  });
+  }
 
   const DEFAULT_CATS = [
     { id: 'sleep', name: '睡眠', icon: '🌙' },
@@ -374,7 +364,6 @@
     }
   }
 
-  /* カテゴリ追加 */
   function openCatModal() { document.getElementById('catModal').style.display = 'flex'; }
   function closeCatModal() { document.getElementById('catModal').style.display = 'none'; }
   function addCategory() {
@@ -387,7 +376,6 @@
     save();
   }
 
-  /* ⚙ 設定モーダル（≡のみドラッグ処理） */
   function openSettingModal() {
     renderSettingList();
     document.getElementById('settingModal').style.display = 'flex';
@@ -470,7 +458,6 @@
     render();
   }
 
-  /* ログ編集 */
   function openEditModal(id) {
     const l = logs.find(x => x.id === id);
     if (!l) return;
@@ -563,7 +550,6 @@
     save();
   }
 
-  /* Evernote出力（前日分） */
   async function exportEvernoteYesterday() {
     const now = new Date();
     const targetDate = new Date(now);
