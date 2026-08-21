@@ -35,9 +35,7 @@
   .btn-sm { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 5px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
   .btn-evernote { background: #2563eb; color: #fff; border: none; font-weight: 600; padding: 5px 8px; }
   
-  /* 画像アイコン（元画像を直接表示） */
   .logo-icon { width: 28px; height: 28px; border-radius: 6px; display: inline-block; vertical-align: middle; object-fit: contain; background: #fff; }
-  .active-logo-icon { width: 18px; height: 18px; border-radius: 4px; display: inline-block; vertical-align: middle; object-fit: contain; }
   
   .active-section { margin-bottom: 12px; display: none; }
   .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -96,8 +94,7 @@
 
 <div class="header">
   <div class="header-title-wrap">
-    <!-- 元画像ファイルを直接表示 -->
-    <img src="logo.png" class="logo-icon" alt="ライフログ">
+    <img src="logo.png" class="logo-icon" alt="ロゴ">
     <h1>ライフログ</h1>
   </div>
   <div class="header-btns">
@@ -141,7 +138,7 @@
 <div class="modal" id="settingModal">
   <div class="modal-box">
     <h3 style="margin-bottom:4px;font-size:1rem;">カテゴリ設定・並び替え</h3>
-    <div style="font-size:0.7rem;color:var(--text-sub);margin-bottom:10px;">「≡」を長押しドラッグで移動、他はスクロールできます</div>
+    <div style="font-size:0.7rem;color:var(--text-sub);margin-bottom:10px;">「≡」を長押しドラッグで移動、文字を直接編集できます</div>
     <div id="settingList"></div>
     <div class="modal-btns">
       <button class="btn-action btn-submit" onclick="closeSettingModal()">完了</button>
@@ -159,7 +156,7 @@
     <input type="time" id="editStartTime">
     
     <div id="endTimeWrap">
-      <label style="font-size:0.75rem;color:var(--text-sub);">終了時刻</label>
+      <label style="font-size:0.75rem;color:var(--text-sub);">終了時刻 <span style="font-size:0.65rem;color:var(--accent);">※翌朝の時間は自動で日またぎ判定</span></label>
       <input type="time" id="editEndTime">
     </div>
     
@@ -225,7 +222,9 @@
   }
 
   function formatDuration(s, e) {
-    const sec = Math.max(0, Math.floor(((e ? new Date(e) : new Date()) - new Date(s)) / 1000));
+    const start = new Date(s);
+    const end = e ? new Date(e) : new Date();
+    const sec = Math.max(0, Math.floor((end - start) / 1000));
     const m = Math.floor(sec / 60);
     if (m < 60) return `${m}分`;
     return `${Math.floor(m / 60)}h ${m % 60}m`;
@@ -286,6 +285,7 @@
 
     const h = document.getElementById('history');
     const t = new Date().toDateString();
+    // 開始日（startAt）が「今日」のものを本日履歴として表示
     const tl = logs.filter(l => l.endAt && new Date(l.startAt).toDateString() === t);
     
     if (tl.length === 0) {
@@ -461,6 +461,7 @@
 
   function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
+  /* ログ編集保存（日またぎ自動判定 & 0分防止） */
   function saveLogEdit(stopTimer = false) {
     const id = document.getElementById('editLogId').value;
     const l = logs.find(x => x.id === id);
@@ -469,22 +470,37 @@
     const s = document.getElementById('editStartTime').value;
     const e = document.getElementById('editEndTime').value;
     
+    let newStart = new Date(l.startAt);
     if (s) {
-      const d = new Date(l.startAt);
-      const [h, m] = s.split(':');
-      d.setHours(h, m, 0);
-      l.startAt = d.toISOString();
+      const [sh, sm] = s.split(':');
+      newStart.setHours(parseInt(sh, 10), parseInt(sm, 10), 0, 0);
     }
+    
+    let newEnd = l.endAt ? new Date(l.endAt) : null;
+    
     if (l.endAt && e) {
-      const d = new Date(l.endAt);
-      const [h, m] = e.split(':');
-      d.setHours(h, m, 0);
-      l.endAt = d.toISOString();
+      const [eh, em] = e.split(':');
+      newEnd = new Date(newStart); // 開始日を基準にする
+      newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
+      
+      // 終了時刻の数字が開始時刻以下の場合（例: 開始23:00 / 終了06:00）、日またぎとして翌日扱いに自動加算
+      if (newEnd <= newStart) {
+        newEnd.setDate(newEnd.getDate() + 1);
+      }
+      
+      // 24時間以上の異常な差がある場合は確認ブロック
+      if ((newEnd - newStart) > 24 * 60 * 60 * 1000) {
+        alert('終了時刻が不正です。開始時刻と終了時刻をご確認ください。');
+        return;
+      }
     }
     
     if (stopTimer && !l.endAt) {
-      l.endAt = new Date().toISOString();
+      newEnd = new Date();
     }
+    
+    l.startAt = newStart.toISOString();
+    if (newEnd) l.endAt = newEnd.toISOString();
     
     l.memo = document.getElementById('editMemo').value.trim();
     l.photos = currentPhotos;
@@ -500,10 +516,11 @@
     save();
   }
 
+  /* Evernote出力（開始日 startAt が前日のログをすべて抽出） */
   async function exportEvernoteYesterday() {
     const now = new Date();
     const targetDate = new Date(now);
-    targetDate.setDate(targetDate.getDate() - 1);
+    targetDate.setDate(targetDate.getDate() - 1); // 前日を対象
 
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const y = targetDate.getFullYear();
@@ -513,6 +530,7 @@
     const dateTitle = `${y}/${m}/${d}(${w})`;
 
     const targetDateStr = targetDate.toDateString();
+    // 開始日時が「前日」の記録をすべて抽出（日をまたいだログも前日分に含まれる）
     const tl = logs.filter(l => l.endAt && new Date(l.startAt).toDateString() === targetDateStr).reverse();
     
     if (tl.length === 0) {
