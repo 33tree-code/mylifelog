@@ -38,7 +38,7 @@
   .header-btns { display: flex; gap: 8px; align-items: center; }
   .btn-icon-lg { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   
-  /* 下段：Evernote出力エリア */
+  /* 下段：出力エリア */
   .export-bar { display: flex; gap: 8px; margin-bottom: 12px; }
   .btn-evernote-main { 
     flex: 1.1; 
@@ -56,8 +56,7 @@
     gap: 6px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
-  .evernote-img-icon { width: 20px; height: 20px; object-fit: contain; display: inline-block; vertical-align: middle; }
-
+  
   .date-picker-wrap { 
     flex: 1; 
     position: relative; 
@@ -146,6 +145,7 @@
 
 <div class="header-top">
   <div class="header-title-wrap">
+    <!-- GitHub上のlogo.pngを表示 -->
     <img src="logo.png" class="logo-icon" alt="ロゴ">
     <h1>ライフログ</h1>
   </div>
@@ -155,10 +155,11 @@
   </div>
 </div>
 
-<!-- Evernote出力バー（公式画像読み込み） -->
+<!-- 出力バー -->
 <div class="export-bar">
+  <!-- HTMLとCSSのみで実装 -->
   <button class="btn-evernote-main" onclick="exportEvernoteByDate(getYesterdayStr())">
-    <img src="https://cdn.iconscout.com/icon/free/png-256/free-evernote-icon-download-in-svg-png-gif-file-formats--logo-social-media-pack-logos-icons-2673809.png" class="evernote-img-icon" alt="Evernote">
+    <span style="font-size: 1rem;">🐘</span>
     <span>前日log出力</span>
   </button>
   <div class="date-picker-wrap">
