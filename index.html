@@ -6,8 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>ライフログ</title>
-<link rel="apple-touch-icon" href="icon.png">
-<link rel="icon" href="icon.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" href="logo.png">
 <style>
   :root {
     --bg: #0b1120;
@@ -35,8 +35,9 @@
   .btn-sm { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); padding: 5px 7px; border-radius: 6px; font-size: 0.72rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
   .btn-evernote { background: #2563eb; color: #fff; border: none; font-weight: 600; padding: 5px 8px; }
   
-  .logo-icon { width: 28px; height: 28px; display: inline-block; vertical-align: middle; }
-  .active-logo-icon { width: 18px; height: 18px; display: inline-block; vertical-align: middle; }
+  /* 画像アイコン（元画像を直接表示） */
+  .logo-icon { width: 28px; height: 28px; border-radius: 6px; display: inline-block; vertical-align: middle; object-fit: contain; background: #fff; }
+  .active-logo-icon { width: 18px; height: 18px; border-radius: 4px; display: inline-block; vertical-align: middle; object-fit: contain; }
   
   .active-section { margin-bottom: 12px; display: none; }
   .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
@@ -95,33 +96,8 @@
 
 <div class="header">
   <div class="header-title-wrap">
-    <!-- 元画像の構成完全維持（太陽・月・正円矢印）＋ 中の斜め線のみ短縮 -->
-    <svg class="logo-icon" viewBox="0 0 100 100">
-      <rect width="100" height="100" fill="#ffffff" rx="22"/>
-      <g fill="none" stroke="#111827" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round">
-        <!-- 左側〜上側の円弧＋矢印 -->
-        <path d="M 20 62 A 38 38 0 0 1 80 26"/>
-        <polyline points="10 32 20 22 30 32"/>
-        <!-- 右側〜下側の円弧＋矢印 -->
-        <path d="M 80 38 A 38 38 0 0 1 20 74"/>
-        <polyline points="90 68 80 78 70 68"/>
-        <!-- 中央の斜め線（両端を短縮） -->
-        <line x1="32" y1="41" x2="68" y2="59"/>
-        <!-- 太陽本体 -->
-        <circle cx="63" cy="35" r="7.5"/>
-        <!-- 太陽の光線8本 -->
-        <line x1="63" y1="21" x2="63" y2="24"/>
-        <line x1="63" y1="46" x2="63" y2="49"/>
-        <line x1="49" y1="35" x2="52" y2="35"/>
-        <line x1="74" y1="35" x2="77" y2="35"/>
-        <line x1="53" y1="25" x2="55" y2="27"/>
-        <line x1="71" y1="43" x2="73" y2="45"/>
-        <line x1="53" y1="45" x2="55" y2="43"/>
-        <line x1="71" y1="27" x2="73" y2="25"/>
-        <!-- 三日月 -->
-        <path d="M 43 55 A 11 11 0 0 1 31 73 A 13 13 0 1 0 43 55 Z" stroke-width="4" fill="#111827"/>
-      </g>
-    </svg>
+    <!-- 元画像ファイルを直接表示 -->
+    <img src="logo.png" class="logo-icon" alt="ライフログ">
     <h1>ライフログ</h1>
   </div>
   <div class="header-btns">
