@@ -319,11 +319,12 @@
 </div>
 
 <script>
+  /* 最新版 全50項目カテゴリデータ */
   const DEFAULT_CATS = [
     { id: 'c1', name: '睡眠💤', icon: '🛏', color: 'rgba(168, 85, 247, 0.18)' },
     { id: 'c2', name: '眠れなかった時間', icon: '🛌', color: 'rgba(148, 163, 184, 0.18)' },
     { id: 'c3', name: 'パワーナップ', icon: '⌛', color: 'rgba(236, 72, 153, 0.18)' },
-    { id: 'c4', name: '珈琲☕Time', icon: '☕', color: 'rgba(249, 115, 22, 0.18)' },
+    { id: 'c4', name: '珈琲♨Time', icon: '☕', color: 'rgba(249, 115, 22, 0.18)' },
     { id: 'c5', name: '抹茶🍵Time', icon: '🍵', color: 'rgba(34, 197, 94, 0.18)' },
     { id: 'c6', name: 'ストレッチ🙆', icon: '🧘', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c7', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.18)' },
@@ -343,8 +344,8 @@
     { id: 'c20', name: '掃除🧹', icon: '🧹', color: 'rgba(129, 140, 248, 0.18)' },
     { id: 'c21', name: 'アイロン', icon: '👔', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c22', name: '片付け', icon: '🗄️', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c23', name: '試し・メンテ', icon: '🪥', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c24', name: '設定⚙', icon: '🔧', color: 'rgba(96, 165, 250, 0.18)' },
+    { id: 'c23', name: '試し・メンテ', icon: '🪮', color: 'rgba(56, 189, 248, 0.18)' },
+    { id: 'c24', name: '設定🔧', icon: '⚙', color: 'rgba(96, 165, 250, 0.18)' },
 
     { id: 'c25', name: '撮影📸Time', icon: '📷', color: 'rgba(52, 211, 153, 0.18)' },
     { id: 'c26', name: '仕事💼', icon: '💼', color: 'rgba(74, 222, 128, 0.18)' },
@@ -366,7 +367,7 @@
     { id: 'c41', name: '筋トレ🏋️', icon: '💪', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c42', name: 'ランニング🏃', icon: '👟', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c43', name: 'ウォーキング🚶', icon: '🚶', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c44', name: 'Golf練習', icon: '🏌️', color: 'rgba(45, 212, 191, 0.18)' },
+    { id: 'c44', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(45, 212, 191, 0.18)' },
     { id: 'c45', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(52, 211, 153, 0.18)' },
     { id: 'c46', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(74, 222, 128, 0.18)' },
     { id: 'c47', name: '飲み会🍻private', icon: '🍺', color: 'rgba(56, 189, 248, 0.18)' },
@@ -379,7 +380,7 @@
     { id: 'c53', name: '休息', icon: '🌿', color: 'rgba(45, 212, 191, 0.18)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_order_v5';
+  const CURRENT_VER = '2026_08_cats_exact_order_v6';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
