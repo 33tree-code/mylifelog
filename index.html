@@ -23,7 +23,7 @@
     box-sizing: border-box; 
     margin: 0; 
     padding: 0; 
-    font-family: "Meiryo", "メイリオ", "Hiragino Sans", "Hiragino Kaku Gothic ProN", -apple-system, BlinkMacSystemFont, sans-serif; 
+    font-family: "Meiryo", "メイリオ", "Hiragino Sans", -apple-system, BlinkMacSystemFont, sans-serif; 
     -webkit-tap-highlight-color: transparent; 
   }
   body { 
@@ -750,14 +750,7 @@
     });
   }
 
-  /* 絵文字を確実に大きなSVG画像タグとして生成 */
-  function getEmojiSvgImg(emoji) {
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"><text x="50%" y="50%" dominant-baseline="central" text-anchor="middle" font-size="32">${emoji}</text></svg>`;
-    const src = 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-    return `<img src="${src}" width="40" height="40" style="width:40px;height:40px;vertical-align:middle;display:inline-block;" alt="${emoji}">`;
-  }
-
-  /* Evernote出力処理 */
+  /* Evernote出力処理（メイリオインライン完全適用 ＆ カラー絵文字直接出力） */
   async function exportEvernoteByDate(dateStringYMD) {
     const [y, m, d] = dateStringYMD.split('-').map(Number);
     const targetDate = new Date(y, m - 1, d);
@@ -774,27 +767,29 @@
       return;
     }
 
-    const fontFamily = 'font-family: Meiryo, メイリオ, Hiragino Sans, sans-serif;';
+    const FONT_MEIRYO = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
 
-    let html = `<div style="${fontFamily}">
-      <p style="font-size:22px;font-weight:bold;margin:0 0 10px 0;${fontFamily}">${dateTitle}</p>
+    let html = `<div style="${FONT_MEIRYO}">
+      <p style="font-size:22px;font-weight:bold;margin:0 0 10px 0;${FONT_MEIRYO}">${dateTitle}</p>
       <hr style="border:0;border-top:1px solid #ccc;margin-bottom:12px;">`;
     let plain = `${dateTitle}\n====================\n\n`;
 
     tl.forEach(l => {
       const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${formatDurationJP(l.startAt, l.endAt)})`;
       const p = l.photos || (l.photo ? [l.photo] : []);
-      const iconImg = getEmojiSvgImg(l.icon);
       
+      /* アイコンを直接32pxフォントサイズのカラー文字として出力（反転防止） */
       html += `
-        <p style="margin:14px 0 2px 0;line-height:1;">${iconImg}</p>
-        <p style="font-size:18px;font-weight:bold;margin:2px 0 0 0;padding:0;${fontFamily}">${l.name}</p>
-        <p style="font-size:13px;color:#888888;margin:2px 0 4px 0;${fontFamily}">${tr}</p>
+        <p style="margin:14px 0 2px 0;padding:0;line-height:1.2;">
+          <span style="font-size:32px;display:inline-block;">${l.icon}</span>
+        </p>
+        <p style="font-size:18px;font-weight:bold;margin:2px 0 0 0;padding:0;${FONT_MEIRYO}">${l.name}</p>
+        <p style="font-size:13px;color:#888888;margin:2px 0 4px 0;${FONT_MEIRYO}">${tr}</p>
       `;
       plain += `${l.icon}\n${l.name}\n${tr}\n`;
 
       if (l.memo) {
-        html += `<p style="font-size:14px;margin:4px 0 8px 0;white-space:pre-wrap;${fontFamily}">${l.memo}</p>`;
+        html += `<p style="font-size:14px;margin:4px 0 8px 0;white-space:pre-wrap;${FONT_MEIRYO}">${l.memo}</p>`;
         plain += `${l.memo}\n`;
       }
       p.forEach(x => {
