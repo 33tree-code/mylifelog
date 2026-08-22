@@ -263,16 +263,69 @@
 </div>
 
 <script>
+  /* 全37カテゴリ初期設定リスト */
   const DEFAULT_CATS = [
-    { id: 'sleep', name: '睡眠', icon: '🌙' },
-    { id: 'work', name: '仕事 🧳', icon: '💼' },
-    { id: 'housework', name: '家事', icon: '🧹' },
-    { id: 'coffee', name: '珈琲 ☕ Time', icon: '☕' },
-    { id: 'meal', name: '食事', icon: '🍽' },
-    { id: 'rest', name: '休憩', icon: '☕' },
-    { id: 'exercise', name: '運動', icon: '🏃' },
-    { id: 'move', name: '移動→', icon: '⇢' }
+    { id: 'c1', name: '睡眠💤', icon: '🛏' },
+    { id: 'c2', name: '眠れなかった時間', icon: '🛌' },
+    { id: 'c3', name: 'パワーナップ', icon: '⌛' },
+    { id: 'c4', name: '珈琲☕Time', icon: '☕' },
+    { id: 'c5', name: '抹茶🍵Time', icon: '🍵' },
+    { id: 'c6', name: 'ストレッチ🙆', icon: '🧘' },
+    { id: 'c7', name: '読書📚', icon: '📚' },
+    { id: 'c8', name: 'NewsPicks', icon: '🌐' },
+    { id: 'c9', name: '自己啓発', icon: '🌱' },
+    { id: 'c10', name: '休息', icon: '🌿' },
+    { id: 'c11', name: 'Trade💹', icon: '📈' },
+    { id: 'c12', name: 'PC・スマホ作業💻', icon: '💻' },
+    { id: 'c13', name: '調べ物', icon: '🔍' },
+    { id: 'c14', name: '身支度等', icon: '🪞' },
+    { id: 'c15', name: 'poop', icon: '🚽' },
+    { id: 'c16', name: '風呂🛀', icon: '🛁' },
+    { id: 'c17', name: '移動➔', icon: '⇢' },
+    { id: 'c18', name: '食事🍴', icon: '🍽' },
+    { id: 'c19', name: '食事🍴 (家族)', icon: '👨‍👩‍👧‍👦' },
+    { id: 'c20', name: '家事🧺', icon: '🏠' },
+    { id: 'c21', name: '掃除🧹', icon: '🧹' },
+    { id: 'c22', name: 'アイロン', icon: '👔' },
+    { id: 'c23', name: '片付け', icon: '📦' },
+    { id: 'c24', name: '試し・メンテ', icon: '🪥' },
+    { id: 'c25', name: '設定⚙', icon: '⚙' },
+    { id: 'c26', name: '撮影📸Time', icon: '📷' },
+    { id: 'c27', name: '仕事💼', icon: '💼' },
+    { id: 'c28', name: '所用', icon: '🚶' },
+    { id: 'c29', name: '所用 (家族)', icon: '👥' },
+    { id: 'c30', name: '開封📦', icon: '📦' },
+    { id: 'c31', name: '病院等', icon: '🏥' },
+    { id: 'c32', name: '買い物等🛍リアル', icon: '🛒' },
+    { id: 'c33', name: '買い物等🛍ネット', icon: '📦' },
+    { id: 'c34', name: 'Family', icon: '👨‍👩‍👧' },
+    { id: 'c35', name: '仕事関連', icon: '👥' },
+    { id: 'c36', name: 'Social👥', icon: '👥' },
+    { id: 'c37', name: 'cooking👨‍🍳', icon: '🍳' },
+    { id: 'c38', name: 'Sweets🍪Time', icon: '🍪' },
+    { id: 'c39', name: '遊び', icon: '🤖' },
+    { id: 'c40', name: '動画視聴', icon: '📱' },
+    { id: 'c41', name: 'Money💰関連', icon: '💰' },
+    { id: 'c42', name: '筋トレ🏋️', icon: '🏋️' },
+    { id: 'c43', name: 'ランニング🏃', icon: '🏃' },
+    { id: 'c44', name: 'ウォーキング🚶', icon: '🚶' },
+    { id: 'c45', name: 'Golf🏌️ゴルフ練習', icon: '⛳' },
+    { id: 'c46', name: 'Golf⛳ゴルフラウンド', icon: '⛳' },
+    { id: 'c47', name: '飲み会🍻', icon: '🍻' },
+    { id: 'c48', name: '飲み会🍻private', icon: '🍻' },
+    { id: 'c49', name: 'i', icon: 'ℹ️' },
+    { id: 'c50', name: '☀', icon: '☀️' },
+    { id: 'c51', name: '旅行✈等Plan', icon: '✈️' },
+    { id: 'c52', name: '待ちTime', icon: '⏳' },
+    { id: 'c53', name: 'Relux', icon: '🌳' }
   ];
+
+  // 全カテゴリを確実に反映させるための更新フラグ
+  const CURRENT_VER = '2026_08_cats_all';
+  if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
+    localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
+    localStorage.setItem('ll_cats_ver', CURRENT_VER);
+  }
 
   let cats = JSON.parse(localStorage.getItem('ll_cats') || JSON.stringify(DEFAULT_CATS));
   let logs = JSON.parse(localStorage.getItem('ll_logs') || '[]');
