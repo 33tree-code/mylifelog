@@ -44,28 +44,25 @@
   .header-btns { display: flex; gap: 8px; align-items: center; }
   .btn-icon-lg { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   
-  /* Evernote出力バー（左端アイコン ＋ 3ボタン） */
+  /* Evernote出力バー（アイコンのみ ＋ 3ボタン） */
   .export-bar-3col {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     margin-bottom: 12px;
     width: 100%;
   }
   .evernote-standalone-icon {
-    width: 38px;
-    height: 38px;
-    background: var(--evernote-green);
-    border-radius: 8px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
   .evernote-standalone-icon img {
-    width: 22px;
-    height: 22px;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
   }
   .export-btn-group {
@@ -149,7 +146,7 @@
   .history-thumbs { display: flex; gap: 4px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 26px; height: 26px; border-radius: 4px; object-fit: cover; }
   
-  /* モーダル構造（Safari・PC完全等幅化） */
+  /* モーダル */
   .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
   .modal-box { 
     background: var(--card-bg); 
@@ -166,7 +163,6 @@
   .form-group { width: 100% !important; margin-bottom: 8px; display: flex; flex-direction: column; }
   .form-group label { font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; }
   
-  /* 全入力要素の横幅を完全一致させるスタイル */
   .modal-input {
     width: 100% !important; 
     max-width: 100% !important;
@@ -182,7 +178,6 @@
     appearance: none !important;
   }
   
-  /* 横一列ボタン */
   .modal-btns { display: flex; width: 100%; gap: 6px; margin-top: 10px; }
   .btn-action { flex: 1; padding: 9px 0; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-size: 0.82rem; text-align: center; white-space: nowrap; }
   .btn-submit { background: #2563eb; color: #fff; }
@@ -219,7 +214,7 @@
   </div>
 </div>
 
-<!-- Evernote出力バー（左端単独アイコン ＋ 3ボタン） -->
+<!-- Evernote出力バー（アイコン単独配置） -->
 <div class="export-bar-3col">
   <div class="evernote-standalone-icon">
     <img src="evernote.png" alt="Evernote">
@@ -324,7 +319,6 @@
 </div>
 
 <script>
-  /* 全50項目の完全順序 ＆ 最適化アイコン */
   const DEFAULT_CATS = [
     { id: 'c1', name: '睡眠💤', icon: '🛏', color: 'rgba(168, 85, 247, 0.18)' },
     { id: 'c2', name: '眠れなかった時間', icon: '🛌', color: 'rgba(148, 163, 184, 0.18)' },
@@ -355,7 +349,7 @@
     { id: 'c25', name: '撮影📸Time', icon: '📷', color: 'rgba(52, 211, 153, 0.18)' },
     { id: 'c26', name: '仕事💼', icon: '💼', color: 'rgba(74, 222, 128, 0.18)' },
     { id: 'c27', name: '所用', icon: '📋', color: 'rgba(96, 165, 250, 0.18)' },
-    { id: 'c28', name: '所用 (家族)', icon: '👥', color: 'rgba(244, 114, 182, 0.18)' },
+    { id: 'c28', name: '所用 (家族)', icon: '👨‍👩‍👧', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c29', name: '開封✂️', icon: '📦', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c30', name: '病院等', icon: '🏥', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c31', name: '買い物等🛍リアル', icon: '🛒', color: 'rgba(45, 212, 191, 0.18)' },
@@ -366,14 +360,14 @@
 
     { id: 'c36', name: 'cooking👨‍🍳', icon: '🍳', color: 'rgba(251, 191, 36, 0.18)' },
     { id: 'c37', name: 'Sweets🍪Time', icon: '🧁', color: 'rgba(249, 115, 22, 0.18)' },
-    { id: 'c38', name: '遊び', icon: '🎮', color: 'rgba(250, 204, 21, 0.18)' },
-    { id: 'c39', name: '動画視聴', icon: '📟', color: 'rgba(249, 115, 22, 0.18)' },
+    { id: 'c38', name: '遊び', icon: '🤖', color: 'rgba(250, 204, 21, 0.18)' },
+    { id: 'c39', name: '動画視聴', icon: '📲', color: 'rgba(249, 115, 22, 0.18)' },
     { id: 'c40', name: 'Money💰関連', icon: '💵', color: 'rgba(234, 179, 8, 0.18)' },
     { id: 'c41', name: '筋トレ🏋️', icon: '💪', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c42', name: 'ランニング🏃', icon: '👟', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c43', name: 'ウォーキング🚶', icon: '🚶', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c44', name: 'Golf🏌️練習', icon: '⚪', color: 'rgba(45, 212, 191, 0.18)' },
-    { id: 'c45', name: 'Golf⛳ラウンド', icon: '🏌️', color: 'rgba(52, 211, 153, 0.18)' },
+    { id: 'c44', name: 'Golf⛳練習', icon: '🏌️', color: 'rgba(45, 212, 191, 0.18)' },
+    { id: 'c45', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(52, 211, 153, 0.18)' },
     { id: 'c46', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(74, 222, 128, 0.18)' },
     { id: 'c47', name: '飲み会🍻private', icon: '🍺', color: 'rgba(56, 189, 248, 0.18)' },
 
@@ -385,7 +379,7 @@
     { id: 'c53', name: '休息', icon: '🌿', color: 'rgba(45, 212, 191, 0.18)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_order_v3';
+  const CURRENT_VER = '2026_08_cats_exact_order_v4';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
