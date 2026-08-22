@@ -294,7 +294,7 @@
     </div>
     
     <div class="form-group" id="endTimeWrap">
-      <label>終了時刻 <span style="font-size:0.65rem;color:var(--accent);">※翌朝は自動判定</span></label>
+      <label>終了時刻 <span style="font-size:0.65rem;color:var(--accent);">※睡眠系のみ翌朝自動判定</span></label>
       <input type="time" id="editEndTime" class="modal-input">
     </div>
     
@@ -319,7 +319,6 @@
 </div>
 
 <script>
-  /* 最新版 全50項目カテゴリデータ（NewsPicks等の直後に珈琲Time、抹茶Timeを配置） */
   const DEFAULT_CATS = [
     { id: 'c1', name: '睡眠💤', icon: '🛏', color: 'rgba(168, 85, 247, 0.18)' },
     { id: 'c3', name: 'パワーナップ', icon: '⌛', color: 'rgba(236, 72, 153, 0.18)' },
@@ -331,7 +330,6 @@
     { id: 'c11', name: 'PC・スマホ作業', icon: '🖥', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c12', name: 'Trade💹', icon: '📈', color: 'rgba(74, 222, 128, 0.18)' },
 
-    /* NewsPicks等の直後に珈琲 Time、抹茶 Time、仕事 */
     { id: 'c13', name: 'NewsPicks等', icon: '🌐', color: 'rgba(34, 211, 238, 0.18)' },
     { id: 'c4', name: '珈琲 Time', icon: '☕', color: 'rgba(249, 115, 22, 0.18)' },
     { id: 'c5', name: '抹茶 Time', icon: '🍵', color: 'rgba(34, 197, 94, 0.18)' },
@@ -347,13 +345,11 @@
     { id: 'c23', name: '試し・メンテ', icon: '🪮', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c24', name: '設定🔧', icon: '⚙', color: 'rgba(96, 165, 250, 0.18)' },
 
-    /* 設定の下 */
     { id: 'c31', name: '買い物等🛍リアル', icon: '🛒', color: 'rgba(45, 212, 191, 0.18)' },
     { id: 'c32', name: '買い物等🛍ネット', icon: '📦', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c29', name: '開封✂️', icon: '📦', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c30', name: '病院等', icon: '🏥', color: 'rgba(56, 189, 248, 0.18)' },
 
-    /* 撮影 Time の後ろに自己啓発、調べ物 */
     { id: 'c25', name: '撮影 Time', icon: '📷', color: 'rgba(52, 211, 153, 0.18)' },
     { id: 'c14', name: '自己啓発', icon: '🌱', color: 'rgba(234, 179, 8, 0.18)' },
     { id: 'c15', name: '調べ物', icon: '🔍', color: 'rgba(250, 204, 21, 0.18)' },
@@ -386,7 +382,7 @@
     { id: 'c2', name: '眠れなかった時間', icon: '🛌', color: 'rgba(148, 163, 184, 0.18)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_order_v10';
+  const CURRENT_VER = '2026_08_cats_exact_order_v12';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -414,6 +410,7 @@
   }
 
   function saveOnly() {
+    logs.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     localStorage.setItem('ll_cats', JSON.stringify(cats));
     localStorage.setItem('ll_logs', JSON.stringify(logs));
   }
@@ -428,7 +425,7 @@
     if (i >= 0) {
       logs[i].endAt = new Date().toISOString();
     } else {
-      logs.unshift({
+      logs.push({
         id: Date.now().toString(),
         catId: c.id,
         name: c.name,
@@ -516,7 +513,10 @@
 
     const h = document.getElementById('history');
     const t = new Date().toDateString();
-    const tl = logs.filter(l => l.endAt && new Date(l.startAt).toDateString() === t);
+    
+    // 朝から夜への昇順（古い時間順）で並べる
+    const tl = logs.filter(l => l.endAt && new Date(l.startAt).toDateString() === t)
+                   .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     
     if (tl.length === 0) {
       h.innerHTML = '<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:12px 0;">本日の記録はありません</div>';
@@ -691,6 +691,7 @@
 
   function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
+  /* 厳密な時間整合性チェック付き保存処理 */
   function saveLogEdit(stopTimer = false) {
     const id = document.getElementById('editLogId').value;
     const l = logs.find(x => x.id === id);
@@ -712,18 +713,32 @@
       newEnd = new Date(newStart);
       newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
       
-      if (newEnd <= newStart) {
-        newEnd.setDate(newEnd.getDate() + 1);
+      const isSleepCat = l.name.includes('睡眠') || l.name.includes('眠れなかった');
+      
+      // 睡眠系以外で時間が逆行している場合はエラー判定
+      if (newEnd < newStart) {
+        if (isSleepCat) {
+          // 睡眠系のみ翌朝の日またぎとして許容 (+1日)
+          newEnd.setDate(newEnd.getDate() + 1);
+        } else {
+          alert('終了時刻が開始時刻より前になっています。正しい時間を入力してください。');
+          return;
+        }
       }
       
-      if ((newEnd - newStart) > 24 * 60 * 60 * 1000) {
-        alert('終了時刻が不正です。開始時刻と終了時刻をご確認ください。');
+      // 24時間以上の記録は誤入力としてブロック
+      if ((newEnd - newStart) >= 24 * 60 * 60 * 1000) {
+        alert('記録時間が24時間以上になっています。時間をご確認ください。');
         return;
       }
     }
     
     if (stopTimer && !l.endAt) {
       newEnd = new Date();
+      if (newEnd < newStart) {
+        alert('終了時刻が開始時刻より前になっています。');
+        return;
+      }
     }
     
     l.startAt = newStart.toISOString();
@@ -809,7 +824,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理 */
+  /* Evernote出力処理（朝から夜へ時系列順に出力） */
   async function exportEvernoteByDate(dateStringYMD) {
     const [y, m, d] = dateStringYMD.split('-').map(Number);
     const targetDate = new Date(y, m - 1, d);
@@ -819,7 +834,10 @@
     const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})のログ`;
 
     const targetDateStr = targetDate.toDateString();
-    const tl = logs.filter(l => new Date(l.startAt).toDateString() === targetDateStr).reverse();
+    
+    // 朝から夜への昇順ソート
+    const tl = logs.filter(l => new Date(l.startAt).toDateString() === targetDateStr)
+                   .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     
     if (tl.length === 0) {
       alert(`指定日（${dateTitle}）の記録はありません`);
