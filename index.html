@@ -744,7 +744,7 @@
     });
   }
 
-  /* Evernote出力処理 */
+  /* Evernote出力処理（大型アイコン＋トグルなし） */
   async function exportEvernoteByDate(dateStringYMD) {
     const [y, m, d] = dateStringYMD.split('-').map(Number);
     const targetDate = new Date(y, m - 1, d);
@@ -768,8 +768,9 @@
       const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${formatDurationJP(l.startAt, l.endAt)})`;
       const p = l.photos || (l.photo ? [l.photo] : []);
       
+      /* アイコンをフォントサイズ32px + fontタグ size="6" で大きく設定 */
       html += `
-        <p style="font-size:28px;line-height:1.2;margin:0;padding:0;">${l.icon}</p>
+        <p style="font-size:32px;line-height:1.2;margin:0;padding:0;"><font size="6">${l.icon}</font></p>
         <p style="font-size:18px;font-weight:bold;margin:2px 0 0 0;padding:0;">${l.name}</p>
         <p style="font-size:13px;color:#888888;margin:2px 0 4px 0;">${tr}</p>
       `;
