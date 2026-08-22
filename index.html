@@ -38,10 +38,10 @@
   .header-btns { display: flex; gap: 8px; align-items: center; }
   .btn-icon-lg { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   
-  /* 下段：Evernote出力エリア（下のグリッドと完全同一幅） */
+  /* 出力バー（完全50:50等幅グリッド） */
   .export-grid { 
     display: grid; 
-    grid-template-columns: repeat(2, 1fr); 
+    grid-template-columns: repeat(2, minmax(0, 1fr)); 
     gap: 8px; 
     margin-bottom: 12px; 
     width: 100%;
@@ -103,32 +103,50 @@
 
   .active-section { margin-bottom: 12px; display: none; }
   .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; }
-  .active-icon { font-size: 1.4rem; }
-  .active-title { font-weight: bold; font-size: 0.95rem; }
+  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .active-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .active-title { font-weight: bold; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .active-badge { font-size: 0.7rem; color: var(--running); }
-  .active-right { display: flex; align-items: center; gap: 8px; }
+  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .active-timer { font-size: 1.05rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
   .btn-active-edit { background: var(--running); color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
 
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 16px; width: 100%; }
-  .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; }
+  /* カテゴリグリッド（文字数に関わらず完全に左右1:1固定） */
+  .grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, minmax(0, 1fr)); 
+    gap: 8px; 
+    margin-bottom: 16px; 
+    width: 100%; 
+  }
+  .card { 
+    background: var(--card-bg); 
+    border: 1px solid var(--border); 
+    border-radius: 10px; 
+    padding: 10px; 
+    cursor: pointer; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 3px; 
+    min-width: 0; 
+    width: 100%;
+  }
   .card.running { border: 1.5px solid var(--running); background: rgba(239, 68, 68, 0.1); }
   .card-top { display: flex; justify-content: space-between; align-items: center; }
-  .card-icon { font-size: 1.3rem; }
-  .card-status { font-size: 0.7rem; font-weight: 600; color: var(--text-sub); }
+  .card-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .card-status { font-size: 0.7rem; font-weight: 600; color: var(--text-sub); flex-shrink: 0; }
   .card.running .card-status { color: var(--running); }
-  .card-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
   .card-timer { font-size: 0.75rem; color: var(--text-sub); font-variant-numeric: tabular-nums; }
   .card.running .card-timer { color: var(--running); font-weight: 600; }
   
   h2 { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 8px; }
   .history-list { display: flex; flex-direction: column; gap: 6px; }
   .history-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-  .history-left { display: flex; align-items: center; gap: 8px; }
+  .history-left { display: flex; align-items: center; gap: 8px; min-width: 0; }
   .history-meta { font-size: 0.7rem; color: var(--text-sub); }
-  .history-dur { font-size: 0.85rem; font-weight: 700; color: var(--accent); }
-  .history-thumbs { display: flex; gap: 4px; }
+  .history-dur { font-size: 0.85rem; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+  .history-thumbs { display: flex; gap: 4px; flex-shrink: 0; }
   .history-img-thumb { width: 28px; height: 28px; border-radius: 4px; object-fit: cover; }
   
   .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
@@ -169,7 +187,7 @@
   </div>
 </div>
 
-<!-- Evernote出力バー（下のグリッドと完全同一幅） -->
+<!-- Evernote出力バー（完全均等グリッド） -->
 <div class="export-grid">
   <button class="btn-evernote-main" onclick="exportEvernoteByDate(getYesterdayStr())">
     <img src="evernote.png" class="evernote-local-icon" alt="Evernote">
@@ -413,7 +431,7 @@
         <div class="active-card">
           <div class="active-left" onclick="toggleLog({id:'${r.catId}', name:'${r.name}', icon:'${r.icon}'})">
             <span class="active-icon">${r.icon}</span>
-            <div>
+            <div style="min-width:0;">
               <div class="active-title">${r.name} ${r.memo ? '📝' : ''}</div>
               <div class="active-badge">タップで停止 (${formatTimeSingleDigit(r.startAt)}〜)</div>
             </div>
@@ -455,13 +473,13 @@
         return `
           <div class="history-item" onclick="openEditModal('${l.id}')">
             <div class="history-left">
-              <span style="font-size:1.1rem;">${l.icon}</span>
-              <div>
-                <div style="font-weight:600;font-size:0.85rem;">${l.name} ${l.memo ? '📝' : ''}</div>
+              <span style="font-size:1.1rem;flex-shrink:0;">${l.icon}</span>
+              <div style="min-width:0;">
+                <div style="font-weight:600;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.name} ${l.memo ? '📝' : ''}</div>
                 <div class="history-meta">${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)}</div>
               </div>
             </div>
-            <div style="display:flex;align-items:center;gap:6px;">
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
               <div class="history-thumbs">
                 ${p.map(x => `<img src="${x}" class="history-img-thumb">`).join('')}
               </div>
@@ -686,44 +704,46 @@
     exportEvernoteByDate(val);
   }
 
-  async function copyToClipboard(html, plain) {
-    let success = false;
-    if (navigator.clipboard && window.ClipboardItem) {
-      try {
+  /* PC・スマートフォン完全対応クリップボードコピー */
+  function copyToClipboard(html, plain) {
+    return new Promise(resolve => {
+      // 1. execCommand による確実なコピー
+      const handler = e => {
+        e.clipboardData.setData('text/html', html);
+        e.clipboardData.setData('text/plain', plain);
+        e.preventDefault();
+      };
+      document.addEventListener('copy', handler);
+      const success = document.execCommand('copy');
+      document.removeEventListener('copy', handler);
+
+      if (success) {
+        resolve(true);
+        return;
+      }
+
+      // 2. Clipboard API フォールバック
+      if (navigator.clipboard && window.ClipboardItem) {
         const bh = new Blob([html], { type: 'text/html' });
         const bp = new Blob([plain], { type: 'text/plain' });
-        await navigator.clipboard.write([new ClipboardItem({ 'text/html': bh, 'text/plain': bp })]);
-        success = true;
-      } catch (err) {
-        console.warn('ClipboardItem failed, using fallback', err);
+        navigator.clipboard.write([new ClipboardItem({ 'text/html': bh, 'text/plain': bp })])
+          .then(() => resolve(true))
+          .catch(() => {
+            navigator.clipboard.writeText(plain)
+              .then(() => resolve(true))
+              .catch(() => resolve(false));
+          });
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(plain)
+          .then(() => resolve(true))
+          .catch(() => resolve(false));
+      } else {
+        resolve(false);
       }
-    }
-
-    if (!success) {
-      try {
-        const listener = e => {
-          e.clipboardData.setData('text/html', html);
-          e.clipboardData.setData('text/plain', plain);
-          e.preventDefault();
-        };
-        document.addEventListener('copy', listener);
-        success = document.execCommand('copy');
-        document.removeEventListener('copy', listener);
-      } catch (err) {
-        console.error('execCommand failed', err);
-      }
-    }
-
-    if (!success && navigator.clipboard) {
-      try {
-        await navigator.clipboard.writeText(plain);
-        success = true;
-      } catch (err) {}
-    }
-    return success;
+    });
   }
 
-  /* Evernote出力（折りたたみトグルを完全排除したプレーンHTML生成） */
+  /* Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     const [y, m, d] = dateStringYMD.split('-').map(Number);
     const targetDate = new Date(y, m - 1, d);
@@ -740,7 +760,6 @@
       return;
     }
 
-    /* h1, h2, h3 を使わず pタグ＋スタイルで構築してEvernoteのトグル化を完全回避 */
     let html = `<div><p style="font-size:22px;font-weight:bold;margin:0 0 10px 0;">${dateTitle}</p><hr style="border:0;border-top:1px solid #ccc;margin-bottom:12px;">`;
     let plain = `${dateTitle}\n====================\n\n`;
 
@@ -771,7 +790,7 @@
     if (ok) {
       alert(`【${dateTitle}】のログをコピーしました！\nEvernoteに貼り付けてください。`);
     } else {
-      alert('クリップボードへのコピーに失敗しました。ブラウザの権限設定をご確認ください。');
+      alert('クリップボードへのコピーに失敗しました。');
     }
   }
 
