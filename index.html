@@ -19,7 +19,13 @@
     --border: #334155;
     --evernote-green: #00a82d;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+  * { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+    font-family: "Meiryo", "メイリオ", "Hiragino Sans", "Hiragino Kaku Gothic ProN", -apple-system, BlinkMacSystemFont, sans-serif; 
+    -webkit-tap-highlight-color: transparent; 
+  }
   body { 
     background: var(--bg); 
     color: var(--text); 
@@ -744,7 +750,7 @@
     });
   }
 
-  /* Evernote出力処理（大型アイコン＋トグルなし） */
+  /* Evernote出力処理（メイリオ指定 ＆ アイコン大型化） */
   async function exportEvernoteByDate(dateStringYMD) {
     const [y, m, d] = dateStringYMD.split('-').map(Number);
     const targetDate = new Date(y, m - 1, d);
@@ -761,23 +767,29 @@
       return;
     }
 
-    let html = `<div><p style="font-size:22px;font-weight:bold;margin:0 0 10px 0;">${dateTitle}</p><hr style="border:0;border-top:1px solid #ccc;margin-bottom:12px;">`;
+    const fontFamily = 'font-family: Meiryo, メイリオ, Hiragino Sans, sans-serif;';
+
+    let html = `<div style="${fontFamily}">
+      <p style="font-size:22px;font-weight:bold;margin:0 0 10px 0;${fontFamily}">${dateTitle}</p>
+      <hr style="border:0;border-top:1px solid #ccc;margin-bottom:12px;">`;
     let plain = `${dateTitle}\n====================\n\n`;
 
     tl.forEach(l => {
       const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${formatDurationJP(l.startAt, l.endAt)})`;
       const p = l.photos || (l.photo ? [l.photo] : []);
       
-      /* アイコンをフォントサイズ32px + fontタグ size="6" で大きく設定 */
+      /* アイコンを直接2.5em・font-size:36px・fontタグ指定で確実に大型化 */
       html += `
-        <p style="font-size:32px;line-height:1.2;margin:0;padding:0;"><font size="6">${l.icon}</font></p>
-        <p style="font-size:18px;font-weight:bold;margin:2px 0 0 0;padding:0;">${l.name}</p>
-        <p style="font-size:13px;color:#888888;margin:2px 0 4px 0;">${tr}</p>
+        <div style="margin-top:12px;margin-bottom:2px;">
+          <font size="7" style="font-size:36px;line-height:1.2;">${l.icon}</font>
+        </div>
+        <p style="font-size:18px;font-weight:bold;margin:2px 0 0 0;padding:0;${fontFamily}">${l.name}</p>
+        <p style="font-size:13px;color:#888888;margin:2px 0 4px 0;${fontFamily}">${tr}</p>
       `;
       plain += `${l.icon}\n${l.name}\n${tr}\n`;
 
       if (l.memo) {
-        html += `<p style="font-size:14px;margin:4px 0 8px 0;white-space:pre-wrap;">${l.memo}</p>`;
+        html += `<p style="font-size:14px;margin:4px 0 8px 0;white-space:pre-wrap;${fontFamily}">${l.memo}</p>`;
         plain += `${l.memo}\n`;
       }
       p.forEach(x => {
