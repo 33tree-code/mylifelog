@@ -38,7 +38,7 @@
   .header-btns { display: flex; gap: 8px; align-items: center; }
   .btn-icon-lg { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   
-  /* 下段：Evernote出力エリア（完全50:50均等配置） */
+  /* 下段：Evernote出力エリア（完全均等グリッド） */
   .export-grid { 
     display: grid; 
     grid-template-columns: repeat(2, 1fr); 
@@ -175,7 +175,7 @@
     <span>前日log出力</span>
   </button>
   <div class="date-picker-wrap">
-    <button class="btn-export-date">
+    <button class="btn-export-date" onclick="openDatePicker()">
       <img src="evernote.png" class="evernote-local-icon" alt="Evernote">
       <span>日付指定出力</span>
     </button>
@@ -263,7 +263,6 @@
 </div>
 
 <script>
-  /* 全37カテゴリ初期設定リスト */
   const DEFAULT_CATS = [
     { id: 'c1', name: '睡眠💤', icon: '🛏' },
     { id: 'c2', name: '眠れなかった時間', icon: '🛌' },
@@ -320,7 +319,6 @@
     { id: 'c53', name: 'Relux', icon: '🌳' }
   ];
 
-  // 全カテゴリを確実に反映させるための更新フラグ
   const CURRENT_VER = '2026_08_cats_all';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
@@ -369,6 +367,7 @@
     save();
   }
 
+  /* 画面表示用の経過時間 */
   function formatDuration(s, e) {
     const start = new Date(s);
     const end = e ? new Date(e) : new Date();
@@ -376,6 +375,17 @@
     const m = Math.floor(sec / 60);
     if (m < 60) return `${m}分`;
     return `${Math.floor(m / 60)}h ${m % 60}m`;
+  }
+
+  /* Evernote出力用：日本語フォーマット「〇時間 〇分」に完全統一 */
+  function formatDurationJP(s, e) {
+    const start = new Date(s);
+    const end = e ? new Date(e) : new Date();
+    const sec = Math.max(0, Math.floor((end - start) / 1000));
+    const totalMin = Math.floor(sec / 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    return `${h}時間 ${m}分`;
   }
 
   function formatTimeSingleDigit(s) {
@@ -660,9 +670,56 @@
     save();
   }
 
+  function openDatePicker() {
+    const picker = document.getElementById('exportTargetDate');
+    if (picker.showPicker) {
+      picker.showPicker();
+    } else {
+      picker.focus();
+    }
+  }
+
   function exportSelectedDate(val) {
     if (!val) return;
     exportEvernoteByDate(val);
+  }
+
+  /* PC・スマホ両対応の確実なクリップボードコピー処理 */
+  async function copyToClipboard(html, plain) {
+    let success = false;
+    if (navigator.clipboard && window.ClipboardItem) {
+      try {
+        const bh = new Blob([html], { type: 'text/html' });
+        const bp = new Blob([plain], { type: 'text/plain' });
+        await navigator.clipboard.write([new ClipboardItem({ 'text/html': bh, 'text/plain': bp })]);
+        success = true;
+      } catch (err) {
+        console.warn('ClipboardItem failed, using fallback', err);
+      }
+    }
+
+    if (!success) {
+      try {
+        const listener = e => {
+          e.clipboardData.setData('text/html', html);
+          e.clipboardData.setData('text/plain', plain);
+          e.preventDefault();
+        };
+        document.addEventListener('copy', listener);
+        success = document.execCommand('copy');
+        document.removeEventListener('copy', listener);
+      } catch (err) {
+        console.error('execCommand failed', err);
+      }
+    }
+
+    if (!success && navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(plain);
+        success = true;
+      } catch (err) {}
+    }
+    return success;
   }
 
   async function exportEvernoteByDate(dateStringYMD) {
@@ -685,7 +742,7 @@
     let plain = `${dateTitle}\n====================\n\n`;
 
     tl.forEach(l => {
-      const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${formatDuration(l.startAt, l.endAt)})`;
+      const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${formatDurationJP(l.startAt, l.endAt)})`;
       const p = l.photos || (l.photo ? [l.photo] : []);
       
       html += `
@@ -707,16 +764,11 @@
     });
     html += '</div>';
 
-    try {
-      const bh = new Blob([html], { type: 'text/html' });
-      const bp = new Blob([plain], { type: 'text/plain' });
-      const item = [new ClipboardItem({ 'text/html': bh, 'text/plain': bp })];
-      await navigator.clipboard.write(item);
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
       alert(`【${dateTitle}】のログをコピーしました！\nEvernoteに貼り付けてください。`);
-    } catch (err) {
-      navigator.clipboard.writeText(plain).then(() => {
-        alert(`【${dateTitle}】のテキストをコピーしました`);
-      });
+    } else {
+      alert('クリップボードへのコピーに失敗しました。ブラウザの権限設定をご確認ください。');
     }
   }
 
