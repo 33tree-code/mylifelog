@@ -113,7 +113,7 @@
   .active-timer { font-size: 1rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
   .btn-active-edit { background: var(--running); color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
 
-  /* カテゴリグリッド（コンパクト ＆ 各色背景対応） */
+  /* カテゴリグリッド */
   .grid { 
     display: grid; 
     grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -149,7 +149,7 @@
   .history-thumbs { display: flex; gap: 4px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 26px; height: 26px; border-radius: 4px; object-fit: cover; }
   
-  /* モーダル（完全等幅・余白ズレ防止構造） */
+  /* モーダル構造（Safari・PC完全等幅化） */
   .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
   .modal-box { 
     background: var(--card-bg); 
@@ -163,10 +163,14 @@
     flex-direction: column; 
     overflow: hidden; 
   }
-  .form-group { width: 100%; margin-bottom: 8px; }
-  .form-group label { display: block; font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; }
+  .form-group { width: 100% !important; margin-bottom: 8px; display: flex; flex-direction: column; }
+  .form-group label { font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; }
+  
+  /* 全入力要素の横幅を完全一致させるスタイル */
   .modal-input {
     width: 100% !important; 
+    max-width: 100% !important;
+    min-width: 100% !important;
     display: block !important;
     padding: 10px 12px !important; 
     background: #0b1120 !important; 
@@ -174,6 +178,8 @@
     color: #fff !important; 
     border-radius: 8px !important; 
     font-size: 0.95rem !important; 
+    -webkit-appearance: none !important;
+    appearance: none !important;
   }
   
   /* 横一列ボタン */
@@ -281,7 +287,7 @@
   </div>
 </div>
 
-<!-- ログ編集モーダル（入力枠等幅・余白完全修正版） -->
+<!-- ログ編集モーダル -->
 <div class="modal" id="editModal">
   <div class="modal-box" style="overflow-y:auto;max-height:90vh;">
     <h3 style="margin-bottom:10px;font-size:1rem;" id="editModalTitle">ログ編集</h3>
@@ -318,15 +324,14 @@
 </div>
 
 <script>
-  /* 全50項目の色・アイコン最適化リスト */
+  /* 全50項目の完全順序 ＆ 最適化アイコン */
   const DEFAULT_CATS = [
-    /* 睡眠・休息・ドリンク系 */
     { id: 'c1', name: '睡眠💤', icon: '🛏', color: 'rgba(168, 85, 247, 0.18)' },
     { id: 'c2', name: '眠れなかった時間', icon: '🛌', color: 'rgba(148, 163, 184, 0.18)' },
     { id: 'c3', name: 'パワーナップ', icon: '⌛', color: 'rgba(236, 72, 153, 0.18)' },
     { id: 'c4', name: '珈琲☕Time', icon: '☕', color: 'rgba(249, 115, 22, 0.18)' },
     { id: 'c5', name: '抹茶🍵Time', icon: '🍵', color: 'rgba(34, 197, 94, 0.18)' },
-    { id: 'c6', name: 'ストレッチ🙆', icon: '🙆', color: 'rgba(244, 114, 182, 0.18)' },
+    { id: 'c6', name: 'ストレッチ🙆', icon: '🧘', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c7', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c8', name: 'poop', icon: '🚽', color: 'rgba(96, 165, 250, 0.18)' },
     { id: 'c9', name: '風呂🛀', icon: '🛁', color: 'rgba(34, 211, 238, 0.18)' },
@@ -334,7 +339,6 @@
     { id: 'c11', name: 'PC・スマホ作業💻', icon: '🖥', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c12', name: 'Trade💹', icon: '📈', color: 'rgba(74, 222, 128, 0.18)' },
 
-    /* 情報・移動・食事・家事 */
     { id: 'c13', name: 'NewsPicks等', icon: '🌐', color: 'rgba(34, 211, 238, 0.18)' },
     { id: 'c14', name: '自己啓発', icon: '🌱', color: 'rgba(234, 179, 8, 0.18)' },
     { id: 'c15', name: '調べ物', icon: '🔍', color: 'rgba(250, 204, 21, 0.18)' },
@@ -348,10 +352,9 @@
     { id: 'c23', name: '試し・メンテ', icon: '🪥', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c24', name: '設定⚙', icon: '🔧', color: 'rgba(96, 165, 250, 0.18)' },
 
-    /* 仕事・用事・買い物 */
     { id: 'c25', name: '撮影📸Time', icon: '📷', color: 'rgba(52, 211, 153, 0.18)' },
-    { id: 'c26', name: '仕事💼', icon: '🧳', color: 'rgba(74, 222, 128, 0.18)' },
-    { id: 'c27', name: '所用', icon: '🚶', color: 'rgba(96, 165, 250, 0.18)' },
+    { id: 'c26', name: '仕事💼', icon: '💼', color: 'rgba(74, 222, 128, 0.18)' },
+    { id: 'c27', name: '所用', icon: '📋', color: 'rgba(96, 165, 250, 0.18)' },
     { id: 'c28', name: '所用 (家族)', icon: '👥', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c29', name: '開封✂️', icon: '📦', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c30', name: '病院等', icon: '🏥', color: 'rgba(56, 189, 248, 0.18)' },
@@ -361,21 +364,19 @@
     { id: 'c34', name: '仕事関連', icon: '👥', color: 'rgba(74, 222, 128, 0.18)' },
     { id: 'c35', name: 'Social👥', icon: '🤝', color: 'rgba(96, 165, 250, 0.18)' },
 
-    /* 料理・趣味・スポーツ・交流 */
     { id: 'c36', name: 'cooking👨‍🍳', icon: '🍳', color: 'rgba(251, 191, 36, 0.18)' },
     { id: 'c37', name: 'Sweets🍪Time', icon: '🧁', color: 'rgba(249, 115, 22, 0.18)' },
-    { id: 'c38', name: '遊び', icon: '🤖', color: 'rgba(250, 204, 21, 0.18)' },
+    { id: 'c38', name: '遊び', icon: '🎮', color: 'rgba(250, 204, 21, 0.18)' },
     { id: 'c39', name: '動画視聴', icon: '📟', color: 'rgba(249, 115, 22, 0.18)' },
     { id: 'c40', name: 'Money💰関連', icon: '💵', color: 'rgba(234, 179, 8, 0.18)' },
     { id: 'c41', name: '筋トレ🏋️', icon: '💪', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c42', name: 'ランニング🏃', icon: '👟', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c43', name: 'ウォーキング🚶', icon: '🚶', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c44', name: 'Golf🏌️練習', icon: '⛳', color: 'rgba(45, 212, 191, 0.18)' },
+    { id: 'c44', name: 'Golf🏌️練習', icon: '⚪', color: 'rgba(45, 212, 191, 0.18)' },
     { id: 'c45', name: 'Golf⛳ラウンド', icon: '🏌️', color: 'rgba(52, 211, 153, 0.18)' },
     { id: 'c46', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(74, 222, 128, 0.18)' },
     { id: 'c47', name: '飲み会🍻private', icon: '🍺', color: 'rgba(56, 189, 248, 0.18)' },
 
-    /* その他 */
     { id: 'c48', name: 'i', icon: 'ℹ️', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c49', name: '☀', icon: '☀️', color: 'rgba(236, 72, 153, 0.18)' },
     { id: 'c50', name: '旅行✈等Plan', icon: '✈️', color: 'rgba(34, 211, 238, 0.18)' },
@@ -384,7 +385,7 @@
     { id: 'c53', name: '休息', icon: '🌿', color: 'rgba(45, 212, 191, 0.18)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_color_palette_v2';
+  const CURRENT_VER = '2026_08_cats_exact_order_v3';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -500,7 +501,6 @@
       activeSection.style.display = 'none';
     }
 
-    /* 各カテゴリの独自背景色を適用 */
     const g = document.getElementById('grid');
     g.innerHTML = cats.map(c => {
       const r = logs.find(l => l.catId === c.id && !l.endAt);
