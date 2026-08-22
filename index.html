@@ -319,7 +319,7 @@
 </div>
 
 <script>
-  /* 最新版 全50項目カテゴリデータ（眠れなかった時間を最下部に移動、PC・抹茶・仕事表記最適化） */
+  /* 最新版 全50項目カテゴリデータ（指定の配置順序を完全反映） */
   const DEFAULT_CATS = [
     { id: 'c1', name: '睡眠💤', icon: '🛏', color: 'rgba(168, 85, 247, 0.18)' },
     { id: 'c3', name: 'パワーナップ', icon: '⌛', color: 'rgba(236, 72, 153, 0.18)' },
@@ -333,9 +333,10 @@
     { id: 'c11', name: 'PC・スマホ作業', icon: '🖥', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c12', name: 'Trade💹', icon: '📈', color: 'rgba(74, 222, 128, 0.18)' },
 
+    /* NewsPicks等の次に仕事 */
     { id: 'c13', name: 'NewsPicks等', icon: '🌐', color: 'rgba(34, 211, 238, 0.18)' },
-    { id: 'c14', name: '自己啓発', icon: '🌱', color: 'rgba(234, 179, 8, 0.18)' },
-    { id: 'c15', name: '調べ物', icon: '🔍', color: 'rgba(250, 204, 21, 0.18)' },
+    { id: 'c26', name: '仕事', icon: '🏢', color: 'rgba(74, 222, 128, 0.18)' },
+
     { id: 'c16', name: '移動➔', icon: '⇢', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c17', name: '食事🍴', icon: '🍽', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c18', name: '食事🍴 (家族)', icon: '👨‍👩‍👧‍👦', color: 'rgba(244, 114, 182, 0.18)' },
@@ -346,14 +347,19 @@
     { id: 'c23', name: '試し・メンテ', icon: '🪮', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c24', name: '設定🔧', icon: '⚙', color: 'rgba(96, 165, 250, 0.18)' },
 
-    { id: 'c25', name: '撮影📸Time', icon: '📷', color: 'rgba(52, 211, 153, 0.18)' },
-    { id: 'c26', name: '仕事', icon: '🏢', color: 'rgba(74, 222, 128, 0.18)' },
-    { id: 'c27', name: '所用', icon: '📋', color: 'rgba(96, 165, 250, 0.18)' },
-    { id: 'c28', name: '所用 (家族)', icon: '👨‍👩‍👧', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c29', name: '開封✂️', icon: '📦', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c30', name: '病院等', icon: '🏥', color: 'rgba(56, 189, 248, 0.18)' },
+    /* 設定の下に買い物リアル、買い物ネット、開封、病院 */
     { id: 'c31', name: '買い物等🛍リアル', icon: '🛒', color: 'rgba(45, 212, 191, 0.18)' },
     { id: 'c32', name: '買い物等🛍ネット', icon: '📦', color: 'rgba(56, 189, 248, 0.18)' },
+    { id: 'c29', name: '開封✂️', icon: '📦', color: 'rgba(56, 189, 248, 0.18)' },
+    { id: 'c30', name: '病院等', icon: '🏥', color: 'rgba(56, 189, 248, 0.18)' },
+
+    /* 撮影 Time の後ろに自己啓発、調べ物 */
+    { id: 'c25', name: '撮影 Time', icon: '📷', color: 'rgba(52, 211, 153, 0.18)' },
+    { id: 'c14', name: '自己啓発', icon: '🌱', color: 'rgba(234, 179, 8, 0.18)' },
+    { id: 'c15', name: '調べ物', icon: '🔍', color: 'rgba(250, 204, 21, 0.18)' },
+
+    { id: 'c27', name: '所用', icon: '📋', color: 'rgba(96, 165, 250, 0.18)' },
+    { id: 'c28', name: '所用 (家族)', icon: '👨‍👩‍👧', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c33', name: 'Family', icon: '👨‍👩‍👧', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c34', name: '仕事関連', icon: '👥', color: 'rgba(74, 222, 128, 0.18)' },
     { id: 'c35', name: 'Social👥', icon: '🤝', color: 'rgba(96, 165, 250, 0.18)' },
@@ -380,7 +386,7 @@
     { id: 'c2', name: '眠れなかった時間', icon: '🛌', color: 'rgba(148, 163, 184, 0.18)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_order_v8';
+  const CURRENT_VER = '2026_08_cats_exact_order_v9';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
