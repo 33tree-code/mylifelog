@@ -44,7 +44,7 @@
   .header-btns { display: flex; gap: 8px; align-items: center; }
   .btn-icon-lg { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   
-  /* Evernote出力バー（アイコンのみ ＋ 3ボタン） */
+  /* Evernote出力バー（アイコン単独配置 ＋ 3ボタン） */
   .export-bar-3col {
     display: flex;
     align-items: center;
@@ -214,7 +214,7 @@
   </div>
 </div>
 
-<!-- Evernote出力バー（アイコン単独配置） -->
+<!-- Evernote出力バー -->
 <div class="export-bar-3col">
   <div class="evernote-standalone-icon">
     <img src="evernote.png" alt="Evernote">
@@ -360,13 +360,13 @@
 
     { id: 'c36', name: 'cooking👨‍🍳', icon: '🍳', color: 'rgba(251, 191, 36, 0.18)' },
     { id: 'c37', name: 'Sweets🍪Time', icon: '🧁', color: 'rgba(249, 115, 22, 0.18)' },
-    { id: 'c38', name: '遊び', icon: '🤖', color: 'rgba(250, 204, 21, 0.18)' },
-    { id: 'c39', name: '動画視聴', icon: '📲', color: 'rgba(249, 115, 22, 0.18)' },
+    { id: 'c38', name: '遊び', icon: '🧩', color: 'rgba(250, 204, 21, 0.18)' },
+    { id: 'c39', name: '動画視聴', icon: '📺', color: 'rgba(249, 115, 22, 0.18)' },
     { id: 'c40', name: 'Money💰関連', icon: '💵', color: 'rgba(234, 179, 8, 0.18)' },
     { id: 'c41', name: '筋トレ🏋️', icon: '💪', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c42', name: 'ランニング🏃', icon: '👟', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c43', name: 'ウォーキング🚶', icon: '🚶', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c44', name: 'Golf⛳練習', icon: '🏌️', color: 'rgba(45, 212, 191, 0.18)' },
+    { id: 'c44', name: 'Golf練習', icon: '🏌️', color: 'rgba(45, 212, 191, 0.18)' },
     { id: 'c45', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(52, 211, 153, 0.18)' },
     { id: 'c46', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(74, 222, 128, 0.18)' },
     { id: 'c47', name: '飲み会🍻private', icon: '🍺', color: 'rgba(56, 189, 248, 0.18)' },
@@ -379,7 +379,7 @@
     { id: 'c53', name: '休息', icon: '🌿', color: 'rgba(45, 212, 191, 0.18)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_order_v4';
+  const CURRENT_VER = '2026_08_cats_exact_order_v5';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
