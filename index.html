@@ -750,7 +750,20 @@
     });
   }
 
-  /* Evernote出力処理（メイリオインライン完全適用 ＆ カラー絵文字直接出力） */
+  /* Canvasを使って絵文字を高画質なカラーPNG画像データに変換（Evernoteの縮小・反転を完全防止） */
+  function emojiToPngDataUrl(emoji) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 72;
+    canvas.height = 72;
+    const ctx = canvas.getContext('2d');
+    ctx.font = '54px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, 36, 40);
+    return canvas.toDataURL('image/png');
+  }
+
+  /* Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     const [y, m, d] = dateStringYMD.split('-').map(Number);
     const targetDate = new Date(y, m - 1, d);
@@ -777,11 +790,12 @@
     tl.forEach(l => {
       const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${formatDurationJP(l.startAt, l.endAt)})`;
       const p = l.photos || (l.photo ? [l.photo] : []);
+      const iconPng = emojiToPngDataUrl(l.icon);
       
-      /* アイコンを直接32pxフォントサイズのカラー文字として出力（反転防止） */
+      /* アイコンを直接36pxのPNG画像として埋め込み */
       html += `
-        <p style="margin:14px 0 2px 0;padding:0;line-height:1.2;">
-          <span style="font-size:32px;display:inline-block;">${l.icon}</span>
+        <p style="margin:14px 0 2px 0;padding:0;line-height:1;">
+          <img src="${iconPng}" width="36" height="36" style="width:36px;height:36px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
         </p>
         <p style="font-size:18px;font-weight:bold;margin:2px 0 0 0;padding:0;${FONT_MEIRYO}">${l.name}</p>
         <p style="font-size:13px;color:#888888;margin:2px 0 4px 0;${FONT_MEIRYO}">${tr}</p>
