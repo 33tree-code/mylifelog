@@ -367,7 +367,6 @@
     save();
   }
 
-  /* 画面表示用の経過時間 */
   function formatDuration(s, e) {
     const start = new Date(s);
     const end = e ? new Date(e) : new Date();
@@ -377,7 +376,7 @@
     return `${Math.floor(m / 60)}h ${m % 60}m`;
   }
 
-  /* Evernote出力用：日本語フォーマット「〇時間 〇分」に完全統一 */
+  /* 1時間未満は「〇分」、1時間以上は「〇時間 〇分」 */
   function formatDurationJP(s, e) {
     const start = new Date(s);
     const end = e ? new Date(e) : new Date();
@@ -385,6 +384,9 @@
     const totalMin = Math.floor(sec / 60);
     const h = Math.floor(totalMin / 60);
     const m = totalMin % 60;
+    if (h === 0) {
+      return `${m}分`;
+    }
     return `${h}時間 ${m}分`;
   }
 
@@ -684,7 +686,6 @@
     exportEvernoteByDate(val);
   }
 
-  /* PC・スマホ両対応の確実なクリップボードコピー処理 */
   async function copyToClipboard(html, plain) {
     let success = false;
     if (navigator.clipboard && window.ClipboardItem) {
