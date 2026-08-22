@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="screen-orientation" content="portrait">
 <title>ライフログ</title>
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="icon" href="logo.png">
@@ -15,7 +16,8 @@
     --text: #f8fafc;
     --text-sub: #94a3b8;
     --accent: #38bdf8;
-    --running: #ef4444;
+    --running: #00c3ff; /* 鮮やかな水色 */
+    --running-bg: rgba(0, 195, 255, 0.15);
     --border: #334155;
     --evernote-green: #00a82d;
   }
@@ -37,12 +39,25 @@
   
   /* 上段ヘッダー */
   .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .header-title-wrap { display: flex; align-items: center; gap: 8px; }
-  .header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.5px; white-space: nowrap; }
-  .logo-icon { width: 30px; height: 30px; border-radius: 6px; display: inline-block; vertical-align: middle; object-fit: contain; background: #fff; }
+  .header-title-wrap { display: flex; align-items: center; gap: 6px; }
+  .header-title-wrap h1 { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.5px; white-space: nowrap; }
+  .logo-icon { width: 26px; height: 26px; border-radius: 6px; display: inline-block; vertical-align: middle; object-fit: contain; background: #fff; }
   
-  .header-btns { display: flex; gap: 8px; align-items: center; }
-  .btn-icon-lg { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+  .header-btns { display: flex; gap: 6px; align-items: center; }
+  .btn-text-icon { 
+    background: var(--card-bg); 
+    border: 1px solid var(--border); 
+    color: var(--text); 
+    padding: 6px 8px; 
+    border-radius: 8px; 
+    font-size: 0.72rem; 
+    font-weight: 600;
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    cursor: pointer; 
+    white-space: nowrap;
+  }
   
   /* Evernote出力バー（アイコン単独配置 ＋ 3ボタン） */
   .export-bar-3col {
@@ -99,16 +114,26 @@
     z-index: 10;
   }
 
-  /* ⚡ 現在記録中エリア */
+  /* ⚡ 現在記録中エリア（水色・太枠） */
   .active-section { margin-bottom: 12px; display: none; }
-  .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .active-card { 
+    background: var(--running-bg); 
+    border: 2px solid var(--running); 
+    box-shadow: 0 0 10px rgba(0, 195, 255, 0.35);
+    border-radius: 10px; 
+    padding: 8px 12px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 6px; 
+  }
   .active-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
   .active-icon { font-size: 1.3rem; flex-shrink: 0; }
-  .active-title { font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .active-title { font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.68rem; color: var(--running); }
   .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .active-timer { font-size: 1rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
-  .btn-active-edit { background: var(--running); color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
+  .btn-active-edit { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
 
   /* カテゴリグリッド */
   .grid { 
@@ -132,7 +157,11 @@
     transition: transform 0.05s ease;
   }
   .card:active { transform: scale(0.98); }
-  .card.running { border: 1.5px solid var(--running) !important; background: rgba(239, 68, 68, 0.25) !important; }
+  .card.running { 
+    border: 2px solid var(--running) !important; 
+    background: var(--running-bg) !important; 
+    box-shadow: 0 0 8px rgba(0, 195, 255, 0.4);
+  }
   .card-icon { font-size: 1.15rem; flex-shrink: 0; line-height: 1; }
   .card-name { font-weight: 500; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
   
@@ -209,8 +238,8 @@
     <h1>ライフログ</h1>
   </div>
   <div class="header-btns">
-    <button class="btn-icon-lg" onclick="openCatModal()" title="カテゴリ追加">＋</button>
-    <button class="btn-icon-lg" onclick="openSettingModal()" title="設定">⚙</button>
+    <button class="btn-text-icon" onclick="openCatModal()" title="カテゴリ追加">カテゴリ＋</button>
+    <button class="btn-text-icon" onclick="openSettingModal()" title="設定">カテゴリ⚙</button>
   </div>
 </div>
 
@@ -282,7 +311,7 @@
   </div>
 </div>
 
-<!-- ログ編集モーダル -->
+<!-- ログ編集モーダル（記録中でも終了時刻を常時入力可能） -->
 <div class="modal" id="editModal">
   <div class="modal-box" style="overflow-y:auto;max-height:90vh;">
     <h3 style="margin-bottom:10px;font-size:1rem;" id="editModalTitle">ログ編集</h3>
@@ -293,8 +322,8 @@
       <input type="time" id="editStartTime" class="modal-input">
     </div>
     
-    <div class="form-group" id="endTimeWrap">
-      <label>終了時刻 <span style="font-size:0.65rem;color:var(--accent);">※睡眠系のみ翌朝自動判定</span></label>
+    <div class="form-group">
+      <label>終了時刻 <span style="font-size:0.65rem;color:var(--accent);">※未入力で終了保存すると現在時刻</span></label>
       <input type="time" id="editEndTime" class="modal-input">
     </div>
     
@@ -335,7 +364,7 @@
     { id: 'c5', name: '抹茶 Time', icon: '🍵', color: 'rgba(34, 197, 94, 0.18)' },
     { id: 'c26', name: '仕事', icon: '🏢', color: 'rgba(74, 222, 128, 0.18)' },
 
-    { id: 'c16', name: '移動➔', icon: '⇢', color: 'rgba(56, 189, 248, 0.18)' },
+    { id: 'c16', name: '移動 →', icon: '⇢', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c17', name: '食事🍴', icon: '🍽', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c18', name: '食事🍴 (家族)', icon: '👨‍👩‍👧‍👦', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c19', name: '家事🧺', icon: '🏠', color: 'rgba(56, 189, 248, 0.18)' },
@@ -382,7 +411,7 @@
     { id: 'c2', name: '眠れなかった時間', icon: '🛌', color: 'rgba(148, 163, 184, 0.18)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_order_v12';
+  const CURRENT_VER = '2026_08_cats_exact_order_v13';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -485,7 +514,7 @@
           <div class="active-left" onclick="toggleLog({id:'${r.catId}', name:'${r.name}', icon:'${r.icon}'})">
             <span class="active-icon">${r.icon}</span>
             <div style="min-width:0;">
-              <div class="active-title">${r.name} ${r.memo ? '📝' : ''}</div>
+              <div class="active-title">${r.name}</div>
               <div class="active-badge">タップで停止 (${formatTimeSingleDigit(r.startAt)}〜)</div>
             </div>
           </div>
@@ -528,7 +557,7 @@
             <div class="history-left">
               <span style="font-size:1.1rem;flex-shrink:0;">${l.icon}</span>
               <div style="min-width:0;">
-                <div style="font-weight:600;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.name} ${l.memo ? '📝' : ''}</div>
+                <div style="font-weight:600;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.name}</div>
                 <div class="history-meta">${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)}</div>
               </div>
             </div>
@@ -645,16 +674,14 @@
     document.getElementById('editModalTitle').innerText = `${l.icon} ${l.name} の編集`;
     document.getElementById('editStartTime').value = timeInputFormat(l.startAt);
     
-    const endWrap = document.getElementById('endTimeWrap');
     const btnStopAndSave = document.getElementById('btnStopAndSave');
     
     if (l.endAt) {
-      endWrap.style.display = 'block';
       btnStopAndSave.style.display = 'none';
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
     } else {
-      endWrap.style.display = 'none';
       btnStopAndSave.style.display = 'block';
+      document.getElementById('editEndTime').value = '';
     }
     
     document.getElementById('editMemo').value = l.memo || '';
@@ -691,7 +718,7 @@
 
   function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
-  /* 厳密な時間整合性チェック付き保存処理 */
+  /* 終了時刻を任意に入力して完了・保存できるロジック */
   function saveLogEdit(stopTimer = false) {
     const id = document.getElementById('editLogId').value;
     const l = logs.find(x => x.id === id);
@@ -708,17 +735,17 @@
     
     let newEnd = l.endAt ? new Date(l.endAt) : null;
     
-    if (l.endAt && e) {
+    if (stopTimer && !e) {
+      newEnd = new Date();
+    } else if (e) {
       const [eh, em] = e.split(':');
       newEnd = new Date(newStart);
       newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
       
       const isSleepCat = l.name.includes('睡眠') || l.name.includes('眠れなかった');
       
-      // 睡眠系以外で時間が逆行している場合はエラー判定
       if (newEnd < newStart) {
         if (isSleepCat) {
-          // 睡眠系のみ翌朝の日またぎとして許容 (+1日)
           newEnd.setDate(newEnd.getDate() + 1);
         } else {
           alert('終了時刻が開始時刻より前になっています。正しい時間を入力してください。');
@@ -726,17 +753,8 @@
         }
       }
       
-      // 24時間以上の記録は誤入力としてブロック
       if ((newEnd - newStart) >= 24 * 60 * 60 * 1000) {
         alert('記録時間が24時間以上になっています。時間をご確認ください。');
-        return;
-      }
-    }
-    
-    if (stopTimer && !l.endAt) {
-      newEnd = new Date();
-      if (newEnd < newStart) {
-        alert('終了時刻が開始時刻より前になっています。');
         return;
       }
     }
@@ -824,7 +842,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理（朝から夜へ時系列順に出力） */
+  /* Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     const [y, m, d] = dateStringYMD.split('-').map(Number);
     const targetDate = new Date(y, m - 1, d);
@@ -835,7 +853,6 @@
 
     const targetDateStr = targetDate.toDateString();
     
-    // 朝から夜への昇順ソート
     const tl = logs.filter(l => new Date(l.startAt).toDateString() === targetDateStr)
                    .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     
