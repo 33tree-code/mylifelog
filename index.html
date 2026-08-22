@@ -111,7 +111,7 @@
   .active-timer { font-size: 1.05rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
   .btn-active-edit { background: var(--running); color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
 
-  /* カテゴリグリッド（文字数に関わらず完全に左右1:1固定） */
+  /* カテゴリグリッド（完全1:1固定） */
   .grid { 
     display: grid; 
     grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -693,9 +693,13 @@
   function openDatePicker() {
     const picker = document.getElementById('exportTargetDate');
     if (picker.showPicker) {
-      picker.showPicker();
+      try {
+        picker.showPicker();
+      } catch(e) {
+        picker.click();
+      }
     } else {
-      picker.focus();
+      picker.click();
     }
   }
 
@@ -704,10 +708,8 @@
     exportEvernoteByDate(val);
   }
 
-  /* PC・スマートフォン完全対応クリップボードコピー */
   function copyToClipboard(html, plain) {
     return new Promise(resolve => {
-      // 1. execCommand による確実なコピー
       const handler = e => {
         e.clipboardData.setData('text/html', html);
         e.clipboardData.setData('text/plain', plain);
@@ -722,7 +724,6 @@
         return;
       }
 
-      // 2. Clipboard API フォールバック
       if (navigator.clipboard && window.ClipboardItem) {
         const bh = new Blob([html], { type: 'text/html' });
         const bp = new Blob([plain], { type: 'text/plain' });
@@ -750,7 +751,7 @@
 
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const w = days[targetDate.getDay()];
-    const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})`;
+    const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})のログ`;
 
     const targetDateStr = targetDate.toDateString();
     const tl = logs.filter(l => l.endAt && new Date(l.startAt).toDateString() === targetDateStr).reverse();
@@ -788,7 +789,7 @@
 
     const ok = await copyToClipboard(html, plain);
     if (ok) {
-      alert(`【${dateTitle}】のログをコピーしました！\nEvernoteに貼り付けてください。`);
+      alert(`【${dateTitle}】をコピーしました！\nEvernoteに貼り付けてください。`);
     } else {
       alert('クリップボードへのコピーに失敗しました。');
     }
