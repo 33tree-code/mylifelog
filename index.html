@@ -44,60 +44,57 @@
   .header-btns { display: flex; gap: 8px; align-items: center; }
   .btn-icon-lg { background: var(--card-bg); border: 1px solid var(--border); color: var(--text); width: 38px; height: 38px; border-radius: 8px; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
   
-  /* 出力バー（完全50:50等幅グリッド） */
-  .export-grid { 
-    display: grid; 
-    grid-template-columns: repeat(2, minmax(0, 1fr)); 
-    gap: 8px; 
-    margin-bottom: 12px; 
+  /* Evernote出力バー（左端アイコン ＋ 3分割ボタン） */
+  .export-bar-3col {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
     width: 100%;
   }
-  
-  .btn-evernote-main { 
-    width: 100%;
-    background: var(--evernote-green); 
-    color: #fff; 
-    border: none; 
-    font-weight: 600; 
-    padding: 10px 4px; 
-    border-radius: 10px; 
-    font-size: 0.8rem; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
+  .evernote-standalone-icon {
+    width: 38px;
+    height: 38px;
+    background: var(--evernote-green);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  }
+  .evernote-standalone-icon img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+  }
+  .export-btn-group {
+    display: flex;
+    flex: 1;
     gap: 6px;
+  }
+  .btn-export-item {
+    flex: 1;
+    background: var(--evernote-green);
+    color: #fff;
+    border: none;
+    font-weight: 600;
+    padding: 10px 0;
+    border-radius: 8px;
+    font-size: 0.76rem;
+    cursor: pointer;
+    text-align: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     white-space: nowrap;
   }
-
-  .date-picker-wrap { 
-    width: 100%;
-    position: relative; 
-    display: block;
-  }
-  .btn-export-date { 
-    width: 100%; 
-    height: 100%;
-    background: var(--evernote-green); 
-    color: #fff; 
-    border: none; 
-    padding: 10px 4px; 
-    border-radius: 10px; 
-    font-size: 0.8rem; 
-    font-weight: 600; 
-    cursor: pointer; 
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    gap: 6px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    white-space: nowrap;
+  .date-picker-wrap-item {
+    flex: 1;
+    position: relative;
+    display: flex;
   }
   .hidden-date-input { 
     position: absolute; 
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100%; 
     height: 100%; 
     opacity: 0; 
@@ -105,42 +102,41 @@
     z-index: 10;
   }
 
-  .evernote-local-icon { width: 20px; height: 20px; border-radius: 4px; object-fit: cover; display: inline-block; vertical-align: middle; flex-shrink: 0; }
-
   /* ⚡ 現在記録中エリア */
   .active-section { margin-bottom: 12px; display: none; }
-  .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
-  .active-icon { font-size: 1.4rem; flex-shrink: 0; }
-  .active-title { font-weight: bold; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .active-badge { font-size: 0.7rem; color: var(--running); }
+  .active-card { background: rgba(239, 68, 68, 0.12); border: 1.5px solid var(--running); border-radius: 10px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .active-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+  .active-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .active-title { font-weight: bold; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .active-badge { font-size: 0.68rem; color: var(--running); }
   .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .active-timer { font-size: 1.05rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
+  .active-timer { font-size: 1rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
   .btn-active-edit { background: var(--running); color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
 
-  /* カテゴリグリッド（アイコン＋カテゴリ名のみのシンプル表示） */
+  /* カテゴリグリッド（コンパクト・横並び配置） */
   .grid { 
     display: grid; 
     grid-template-columns: repeat(2, minmax(0, 1fr)); 
-    gap: 8px; 
+    gap: 6px; 
     margin-bottom: 16px; 
     width: 100%; 
   }
   .card { 
     background: var(--card-bg); 
     border: 1px solid var(--border); 
-    border-radius: 10px; 
-    padding: 12px 10px; 
+    border-radius: 8px; 
+    padding: 7px 8px; 
     cursor: pointer; 
     display: flex; 
-    flex-direction: column; 
+    flex-direction: row; 
+    align-items: center;
     gap: 6px; 
     min-width: 0; 
     width: 100%;
   }
-  .card.running { border: 1.5px solid var(--running); background: rgba(239, 68, 68, 0.1); }
-  .card-icon { font-size: 1.4rem; }
-  .card-name { font-weight: 600; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+  .card.running { border: 1.5px solid var(--running); background: rgba(239, 68, 68, 0.15); }
+  .card-icon { font-size: 1.15rem; flex-shrink: 0; line-height: 1; }
+  .card-name { font-weight: 500; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
   
   h2 { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 8px; }
   .history-list { display: flex; flex-direction: column; gap: 6px; }
@@ -158,13 +154,12 @@
   .modal-box { background: var(--card-bg); padding: 16px; border-radius: 12px; width: 100%; max-width: 380px; border: 1px solid var(--border); max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; }
   .modal-box input, .modal-box textarea { width: 100%; padding: 8px; margin: 4px 0 10px; background: #0b1120; border: 1px solid var(--border); color: #fff; border-radius: 6px; font-size: 0.9rem; }
   
-  /* ボタン横一列配置 */
-  .modal-btns { display: flex; width: 100%; gap: 6px; margin-top: 10px; }
-  .btn-action { flex: 1; padding: 10px 0; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-size: 0.85rem; text-align: center; }
+  /* 横一列ボタン */
+  .modal-btns { display: flex; width: 100%; gap: 5px; margin-top: 10px; }
+  .btn-action { flex: 1; padding: 8px 0; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; font-size: 0.78rem; text-align: center; white-space: nowrap; }
   .btn-submit { background: #2563eb; color: #fff; }
   .btn-danger { background: #ef4444; color: #fff; }
   .btn-save-green { background: var(--evernote-green); color: #fff; }
-  /* 太い白枠の閉じるボタン */
   .btn-cancel-white { background: transparent; border: 2px solid #ffffff !important; color: #ffffff !important; font-weight: bold; }
   
   #settingList { overflow-y: auto; flex: 1; margin-bottom: 12px; padding-right: 2px; }
@@ -175,7 +170,6 @@
   .sort-name-input { flex: 1; margin: 0 !important; padding: 6px 8px !important; font-size: 0.85rem !important; }
   .btn-del-cat { background: #ef4444; border: none; color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
   
-  /* プレビューエリアの最大高さ設定 */
   .preview-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; max-height: 180px; overflow-y: auto; padding-right: 2px; }
   .preview-img-wrap { position: relative; }
   .preview-img-wrap img { width: 100%; border-radius: 6px; display: block; }
@@ -197,18 +191,18 @@
   </div>
 </div>
 
-<!-- Evernote出力バー（完全均等グリッド） -->
-<div class="export-grid">
-  <button class="btn-evernote-main" onclick="exportEvernoteByDate(getYesterdayStr())">
-    <img src="evernote.png" class="evernote-local-icon" alt="Evernote">
-    <span>前日log出力</span>
-  </button>
-  <div class="date-picker-wrap">
-    <button class="btn-export-date" onclick="openDatePicker()">
-      <img src="evernote.png" class="evernote-local-icon" alt="Evernote">
-      <span>日付指定出力</span>
-    </button>
-    <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="exportSelectedDate(this.value)">
+<!-- Evernote出力バー（左端単独アイコン ＋ 3ボタン） -->
+<div class="export-bar-3col">
+  <div class="evernote-standalone-icon">
+    <img src="evernote.png" alt="Evernote">
+  </div>
+  <div class="export-btn-group">
+    <button class="btn-export-item" onclick="exportEvernoteByDate(getYesterdayStr())">前日出力</button>
+    <button class="btn-export-item" onclick="exportEvernoteByDate(getTodayStr())">当日出力</button>
+    <div class="date-picker-wrap-item">
+      <button class="btn-export-item" style="width:100%;" onclick="openDatePicker()">日付指定</button>
+      <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="exportSelectedDate(this.value)">
+    </div>
   </div>
 </div>
 
@@ -249,7 +243,7 @@
     <div style="font-size:0.75rem;color:var(--accent);font-weight:bold;margin-top:6px;">データ保護・復元</div>
     <div class="backup-box">
       <button class="btn-action" style="background:#334155;color:#fff;" onclick="exportBackupData()">💾 保存 (JSON)</button>
-      <label class="btn-action" style="background:#334155;color:#fff;text-align:center;cursor:pointer;padding-top:10px;">
+      <label class="btn-action" style="background:#334155;color:#fff;text-align:center;cursor:pointer;padding-top:8px;">
         📂 復元
         <input type="file" accept=".json" style="display:none;" onchange="importBackupData(event)">
       </label>
@@ -261,7 +255,7 @@
   </div>
 </div>
 
-<!-- ログ編集モーダル（入力・スクロール最適化版） -->
+<!-- ログ編集モーダル（全ボタン横一列維持） -->
 <div class="modal" id="editModal">
   <div class="modal-box" style="overflow-y:auto;max-height:90vh;">
     <h3 style="margin-bottom:10px;font-size:1rem;" id="editModalTitle">ログ編集</h3>
@@ -282,12 +276,12 @@
     <input type="file" id="editPhoto" accept="image/*" multiple onchange="handlePhotoUpload(event)">
     <div id="imagePreviewContainer" class="preview-grid"></div>
 
-    <!-- 横一列ボタン -->
+    <!-- 4つのボタンを確実に横一列に配置 -->
     <div class="modal-btns">
       <button class="btn-action btn-danger" onclick="deleteCurrentLog()">削除</button>
       <button class="btn-action btn-cancel-white" onclick="closeEditModal()">閉じる</button>
-      <button class="btn-action btn-save-green" id="btnStopAndSave" style="display:none;" onclick="saveLogEdit(true)">終了して保存</button>
-      <button class="btn-action btn-submit" id="btnNormalSave" onclick="saveLogEdit(false)">保存</button>
+      <button class="btn-action btn-save-green" id="btnStopAndSave" style="display:none;" onclick="saveLogEdit(true)">終了保存</button>
+      <button class="btn-action btn-submit" onclick="saveLogEdit(false)">保存</button>
     </div>
   </div>
 </div>
@@ -362,6 +356,14 @@
   function getYesterdayStr() {
     const d = new Date();
     d.setDate(d.getDate() - 1);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function getTodayStr() {
+    const d = new Date();
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
@@ -457,7 +459,7 @@
       activeSection.style.display = 'none';
     }
 
-    /* アイコンと名前だけのシンプルカード表示 */
+    /* コンパクトな横並びカード表示 */
     const g = document.getElementById('grid');
     g.innerHTML = cats.map(c => {
       const r = logs.find(l => l.catId === c.id && !l.endAt);
@@ -602,17 +604,14 @@
     
     const endWrap = document.getElementById('endTimeWrap');
     const btnStopAndSave = document.getElementById('btnStopAndSave');
-    const btnNormalSave = document.getElementById('btnNormalSave');
     
     if (l.endAt) {
       endWrap.style.display = 'block';
       btnStopAndSave.style.display = 'none';
-      btnNormalSave.style.display = 'block';
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
     } else {
       endWrap.style.display = 'none';
       btnStopAndSave.style.display = 'block';
-      btnNormalSave.style.display = 'none';
     }
     
     document.getElementById('editMemo').value = l.memo || '';
@@ -767,7 +766,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理（当日対応 ＆ 最新レイアウト） */
+  /* Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     const [y, m, d] = dateStringYMD.split('-').map(Number);
     const targetDate = new Date(y, m - 1, d);
@@ -777,8 +776,6 @@
     const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})のログ`;
 
     const targetDateStr = targetDate.toDateString();
-    
-    /* 完了済みログ ＋ 当日選択時は現在進行中のログも含める */
     const tl = logs.filter(l => new Date(l.startAt).toDateString() === targetDateStr).reverse();
     
     if (tl.length === 0) {
