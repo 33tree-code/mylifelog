@@ -61,7 +61,7 @@
     white-space: nowrap;
   }
   
-  /* バー共通スタイル（Evernote ＆ 履歴日付切り替え） */
+  /* バー共通スタイル */
   .export-bar-3col {
     display: flex;
     align-items: center;
@@ -163,7 +163,7 @@
     align-items: center;
     gap: 6px; 
     min-width: 0; 
-    width: 100%;
+    width: 100%; 
     border: 1px solid var(--border);
     transition: transform 0.05s ease;
   }
@@ -182,8 +182,8 @@
   .history-list { display: flex; flex-direction: column; gap: 6px; }
   .history-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
   .history-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
-  .history-meta { font-size: 0.7rem; color: var(--text-sub); }
-  .history-dur { font-size: 0.85rem; font-weight: 700; color: var(--accent); flex-shrink: 0; }
+  .history-meta { font-size: 0.78rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .history-dur { font-size: 0.9rem; font-weight: 700; color: var(--accent); flex-shrink: 0; font-variant-numeric: tabular-nums; }
   
   .history-thumbs { display: flex; gap: 4px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 26px; height: 26px; border-radius: 4px; object-fit: cover; }
@@ -207,8 +207,8 @@
   
   .modal-input {
     width: 100% !important; 
-    max-width: 100% !important;
-    min-width: 100% !important;
+    max-width: 100% !important; 
+    min-width: 100% !important; 
     display: block !important;
     padding: 10px 12px !important; 
     background: #0b1120 !important; 
@@ -256,7 +256,7 @@
   </div>
 </div>
 
-<!-- 履歴表示切り替えバー（カレンダー水色バー） -->
+<!-- 履歴表示切り替えバー -->
 <div class="export-bar-3col">
   <div class="bar-left-icon">
     <span>📅</span>
@@ -271,7 +271,7 @@
   </div>
 </div>
 
-<!-- Evernote出力バー（緑バー） -->
+<!-- Evernote出力バー -->
 <div class="export-bar-3col">
   <div class="bar-left-icon">
     <img src="evernote.png" alt="Evernote">
@@ -364,7 +364,7 @@
     </div>
     
     <div class="form-group">
-      <label>写真追加（自動圧縮保存）</label>
+      <label>写真追加（大容量DB保存）</label>
       <input type="file" id="editPhoto" class="modal-input" accept="image/*" multiple onchange="handlePhotoUpload(event)">
     </div>
     <div id="imagePreviewContainer" class="preview-grid"></div>
@@ -380,7 +380,7 @@
 
 <script>
   const DEFAULT_CATS = [
-    { id: 'c1', name: '睡眠💤', icon: '🛏', color: 'rgba(168, 85, 247, 0.18)' },
+    { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(168, 85, 247, 0.18)' },
     { id: 'c3', name: 'パワーナップ', icon: '⌛', color: 'rgba(236, 72, 153, 0.18)' },
     { id: 'c6', name: 'ストレッチ🙆', icon: '🧘', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c7', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.18)' },
@@ -393,9 +393,9 @@
     { id: 'c13', name: 'NewsPicks等', icon: '🌐', color: 'rgba(34, 211, 238, 0.18)' },
     { id: 'c4', name: '珈琲 Time', icon: '☕', color: 'rgba(249, 115, 22, 0.18)' },
     { id: 'c5', name: '抹茶 Time', icon: '🍵', color: 'rgba(34, 197, 94, 0.18)' },
-    { id: 'c26', name: '仕事', icon: '🏢', color: 'rgba(74, 222, 128, 0.18)' },
+    { id: 'c26', name: '仕事💼', icon: '🏢', color: 'rgba(74, 222, 128, 0.18)' },
 
-    { id: 'c16', name: '移動 →', icon: '⇢', color: 'rgba(56, 189, 248, 0.18)' },
+    { id: 'c16', name: '移動 →', icon: '🧭', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c17', name: '食事🍴', icon: '🍽', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c18', name: '食事🍴 (家族)', icon: '👨‍👩‍👧‍👦', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c19', name: '家事🧺', icon: '🏠', color: 'rgba(56, 189, 248, 0.18)' },
@@ -420,14 +420,14 @@
     { id: 'c34', name: '仕事関連', icon: '👥', color: 'rgba(74, 222, 128, 0.18)' },
     { id: 'c35', name: 'Social👥', icon: '🤝', color: 'rgba(96, 165, 250, 0.18)' },
 
-    { id: 'c36', name: 'cooking👨‍🍳', icon: '🍳', color: 'rgba(251, 191, 36, 0.18)' },
+    { id: 'c36', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(251, 191, 36, 0.18)' },
     { id: 'c37', name: 'Sweets🍪Time', icon: '🧁', color: 'rgba(249, 115, 22, 0.18)' },
-    { id: 'c38', name: '遊び', icon: '🧩', color: 'rgba(250, 204, 21, 0.18)' },
+    { id: 'c38', name: '🎉Leisure', icon: '🧩', color: 'rgba(250, 204, 21, 0.18)' },
     { id: 'c39', name: '動画視聴', icon: '📺', color: 'rgba(249, 115, 22, 0.18)' },
     { id: 'c40', name: 'Money💰関連', icon: '💵', color: 'rgba(234, 179, 8, 0.18)' },
     { id: 'c41', name: '筋トレ🏋️', icon: '💪', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c42', name: 'ランニング🏃', icon: '👟', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c43', name: 'ウォーキング🚶', icon: '🚶', color: 'rgba(244, 114, 182, 0.18)' },
+    { id: 'c42', name: 'ランニング👟', icon: '🏃', color: 'rgba(244, 114, 182, 0.18)' },
+    { id: 'c43', name: 'ウォーキング', icon: '🚶', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c44', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(45, 212, 191, 0.18)' },
     { id: 'c45', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(52, 211, 153, 0.18)' },
     { id: 'c46', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(74, 222, 128, 0.18)' },
@@ -436,22 +436,72 @@
     { id: 'c48', name: 'i', icon: 'ℹ️', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c49', name: '☀', icon: '☀️', color: 'rgba(236, 72, 153, 0.18)' },
     { id: 'c50', name: '旅行✈等Plan', icon: '✈️', color: 'rgba(34, 211, 238, 0.18)' },
-    { id: 'c51', name: '待ちTime', icon: '⏳', color: 'rgba(167, 243, 208, 0.18)' },
+    { id: 'c51', name: 'Waiting Time', icon: '⏳', color: 'rgba(167, 243, 208, 0.18)' },
     { id: 'c52', name: 'Relux', icon: '🌳', color: 'rgba(74, 222, 128, 0.18)' },
     { id: 'c53', name: '休息', icon: '🌿', color: 'rgba(45, 212, 191, 0.18)' },
-    { id: 'c2', name: '眠れなかった時間', icon: '🛌', color: 'rgba(148, 163, 184, 0.18)' }
+    { id: 'c2', name: '🦉Sleepless Time', icon: '🛌', color: 'rgba(148, 163, 184, 0.18)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_order_v16';
+  const CURRENT_VER = '2026_08_cats_exact_order_v21';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
   }
 
   let cats = JSON.parse(localStorage.getItem('ll_cats') || JSON.stringify(DEFAULT_CATS));
-  let logs = JSON.parse(localStorage.getItem('ll_logs') || '[]');
+  let logs = [];
   let currentPhotos = [];
   let currentViewingDateYMD = getTodayStr();
+
+  /* --- 大容量 IndexedDB ストレージエンジン --- */
+  const DB_NAME = 'LifelogDB';
+  const STORE_NAME = 'logs';
+
+  function initDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, 1);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = (e) => reject(e);
+    });
+  }
+
+  async function loadLogsFromDB() {
+    const db = await initDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        let result = req.result || [];
+        // LocalStorageからの初回移行
+        const localLogs = JSON.parse(localStorage.getItem('ll_logs') || '[]');
+        if (result.length === 0 && localLogs.length > 0) {
+          result = localLogs;
+          saveLogsToDB(result);
+        }
+        resolve(result);
+      };
+      req.onerror = () => resolve([]);
+    });
+  }
+
+  async function saveLogsToDB(newLogs) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      store.clear();
+      newLogs.forEach(item => store.put(item));
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = (e) => reject(e);
+    });
+  }
 
   function getYesterdayStr() {
     const d = new Date();
@@ -490,22 +540,14 @@
     } else { p.click(); }
   }
 
-  function saveOnly() {
+  async function save() {
     logs.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
-    try {
-      localStorage.setItem('ll_cats', JSON.stringify(cats));
-      localStorage.setItem('ll_logs', JSON.stringify(logs));
-    } catch (e) {
-      alert('端末の保存容量がいっぱいです。不要な写真付きログを削除するかバックアップを保存してください。');
-    }
-  }
-
-  function save() {
-    saveOnly();
+    localStorage.setItem('ll_cats', JSON.stringify(cats));
+    await saveLogsToDB(logs);
     render();
   }
 
-  function toggleLog(c) {
+  async function toggleLog(c) {
     const i = logs.findIndex(l => l.catId === c.id && !l.endAt);
     if (i >= 0) {
       logs[i].endAt = new Date().toISOString();
@@ -521,18 +563,22 @@
         photos: []
       });
     }
-    save();
+    await save();
   }
 
-  function formatDuration(s, e) {
+  /* 画面側の英語略称フォーマット (min / h m) */
+  function formatDurationEN(s, e) {
     const start = new Date(s);
     const end = e ? new Date(e) : new Date();
     const sec = Math.max(0, Math.floor((end - start) / 1000));
-    const m = Math.floor(sec / 60);
-    if (m < 60) return `${m}分`;
-    return `${Math.floor(m / 60)}h ${m % 60}m`;
+    const totalMin = Math.floor(sec / 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    if (h === 0) return `${m}min`;
+    return `${h}h ${m}m`;
   }
 
+  /* Evernote用の日本語フォーマット (分 / 時間 分) */
   function formatDurationJP(s, e) {
     const start = new Date(s);
     const end = e ? new Date(e) : new Date();
@@ -540,9 +586,7 @@
     const totalMin = Math.floor(sec / 60);
     const h = Math.floor(totalMin / 60);
     const m = totalMin % 60;
-    if (h === 0) {
-      return `${m}分`;
-    }
+    if (h === 0) return `${m}分`;
     return `${h}時間 ${m}分`;
   }
 
@@ -575,7 +619,7 @@
             </div>
           </div>
           <div class="active-right">
-            <div class="active-timer">${formatDuration(r.startAt)}</div>
+            <div class="active-timer">${formatDurationEN(r.startAt)}</div>
             <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
           </div>
         </div>
@@ -606,7 +650,6 @@
 
     const viewDateStr = viewDate.toDateString();
     
-    // 指定日に開始、または指定日に終了したログを全て抽出して朝から夜順に整列
     const tl = logs.filter(l => l.endAt && (new Date(l.startAt).toDateString() === viewDateStr || new Date(l.endAt).toDateString() === viewDateStr))
                    .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     
@@ -628,7 +671,7 @@
               <div class="history-thumbs">
                 ${p.map(x => `<img src="${x}" class="history-img-thumb">`).join('')}
               </div>
-              <div class="history-dur">${formatDuration(l.startAt, l.endAt)}</div>
+              <div class="history-dur">${formatDurationEN(l.startAt, l.endAt)}</div>
             </div>
           </div>
         `;
@@ -638,14 +681,14 @@
 
   function openCatModal() { document.getElementById('catModal').style.display = 'flex'; }
   function closeCatModal() { document.getElementById('catModal').style.display = 'none'; }
-  function addCategory() {
+  async function addCategory() {
     const n = document.getElementById('catName').value.trim();
     const i = document.getElementById('catIcon').value.trim() || '📌';
     if (!n) return;
     cats.push({ id: Date.now().toString(), name: n, icon: i, color: 'rgba(56, 189, 248, 0.18)' });
     document.getElementById('catName').value = '';
     closeCatModal();
-    save();
+    await save();
   }
 
   function openSettingModal() {
@@ -699,7 +742,7 @@
         const movedItem = cats.splice(draggedIndex, 1)[0];
         cats.splice(targetIndex, 0, movedItem);
         draggedIndex = targetIndex;
-        saveOnly();
+        localStorage.setItem('ll_cats', JSON.stringify(cats));
         renderSettingList();
       }
     }
@@ -719,13 +762,13 @@
     const cat = cats.find(c => c.id === id);
     if (!cat) return;
     cat[key] = val.trim();
-    saveOnly();
+    localStorage.setItem('ll_cats', JSON.stringify(cats));
     render();
   }
   
   function deleteCat(id) {
     cats = cats.filter(c => c.id !== id);
-    saveOnly();
+    localStorage.setItem('ll_cats', JSON.stringify(cats));
     renderSettingList();
     render();
   }
@@ -774,7 +817,7 @@
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const maxDim = 800;
+          const maxDim = 1000;
           let w = img.width;
           let h = img.height;
           if (w > maxDim || h > maxDim) {
@@ -791,7 +834,7 @@
           canvas.height = h;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', 0.7));
+          resolve(canvas.toDataURL('image/jpeg', 0.75));
         };
         img.src = e.target.result;
       };
@@ -810,8 +853,7 @@
 
   function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
-  /* 全カテゴリで自然な日またぎ（例: 23:52〜0:12）を自動補正する保存処理 */
-  function saveLogEdit(isStopBtn = false) {
+  async function saveLogEdit(isStopBtn = false) {
     const id = document.getElementById('editLogId').value;
     const l = logs.find(x => x.id === id);
     if (!l) return;
@@ -842,7 +884,6 @@
       newEnd = new Date(newStart);
       newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
       
-      // 終了時刻が開始時刻より前の数値の場合は自動で翌日(+1日)に判定
       if (newEnd < newStart) {
         newEnd.setDate(newEnd.getDate() + 1);
       }
@@ -861,13 +902,13 @@
     delete l.photo;
     
     closeEditModal();
-    save();
+    await save();
   }
 
-  function deleteCurrentLog() {
+  async function deleteCurrentLog() {
     logs = logs.filter(l => l.id !== document.getElementById('editLogId').value);
     closeEditModal();
-    save();
+    await save();
   }
 
   function copyToClipboard(html, plain) {
@@ -918,7 +959,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理 */
+  /* Evernote出力処理（水色時刻・均一行間） */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
@@ -930,7 +971,6 @@
 
     const targetDateStr = targetDate.toDateString();
     
-    // 指定日に開始したログを抽出して朝から夜順に整列
     const tl = logs.filter(l => new Date(l.startAt).toDateString() === targetDateStr)
                    .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     
@@ -942,34 +982,41 @@
     const FONT_MEIRYO = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
 
     let html = `<div style="${FONT_MEIRYO}">
-      <p style="font-size:22px;font-weight:bold;margin:0 0 10px 0;${FONT_MEIRYO}">${dateTitle}</p>
-      <hr style="border:0;border-top:1px solid #ccc;margin-bottom:12px;">`;
+      <div style="font-size:22px;font-weight:bold;margin-bottom:10px;${FONT_MEIRYO}">${dateTitle}</div>
+      <hr style="border:0;border-top:1px solid #ccc;margin-bottom:16px;">`;
     let plain = `${dateTitle}\n====================\n\n`;
 
-    tl.forEach(l => {
+    tl.forEach((l, index) => {
       const end = l.endAt || new Date().toISOString();
       const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(end)} (${formatDurationJP(l.startAt, end)})`;
       const p = l.photos || (l.photo ? [l.photo] : []);
       const iconPng = emojiToPngDataUrl(l.icon);
       
-      html += `
-        <p style="margin:14px 0 2px 0;padding:0;line-height:1;">
-          <img src="${iconPng}" width="36" height="36" style="width:36px;height:36px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
-        </p>
-        <p style="font-size:18px;font-weight:bold;margin:2px 0 0 0;padding:0;${FONT_MEIRYO}">${l.name}</p>
-        <p style="font-size:13px;color:#888888;margin:2px 0 4px 0;${FONT_MEIRYO}">${tr}</p>
+      let logHtml = `
+        <div style="line-height:1.4;margin:0;padding:0;${FONT_MEIRYO}">
+          <div style="line-height:1;margin-bottom:2px;">
+            <img src="${iconPng}" width="36" height="36" style="width:36px;height:36px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
+          </div>
+          <div style="font-size:18px;font-weight:bold;line-height:1.3;${FONT_MEIRYO}">${l.name}</div>
+          <div style="font-size:13px;color:#38bdf8;font-weight:bold;line-height:1.3;${FONT_MEIRYO}">${tr}</div>
       `;
       plain += `${l.icon}\n${l.name}\n${tr}\n`;
 
       if (l.memo) {
-        html += `<p style="font-size:14px;margin:4px 0 8px 0;white-space:pre-wrap;${FONT_MEIRYO}">${l.memo}</p>`;
-        plain += `${l.memo}\n`;
+        logHtml += `<div><br></div><div style="font-size:14px;line-height:1.4;white-space:pre-wrap;${FONT_MEIRYO}">${l.memo}</div>`;
+        plain += `\n${l.memo}\n`;
       }
       p.forEach(x => {
-        html += `<p style="margin:6px 0;"><img src="${x}" style="max-width:100%;border-radius:4px;display:block;"></p>`;
+        logHtml += `<div style="margin-top:6px;"><img src="${x}" style="max-width:100%;border-radius:4px;display:block;"></div>`;
       });
-      html += '<p><br></p>';
-      plain += '\n\n';
+      logHtml += '</div>';
+
+      html += logHtml;
+
+      if (index < tl.length - 1) {
+        html += '<div><br></div>';
+        plain += '\n\n';
+      }
     });
     html += '</div>';
 
@@ -994,14 +1041,14 @@
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = evt => {
+    reader.onload = async evt => {
       try {
         const data = JSON.parse(evt.target.result);
         if (data.cats && data.logs) {
           if (confirm('現在の記録を上書きしてバックアップから復元しますか？')) {
             cats = data.cats;
             logs = data.logs;
-            save();
+            await save();
             alert('データを復元しました！');
             closeSettingModal();
           }
@@ -1015,8 +1062,13 @@
     reader.readAsText(file);
   }
 
+  // 初期読み込み
+  loadLogsFromDB().then(loaded => {
+    logs = loaded;
+    render();
+  });
+
   setInterval(render, 1000);
-  render();
 </script>
 </body>
 </html>
