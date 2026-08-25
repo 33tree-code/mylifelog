@@ -38,31 +38,8 @@
     user-select: none;
   }
   
-  /* 上段ヘッダー */
-  .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; height: 38px; }
-  .header-title-wrap { display: flex; align-items: center; gap: 6px; }
-  .header-title-wrap h1 { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.5px; white-space: nowrap; }
-  .logo-icon { width: 28px; height: 28px; border-radius: 6px; display: inline-block; vertical-align: middle; object-fit: contain; background: #fff; }
-  
-  .header-btns { display: flex; gap: 6px; align-items: center; height: 100%; }
-  .btn-text-icon { 
-    background: var(--card-bg); 
-    border: 1px solid var(--border); 
-    color: var(--text); 
-    height: 38px;
-    padding: 0 10px; 
-    border-radius: 8px; 
-    font-size: 0.76rem; 
-    font-weight: 600;
-    display: flex; 
-    align-items: center; 
-    justify-content: center; 
-    cursor: pointer; 
-    white-space: nowrap;
-  }
-  
-  /* バー共通スタイル */
-  .export-bar-3col {
+  /* 上段3つのバー共通グリッド構造（完全に同じ幅・高さに揃える） */
+  .control-bar-row {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -83,13 +60,51 @@
     height: 32px;
     object-fit: contain;
     border-radius: 6px;
+    display: block;
   }
+  .header-left-title {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+  .header-left-title h1 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+    color: #fff;
+  }
+  
   .bar-btn-group {
     display: flex;
     flex: 1;
     gap: 6px;
     height: 100%;
   }
+  .header-btn-group {
+    display: flex;
+    flex: 2; /* 下のボタン2つ分の幅と完全に一致させる */
+    gap: 6px;
+    height: 100%;
+  }
+  
+  .btn-header-item {
+    flex: 1;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    height: 100%;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
   .btn-bar-item {
     flex: 1;
     color: #fff;
@@ -97,7 +112,7 @@
     font-weight: 600;
     height: 100%;
     border-radius: 8px;
-    font-size: 0.76rem;
+    font-size: 0.78rem;
     cursor: pointer;
     text-align: center;
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
@@ -245,21 +260,24 @@
 </head>
 <body>
 
-<div class="header-top">
-  <div class="header-title-wrap">
-    <img src="logo.png" class="logo-icon" alt="ロゴ">
+<!-- 上段ヘッダー（下の2行と完全に同じ幅・グリッド構造） -->
+<div class="control-bar-row">
+  <div class="bar-left-icon">
+    <img src="logo.png" alt="ロゴ" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' rx=\'6\'/></svg>';">
+  </div>
+  <div class="header-left-title">
     <h1>ライフログ</h1>
   </div>
-  <div class="header-btns">
-    <button class="btn-text-icon" onclick="openCatModal()">カテゴリ＋</button>
-    <button class="btn-text-icon" onclick="openSettingModal()">カテゴリ⚙</button>
+  <div class="header-btn-group">
+    <button class="btn-header-item" onclick="openCatModal()">カテゴリ＋</button>
+    <button class="btn-header-item" onclick="openSettingModal()">カテゴリ⚙</button>
   </div>
 </div>
 
-<!-- 履歴表示切り替えバー（cal.png 画像アイコン配置） -->
-<div class="export-bar-3col">
+<!-- 履歴表示切り替えバー -->
+<div class="control-bar-row">
   <div class="bar-left-icon">
-    <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<span style=\'font-size:1.2rem;\'>📅</span>';">
+    <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.3rem;\'>📅</div>';">
   </div>
   <div class="bar-btn-group">
     <button class="btn-bar-item btn-cal" onclick="setHistoryDate(getYesterdayStr())">前日ログ</button>
@@ -272,7 +290,7 @@
 </div>
 
 <!-- Evernote出力バー -->
-<div class="export-bar-3col">
+<div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="evernote.png" alt="Evernote">
   </div>
@@ -441,7 +459,7 @@
     { id: 'c2', name: 'Sleepless Time', icon: '🦉', color: 'rgba(148, 163, 184, 0.18)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_order_v23';
+  const CURRENT_VER = '2026_08_cats_exact_order_v24';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -452,7 +470,6 @@
   let currentPhotos = [];
   let currentViewingDateYMD = getTodayStr();
 
-  /* --- 大容量 IndexedDB ストレージエンジン --- */
   const DB_NAME = 'LifelogDB';
   const STORE_NAME = 'logs';
 
@@ -955,7 +972,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理（特大アイコン48px・カテゴリ名22px・水色時刻） */
+  /* Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
