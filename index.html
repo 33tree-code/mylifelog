@@ -35,7 +35,6 @@
     user-select: none;
   }
   
-  /* 上段ヘッダー（左ロゴ＋タイトル、右ボタン2種） */
   .header-top-row {
     display: flex;
     align-items: center;
@@ -75,7 +74,6 @@
     height: 100%;
   }
 
-  /* 💎 立体テクスチャボタン */
   .btn-header-text {
     background: linear-gradient(180deg, #2a374a 0%, #151e2e 100%);
     border: 1px solid #3b4d66;
@@ -113,7 +111,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
   }
 
-  /* 下段2列バー */
   .control-bar-row {
     display: flex;
     align-items: center;
@@ -195,7 +192,6 @@
     z-index: 10;
   }
 
-  /* ⚡ 現在記録中エリア */
   .active-section { margin-bottom: 12px; display: none; }
   .active-card { 
     background: var(--running-bg); 
@@ -216,7 +212,6 @@
   .active-timer { font-size: 1.15rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
   .btn-active-edit { background: linear-gradient(180deg, #f87171 0%, #ef4444 100%); color: #fff; border: 1px solid #fca5a5; padding: 5px 10px; border-radius: 7px; font-size: 0.75rem; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.4); }
 
-  /* 🎨 カテゴリグリッド */
   .grid { 
     display: grid; 
     grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -259,7 +254,6 @@
   .history-thumbs { display: flex; gap: 4px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 28px; height: 28px; border-radius: 4px; object-fit: cover; }
   
-  /* モーダル */
   .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
   .modal-box { 
     background: #1e293b; 
@@ -317,7 +311,6 @@
 </head>
 <body>
 
-<!-- 上段ヘッダー（左タイトル・右ボタンの適正分離配置） -->
 <div class="header-top-row">
   <div class="header-left-wrap">
     <img src="logo.png" alt="ロゴ" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'38\' height=\'38\'><rect width=\'38\' height=\'38\' fill=\'%23fff\' rx=\'10\'/></svg>';">
@@ -329,7 +322,6 @@
   </div>
 </div>
 
-<!-- 履歴表示切り替えバー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📅</div>';">
@@ -344,7 +336,6 @@
   </div>
 </div>
 
-<!-- Evernote出力バー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="evernote.png" alt="Evernote">
@@ -505,7 +496,7 @@
     { id: 'c53', name: 'Sleepless', icon: '🦉', color: 'linear-gradient(135deg, rgba(71,85,105,0.4) 0%, rgba(30,41,59,0.8) 100%)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_final_master_v115';
+  const CURRENT_VER = '2026_08_cats_exact_final_master_v120_thumb_fix';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -1018,6 +1009,7 @@
     return canvas.toDataURL('image/png');
   }
 
+  /* Evernote出力処理（サムネイル認識対応の専用ラッパー構造） */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
@@ -1039,8 +1031,19 @@
 
     const FONT_MEIRYO = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
 
+    // Evernoteがサムネイル画像（ノートの顔）として認識しやすいよう、最初の画像を最上位のサムネイルブロックとして配置
+    let firstImageHtml = '';
+    for (const l of tl) {
+      const p = l.photos || (l.photo ? [l.photo] : []);
+      if (p.length > 0) {
+        firstImageHtml = `<div style="margin-bottom:14px;"><img src="${p[0]}" width="200" style="max-width:200px;height:auto;border-radius:6px;display:block;" alt="サムネイル"></div>`;
+        break;
+      }
+    }
+
     let html = `<div style="${FONT_MEIRYO}">
-      <div style="font-size:24px;font-weight:bold;margin-bottom:14px;${FONT_MEIRYO}">${dateTitle}</div>`;
+      <div style="font-size:24px;font-weight:bold;margin-bottom:14px;${FONT_MEIRYO}">${dateTitle}</div>
+      ${firstImageHtml}`;
     let plain = `${dateTitle}\n\n`;
 
     tl.forEach((l, index) => {
@@ -1063,7 +1066,8 @@
         logHtml += `<div style="font-size:15px;line-height:1.4;white-space:pre-wrap;${FONT_MEIRYO}">${l.memo}</div>`;
         plain += `${l.memo}\n`;
       }
-      p.forEach(x => {
+      p.forEach((x, pIdx) => {
+        // 先頭写真はプレビュー用として上部に出力済みの場合があるので、2枚目以降または全写真をリスト内に配置
         logHtml += `<div style="margin-top:8px;"><img src="${x}" style="max-width:100%;height:auto;display:block;border-radius:4px;" alt="添付写真"></div>`;
       });
       logHtml += '</div>';
