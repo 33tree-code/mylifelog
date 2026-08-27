@@ -301,7 +301,7 @@
   .preview-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; max-height: 180px; overflow-y: auto; padding-right: 2px; }
   .preview-img-wrap { position: relative; }
   .preview-img-wrap img { width: 100%; border-radius: 6px; display: block; }
-  .preview-img-wrap button { position: absolute; top: 4px; right: 4px; background: rgba(0, 0, 0, 0.7); color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; }
+  .preview-img-wrap button { position: absolute; top: 6px; right: 6px; background: rgba(0, 0, 0, 0.75); color: #fff; border: none; border-radius: 6px; padding: 5px 10px; font-size: 0.75rem; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
   
   .backup-box { margin-top: 10px; padding: 10px; background: #0c1320; border-radius: 8px; border: 1px solid var(--border); display: flex; gap: 6px; }
 </style>
@@ -493,7 +493,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v6';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v7';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -1006,7 +1006,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理：元の写真を自然に縦並び配置＆メモ改行完全一致 */
+  /* Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
@@ -1049,7 +1049,6 @@
       `;
       plain += `${l.icon}\n${l.name}\n${tr}\n`;
 
-      /* メモ処理：時間との間に1行空け、メモ内の改行・空行を完全一致 */
       if (l.memo && l.memo.trim() !== '') {
         logHtml += `<p style="margin:0;padding:0;"><br></p>`;
         const memoLines = l.memo.split('\n');
@@ -1060,7 +1059,6 @@
         plain += `\n${l.memo}\n`;
       }
       
-      /* 写真：縮小・横並び処理を完全廃止し、Evernote本来の画像として普通に縦並び配置 */
       if (p.length > 0) {
         p.forEach(photoSrc => {
           logHtml += `<p style="margin:8px 0 0 0;padding:0;">
@@ -1072,7 +1070,6 @@
       logHtml += '</div>';
       html += logHtml;
 
-      /* ログ間の1行空け */
       if (index < tl.length - 1) {
         html += '<p style="margin:0;padding:0;"><br></p>';
         plain += '\n';
