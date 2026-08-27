@@ -155,8 +155,10 @@
     z-index: 10;
   }
 
+  /* ⚡ 現在記録中エリア（①のタップ感度改善） */
   .active-section { margin: 8px 0 12px; display: none; }
   .active-card { 
+    position: relative;
     background: linear-gradient(180deg, rgba(0, 229, 255, 0.22) 0%, rgba(11, 27, 44, 0.85) 100%);
     border: 2px solid var(--running); 
     box-shadow: 0 0 14px rgba(0, 229, 255, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3);
@@ -166,12 +168,13 @@
     justify-content: space-between; 
     align-items: center; 
     margin-bottom: 6px; 
+    cursor: pointer;
   }
-  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer; }
+  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; pointer-events: none; }
   .active-icon { font-size: 1.4rem; flex-shrink: 0; }
   .active-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.85rem; font-weight: 700; color: var(--running); margin-top: 1px; }
-  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 2; }
   .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; }
   .btn-active-edit { 
     background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); 
@@ -488,12 +491,12 @@
     { id: 'c46', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
     { id: 'c47', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
     { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(19, 78, 74, 0.35)' },
-    { id: 'c49', name: '🍑🍌', icon: '🍑', color: 'rgba(131, 24, 67, 0.3)' },
+    { id: 'c49', name: '🍌', icon: '🍑', color: 'rgba(131, 24, 67, 0.3)' },
     { id: 'c50', name: 'Waiting', icon: '⏳', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v7';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v9';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -657,15 +660,15 @@
     if (runningLogs.length > 0) {
       activeSection.style.display = 'block';
       activeList.innerHTML = runningLogs.map(r => `
-        <div class="active-card">
-          <div class="active-left" onclick="toggleLog({id:'${r.catId}', name:'${r.name}', icon:'${r.icon}'})">
+        <div class="active-card" onclick="toggleLog({id:'${r.catId}', name:'${r.name}', icon:'${r.icon}'})">
+          <div class="active-left">
             <span class="active-icon">${r.icon}</span>
             <div style="min-width:0;">
               <div class="active-title">${r.name}</div>
               <div class="active-badge">${formatTimeSingleDigit(r.startAt)}〜</div>
             </div>
           </div>
-          <div class="active-right">
+          <div class="active-right" onclick="event.stopPropagation();">
             <div class="active-timer">${formatDurationEN(r.startAt)}</div>
             <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
           </div>
