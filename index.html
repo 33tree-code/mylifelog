@@ -11,17 +11,21 @@
 <link rel="icon" href="logo.png">
 <style>
   :root {
-    --bg: #0b1120;
-    --card-bg: #1e293b;
-    --text: #f8fafc;
+    --bg: #070b14;
+    --card-bg: #151e2e;
+    --text: #f1f5f9;
     --text-sub: #94a3b8;
     --accent: #38bdf8;
-    --running: #00c3ff;
-    --running-bg: rgba(0, 195, 255, 0.15);
-    --border: #334155;
-    --evernote-green: #00a82d;
-    --cal-blue: #0284c7;
+    --running: #00e5ff;
+    --running-bg: rgba(0, 229, 255, 0.16);
+    --border: #233249;
+    
+    /* 立体感・石風テクスチャのベース */
+    --stone-highlight: inset 0 1px 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.5);
+    --stone-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --stone-texture: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0.25) 100%);
   }
+
   * { 
     box-sizing: border-box !important; 
     margin: 0; 
@@ -29,6 +33,7 @@
     font-family: "Meiryo", "メイリオ", "Hiragino Sans", -apple-system, BlinkMacSystemFont, sans-serif; 
     -webkit-tap-highlight-color: transparent; 
   }
+
   body { 
     background: var(--bg); 
     color: var(--text); 
@@ -38,91 +43,104 @@
     user-select: none;
   }
   
-  /* 上段3つのバー共通グリッド構造 */
+  /* 上部バー群 */
   .control-bar-row {
     display: flex;
     align-items: center;
     gap: 8px;
     margin-bottom: 8px;
     width: 100%;
-    height: 38px;
+    height: 42px;
   }
   .bar-left-icon {
-    width: 38px;
-    height: 38px;
+    width: 42px;
+    height: 42px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
   }
   .bar-left-icon img {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     object-fit: contain;
-    border-radius: 6px;
+    border-radius: 8px;
     display: block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
   }
   .header-left-title {
-    flex: 1;
+    flex: 1.2;
     display: flex;
     align-items: center;
     height: 100%;
   }
   .header-left-title h1 {
-    font-size: 1.15rem;
-    font-weight: 700;
+    font-size: 1.2rem;
+    font-weight: 800;
     letter-spacing: -0.5px;
     white-space: nowrap;
     color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
   }
   
-  .bar-btn-group {
-    display: flex;
-    flex: 1;
-    gap: 6px;
-    height: 100%;
-  }
-  .header-btn-group {
+  .bar-btn-group, .header-btn-group {
     display: flex;
     flex: 2;
     gap: 6px;
     height: 100%;
   }
   
-  .btn-header-item {
-    flex: 1;
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    color: var(--text);
-    height: 100%;
-    border-radius: 8px;
-    font-size: 0.78rem;
-    font-weight: 600;
+  /* 石風立体ボタン共通スタイル */
+  .btn-stone {
+    position: relative;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     white-space: nowrap;
+    transition: all 0.08s ease-out;
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+  }
+  .btn-stone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
+  .btn-stone:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.5);
   }
 
-  .btn-bar-item {
-    flex: 1;
-    color: #fff;
-    border: none;
-    font-weight: 600;
-    height: 100%;
-    border-radius: 8px;
-    font-size: 0.78rem;
-    cursor: pointer;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .btn-header-add {
+    flex: 1.4;
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #e2e8f0;
   }
-  .btn-evernote { background: var(--evernote-green); }
-  .btn-cal { background: var(--cal-blue); }
+  .btn-header-gear {
+    flex: 0.8;
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #cbd5e1;
+    font-size: 1.1rem;
+  }
+  .btn-cal { 
+    flex: 1;
+    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+    color: #fff;
+    border-color: rgba(56, 189, 248, 0.3);
+  }
+  .btn-evernote { 
+    flex: 1;
+    background: linear-gradient(180deg, #10b981 0%, #047857 100%);
+    color: #fff;
+    border-color: rgba(52, 211, 153, 0.3);
+  }
 
   .date-picker-wrap-item {
     flex: 1;
@@ -141,84 +159,121 @@
   }
 
   /* ⚡ 現在記録中エリア */
-  .active-section { margin-bottom: 12px; display: none; }
+  .active-section { margin: 8px 0 12px; display: none; }
   .active-card { 
-    background: var(--running-bg); 
+    background: linear-gradient(180deg, rgba(0, 229, 255, 0.22) 0%, rgba(11, 27, 44, 0.85) 100%);
     border: 2px solid var(--running); 
-    box-shadow: 0 0 10px rgba(0, 195, 255, 0.35);
-    border-radius: 10px; 
-    padding: 8px 12px; 
+    box-shadow: 0 0 14px rgba(0, 229, 255, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    border-radius: 12px; 
+    padding: 10px 14px; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
     margin-bottom: 6px; 
   }
-  .active-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
-  .active-icon { font-size: 1.3rem; flex-shrink: 0; }
-  .active-title { font-weight: bold; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-  .active-badge { font-size: 0.85rem; font-weight: bold; color: var(--running); margin-top: 1px; }
+  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer; }
+  .active-icon { font-size: 1.4rem; flex-shrink: 0; }
+  .active-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+  .active-badge { font-size: 0.85rem; font-weight: 700; color: var(--running); margin-top: 1px; }
   .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .active-timer { font-size: 1.1rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
-  .btn-active-edit { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
+  .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; }
+  .btn-active-edit { 
+    background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); 
+    color: #fff; 
+    border: none; 
+    padding: 5px 10px; 
+    border-radius: 7px; 
+    font-size: 0.75rem; 
+    font-weight: 700; 
+    cursor: pointer; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
 
-  /* カテゴリグリッド */
+  /* カテゴリグリッド（石板風デザイン） */
   .grid { 
     display: grid; 
     grid-template-columns: repeat(2, minmax(0, 1fr)); 
-    gap: 6px; 
-    margin-bottom: 14px; 
+    gap: 7px; 
+    margin-bottom: 16px; 
     width: 100%; 
   }
   .card { 
-    border-radius: 8px; 
-    padding: 7px 8px; 
+    position: relative;
+    border-radius: 10px; 
+    padding: 9px 10px; 
     cursor: pointer; 
     display: flex; 
     flex-direction: row; 
-    align-items: center;
-    gap: 6px; 
+    align-items: center; 
+    gap: 8px; 
     min-width: 0; 
     width: 100%; 
-    border: 1px solid var(--border);
-    transition: transform 0.05s ease;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    background: linear-gradient(180deg, #1c2637 0%, #111827 100%);
+    overflow: hidden;
+    transition: transform 0.06s ease-out, box-shadow 0.06s ease-out;
   }
-  .card:active { transform: scale(0.98); }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
+  .card:active { 
+    transform: translateY(2px) scale(0.98); 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 2px 5px rgba(0, 0, 0, 0.6);
+  }
   .card.running { 
     border: 2px solid var(--running) !important; 
-    background: var(--running-bg) !important; 
-    box-shadow: 0 0 8px rgba(0, 195, 255, 0.4);
+    background: linear-gradient(180deg, rgba(0, 229, 255, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%) !important; 
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
   }
-  .card-icon { font-size: 1.15rem; flex-shrink: 0; line-height: 1; }
-  .card-name { font-weight: 500; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+  .card-icon { font-size: 1.25rem; flex-shrink: 0; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
+  .card-name { font-weight: 600; font-size: 0.84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; color: #f8fafc; z-index: 1; }
   
-  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .history-header h2 { font-size: 0.85rem; color: var(--text-sub); }
-  .history-date-label { font-size: 0.8rem; font-weight: bold; color: var(--accent); }
-  .history-list { display: flex; flex-direction: column; gap: 6px; }
-  .history-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
-  .history-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
-  .history-meta { font-size: 0.78rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
-  .history-dur { font-size: 0.9rem; font-weight: 700; color: var(--accent); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  /* 履歴リスト */
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 2px; }
+  .history-header h2 { font-size: 0.9rem; color: var(--text-sub); font-weight: 700; }
+  .history-date-label { font-size: 0.85rem; font-weight: 800; color: var(--accent); }
+  .history-list { display: flex; flex-direction: column; gap: 7px; }
+  .history-item { 
+    background: linear-gradient(180deg, #182234 0%, #0f172a 100%); 
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    border-radius: 10px; 
+    padding: 9px 12px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    cursor: pointer; 
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+  }
+  .history-item:active { transform: scale(0.99); }
+  .history-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+  .history-meta { font-size: 0.8rem; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .history-dur { font-size: 0.92rem; font-weight: 800; color: var(--accent); flex-shrink: 0; font-variant-numeric: tabular-nums; }
   
-  .history-thumbs { display: flex; gap: 4px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
-  .history-img-thumb { width: 26px; height: 26px; border-radius: 4px; object-fit: cover; }
+  .history-thumbs { display: flex; gap: 5px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
+  .history-img-thumb { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
   
   /* モーダル */
-  .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
   .modal-box { 
-    background: var(--card-bg); 
-    padding: 16px; 
-    border-radius: 12px; 
+    background: #151e2e; 
+    padding: 18px; 
+    border-radius: 14px; 
     width: 100%; 
     max-width: 380px; 
     border: 1px solid var(--border); 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
     max-height: 85vh; 
     display: flex; 
     flex-direction: column; 
     overflow: hidden; 
   }
-  .form-group { width: 100% !important; margin-bottom: 8px; display: flex; flex-direction: column; }
-  .form-group label { font-size: 0.75rem; color: var(--text-sub); margin-bottom: 4px; }
+  .form-group { width: 100% !important; margin-bottom: 10px; display: flex; flex-direction: column; }
+  .form-group label { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 5px; font-weight: 600; }
   
   .modal-input {
     width: 100% !important; 
@@ -226,7 +281,7 @@
     min-width: 100% !important; 
     display: block !important;
     padding: 10px 12px !important; 
-    background: #0b1120 !important; 
+    background: #090e17 !important; 
     border: 1px solid var(--border) !important; 
     color: #fff !important; 
     border-radius: 8px !important; 
@@ -235,27 +290,27 @@
     appearance: none !important;
   }
   
-  .modal-btns { display: flex; width: 100%; gap: 6px; margin-top: 10px; }
-  .btn-action { flex: 1; padding: 9px 0; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-size: 0.82rem; text-align: center; white-space: nowrap; }
-  .btn-submit { background: #2563eb; color: #fff; }
-  .btn-danger { background: #ef4444; color: #fff; }
-  .btn-save-green { background: var(--evernote-green); color: #fff; }
-  .btn-cancel-white { background: transparent; border: 2px solid #ffffff !important; color: #ffffff !important; font-weight: bold; }
+  .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
+  .btn-action { flex: 1; padding: 10px 0; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-size: 0.85rem; text-align: center; white-space: nowrap; box-shadow: var(--stone-shadow); }
+  .btn-submit { background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%); color: #fff; }
+  .btn-danger { background: linear-gradient(180deg, #ef4444 0%, #dc2626 100%); color: #fff; }
+  .btn-save-green { background: linear-gradient(180deg, #10b981 0%, #059669 100%); color: #fff; }
+  .btn-cancel-white { background: transparent; border: 1.5px solid rgba(255,255,255,0.4) !important; color: #fff !important; }
   
   #settingList { overflow-y: auto; flex: 1; margin-bottom: 12px; padding-right: 2px; }
-  .sort-item { display: flex; align-items: center; gap: 6px; background: #0b1120; padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border); }
+  .sort-item { display: flex; align-items: center; gap: 6px; background: #0c1320; padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border); }
   .sort-item.dragging { opacity: 0.3; border: 1px dashed var(--accent); }
-  .drag-handle { color: var(--text-sub); font-size: 1.2rem; padding: 6px 8px; cursor: grab; touch-action: none; user-select: none; }
-  .sort-icon-input { width: 40px !important; text-align: center; margin: 0 !important; padding: 6px 2px !important; font-size: 1.1rem !important; }
+  .drag-handle { color: var(--text-sub); font-size: 1.3rem; padding: 6px 8px; cursor: grab; touch-action: none; user-select: none; }
+  .sort-icon-input { width: 42px !important; text-align: center; margin: 0 !important; padding: 6px 2px !important; font-size: 1.1rem !important; }
   .sort-name-input { flex: 1; margin: 0 !important; padding: 6px 8px !important; font-size: 0.85rem !important; }
-  .btn-del-cat { background: #ef4444; border: none; color: #fff; padding: 6px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+  .btn-del-cat { background: #ef4444; border: none; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
   
   .preview-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; max-height: 180px; overflow-y: auto; padding-right: 2px; }
   .preview-img-wrap { position: relative; }
   .preview-img-wrap img { width: 100%; border-radius: 6px; display: block; }
   .preview-img-wrap button { position: absolute; top: 4px; right: 4px; background: rgba(0, 0, 0, 0.7); color: #fff; border: none; border-radius: 4px; padding: 4px 8px; font-size: 0.75rem; }
   
-  .backup-box { margin-top: 10px; padding: 10px; background: #0b1120; border-radius: 8px; border: 1px solid var(--border); display: flex; gap: 6px; }
+  .backup-box { margin-top: 10px; padding: 10px; background: #0c1320; border-radius: 8px; border: 1px solid var(--border); display: flex; gap: 6px; }
 </style>
 </head>
 <body>
@@ -263,27 +318,27 @@
 <!-- 上段ヘッダー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
-    <img src="logo.png" alt="ロゴ" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\'><rect width=\'32\' height=\'32\' fill=\'%23fff\' rx=\'6\'/></svg>';">
+    <img src="logo.png" alt="ロゴ" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'36\' height=\'36\'><rect width=\'36\' height=\'36\' fill=\'%231e293b\' rx=\'8\'/><text x=\'50%\' y=\'55%\' font-size=\'18\' fill=\'%23fff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>⏱</text></svg>';">
   </div>
   <div class="header-left-title">
     <h1>ライフログ</h1>
   </div>
   <div class="header-btn-group">
-    <button class="btn-header-item" onclick="openCatModal()">カテゴリ＋</button>
-    <button class="btn-header-item" onclick="openSettingModal()">カテゴリ⚙</button>
+    <button class="btn-stone btn-header-add" onclick="openCatModal()">カテゴリ追加</button>
+    <button class="btn-stone btn-header-gear" onclick="openSettingModal()">⚙</button>
   </div>
 </div>
 
 <!-- 履歴表示切り替えバー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
-    <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.3rem;\'>📅</div>';">
+    <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📅</div>';">
   </div>
   <div class="bar-btn-group">
-    <button class="btn-bar-item btn-cal" onclick="setHistoryDate(getYesterdayStr())">前日ログ</button>
-    <button class="btn-bar-item btn-cal" onclick="setHistoryDate(getTodayStr())">当日ログ</button>
+    <button class="btn-stone btn-cal" onclick="setHistoryDate(getYesterdayStr())">前日ログ</button>
+    <button class="btn-stone btn-cal" onclick="setHistoryDate(getTodayStr())">当日ログ</button>
     <div class="date-picker-wrap-item">
-      <button class="btn-bar-item btn-cal" style="width:100%;" onclick="openHistoryDatePicker()">日付指定</button>
+      <button class="btn-stone btn-cal" style="width:100%;" onclick="openHistoryDatePicker()">日付指定</button>
       <input type="date" id="historyTargetDate" class="hidden-date-input" onchange="setHistoryDate(this.value)">
     </div>
   </div>
@@ -292,20 +347,20 @@
 <!-- Evernote出力バー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
-    <img src="evernote.png" alt="Evernote">
+    <img src="evernote.png" alt="Evernote" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>🐘</div>';">
   </div>
   <div class="bar-btn-group">
-    <button class="btn-bar-item btn-evernote" onclick="exportEvernoteByDate(getYesterdayStr())">前日出力</button>
-    <button class="btn-bar-item btn-evernote" onclick="exportEvernoteByDate(getTodayStr())">当日出力</button>
+    <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getYesterdayStr())">前日出力</button>
+    <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getTodayStr())">当日出力</button>
     <div class="date-picker-wrap-item">
-      <button class="btn-bar-item btn-evernote" style="width:100%;" onclick="openExportDatePicker()">日付指定</button>
+      <button class="btn-stone btn-evernote" style="width:100%;" onclick="openExportDatePicker()">日付指定</button>
       <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="exportEvernoteByDate(this.value)">
     </div>
   </div>
 </div>
 
 <div class="active-section" id="activeSection">
-  <div style="display:flex;align-items:center;gap:6px;font-size:0.75rem;color:var(--running);font-weight:bold;margin-bottom:4px;">
+  <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--running);font-weight:bold;margin-bottom:6px;">
     <span>⚡ 現在記録中</span>
   </div>
   <div id="activeList"></div>
@@ -322,7 +377,7 @@
 <!-- カテゴリ追加モーダル -->
 <div class="modal" id="catModal">
   <div class="modal-box">
-    <h3 style="margin-bottom:10px;font-size:1rem;">カテゴリ追加</h3>
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">カテゴリ追加</h3>
     <div class="form-group">
       <label>アイコン（絵文字）</label>
       <input type="text" id="catIcon" class="modal-input" value="📌" maxlength="2">
@@ -341,14 +396,14 @@
 <!-- ⚙ カテゴリ設定 ＆ バックアップ/復元モーダル -->
 <div class="modal" id="settingModal">
   <div class="modal-box">
-    <h3 style="margin-bottom:4px;font-size:1rem;">カテゴリ設定・並び替え</h3>
-    <div style="font-size:0.7rem;color:var(--text-sub);margin-bottom:8px;">「≡」を長押しドラッグで移動、文字を直接編集できます</div>
+    <h3 style="margin-bottom:6px;font-size:1.05rem;">カテゴリ設定・並び替え</h3>
+    <div style="font-size:0.75rem;color:var(--text-sub);margin-bottom:10px;">「≡」を長押しドラッグで移動、文字を直接編集できます</div>
     <div id="settingList"></div>
     
-    <div style="font-size:0.75rem;color:var(--accent);font-weight:bold;margin-top:6px;">データ保護・復元</div>
+    <div style="font-size:0.8rem;color:var(--accent);font-weight:bold;margin-top:6px;">データ保護・復元</div>
     <div class="backup-box">
-      <button class="btn-action" style="background:#334155;color:#fff;" onclick="exportBackupData()">💾 保存 (JSON)</button>
-      <label class="btn-action" style="background:#334155;color:#fff;text-align:center;cursor:pointer;padding-top:8px;">
+      <button class="btn-action" style="background:#243248;color:#fff;" onclick="exportBackupData()">💾 保存 (JSON)</button>
+      <label class="btn-action" style="background:#243248;color:#fff;text-align:center;cursor:pointer;padding-top:10px;">
         📂 復元
         <input type="file" accept=".json" style="display:none;" onchange="importBackupData(event)">
       </label>
@@ -363,7 +418,7 @@
 <!-- ログ編集モーダル -->
 <div class="modal" id="editModal">
   <div class="modal-box" style="overflow-y:auto;max-height:90vh;">
-    <h3 style="margin-bottom:10px;font-size:1rem;" id="editModalTitle">ログ編集</h3>
+    <h3 style="margin-bottom:12px;font-size:1.05rem;" id="editModalTitle">ログ編集</h3>
     <input type="hidden" id="editLogId">
     
     <div class="form-group">
@@ -372,7 +427,7 @@
     </div>
     
     <div class="form-group">
-      <label>終了時刻 <span style="font-size:0.65rem;color:var(--accent);">※未入力で終了保存すると現在時刻</span></label>
+      <label>終了時刻 <span style="font-size:0.7rem;color:var(--accent);">※未入力で終了保存すると現在時刻</span></label>
       <input type="time" id="editEndTime" class="modal-input">
     </div>
     
@@ -382,7 +437,7 @@
     </div>
     
     <div class="form-group">
-      <label>写真追加（大容量DB保存）</label>
+      <label>写真追加</label>
       <input type="file" id="editPhoto" class="modal-input" accept="image/*" multiple onchange="handlePhotoUpload(event)">
     </div>
     <div id="imagePreviewContainer" class="preview-grid"></div>
@@ -397,69 +452,62 @@
 </div>
 
 <script>
+  /* 添付画像（IMG_5995, IMG_5996）通りの完全カテゴリ配置 */
   const DEFAULT_CATS = [
-    { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(168, 85, 247, 0.18)' },
-    { id: 'c3', name: 'Power Nap 💤', icon: '🔋', color: 'rgba(236, 72, 153, 0.18)' },
-    { id: 'c6', name: 'ストレッチ🙆', icon: '🧘', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c7', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c8', name: 'poop', icon: '🚽', color: 'rgba(96, 165, 250, 0.18)' },
-    { id: 'c9', name: '風呂🛀', icon: '🛁', color: 'rgba(34, 211, 238, 0.18)' },
-    { id: 'c10', name: '読書📖', icon: '📚', color: 'rgba(251, 146, 60, 0.18)' },
-    { id: 'c11', name: 'PC・スマホ作業', icon: '🖥', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c12', name: 'Trade💹', icon: '📈', color: 'rgba(74, 222, 128, 0.18)' },
-
-    { id: 'c13', name: 'NewsPicks等', icon: '🌐', color: 'rgba(34, 211, 238, 0.18)' },
-    { id: 'c4', name: 'Coffee', icon: '☕', color: 'rgba(249, 115, 22, 0.18)' },
-    { id: 'c5', name: '抹茶 Time', icon: '🍵', color: 'rgba(34, 197, 94, 0.18)' },
-    { id: 'c26', name: 'Work💼', icon: '🏢', color: 'rgba(74, 222, 128, 0.18)' },
-
-    { id: 'c16', name: '移動 →', icon: '🧭', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c17', name: '食事🍴', icon: '🍽', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c18', name: '食事🍴 (家族)', icon: '👨‍👩‍👧‍👦', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c19', name: '家事🧺', icon: '🏠', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c20', name: '掃除', icon: '🧹', color: 'rgba(129, 140, 248, 0.18)' },
-    { id: 'c21', name: 'アイロン', icon: '👔', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c22', name: '片付け', icon: '🗄️', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c23', name: '試し・メンテ', icon: '🪮', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c24', name: '設定🔧', icon: '⚙', color: 'rgba(96, 165, 250, 0.18)' },
-
-    { id: 'c31', name: '買い物等🛍リアル', icon: '🛒', color: 'rgba(45, 212, 191, 0.18)' },
-    { id: 'c32', name: '買い物等🛍ネット', icon: '📦', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c29', name: '開封✂️', icon: '📦', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c30', name: '病院等', icon: '🏥', color: 'rgba(56, 189, 248, 0.18)' },
-
-    { id: 'c25', name: '撮影 Time', icon: '📷', color: 'rgba(52, 211, 153, 0.18)' },
-    { id: 'c14', name: 'Growth🚀', icon: '🌱', color: 'rgba(234, 179, 8, 0.18)' },
-    { id: 'c15', name: '調べ物', icon: '🔍', color: 'rgba(250, 204, 21, 0.18)' },
-
-    { id: 'c27', name: '所用', icon: '📋', color: 'rgba(96, 165, 250, 0.18)' },
-    { id: 'c28', name: '所用 (家族)', icon: '👨‍👩‍👧', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c33', name: 'Family', icon: '👨‍👩‍👧', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c34', name: '仕事関連', icon: '👥', color: 'rgba(74, 222, 128, 0.18)' },
-    { id: 'c35', name: 'Social👥', icon: '🤝', color: 'rgba(96, 165, 250, 0.18)' },
-
-    { id: 'c36', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(251, 191, 36, 0.18)' },
-    { id: 'c37', name: 'Sweets🍪Time', icon: '🧁', color: 'rgba(249, 115, 22, 0.18)' },
-    { id: 'c38', name: 'Leisure', icon: '🎉', color: 'rgba(250, 204, 21, 0.18)' },
-    { id: 'c39', name: '動画視聴', icon: '📺', color: 'rgba(249, 115, 22, 0.18)' },
-    { id: 'c40', name: 'Money💰関連', icon: '💵', color: 'rgba(234, 179, 8, 0.18)' },
-    { id: 'c41', name: '筋トレ💪', icon: '🏋️', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c42', name: 'ランニング👟', icon: '🏃', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c43', name: 'ウォーキング', icon: '🚶', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c44', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(45, 212, 191, 0.18)' },
-    { id: 'c45', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(52, 211, 153, 0.18)' },
-    { id: 'c46', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(74, 222, 128, 0.18)' },
-    { id: 'c47', name: '飲み会🍻private', icon: '🍺', color: 'rgba(56, 189, 248, 0.18)' },
-
-    { id: 'c48', name: '🍌', icon: '🍑', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c49', name: '☀', icon: '☀️', color: 'rgba(236, 72, 153, 0.18)' },
-    { id: 'c50', name: '旅行等🚃Plan', icon: '✈️', color: 'rgba(34, 211, 238, 0.18)' },
-    { id: 'c51', name: 'Waiting Time', icon: '⏳', color: 'rgba(167, 243, 208, 0.18)' },
-    { id: 'c52', name: 'Relux', icon: '🌳', color: 'rgba(74, 222, 128, 0.18)' },
-    { id: 'c2', name: 'Sleepless Time', icon: '🦉', color: 'rgba(148, 163, 184, 0.18)' }
+    { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
+    { id: 'c2', name: 'Power Nap💤', icon: '🔋', color: 'rgba(34, 197, 94, 0.22)' },
+    { id: 'c3', name: 'ストレッチ🙆', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
+    { id: 'c4', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.22)' },
+    { id: 'c5', name: 'BM', icon: '🚽', color: 'rgba(148, 163, 184, 0.22)' },
+    { id: 'c6', name: '風呂🛀', icon: '🛁', color: 'rgba(34, 211, 238, 0.22)' },
+    { id: 'c7', name: '読書📖', icon: '📚', color: 'rgba(180, 83, 9, 0.25)' },
+    { id: 'c8', name: '自己啓発', icon: '🌱', color: 'rgba(132, 204, 22, 0.22)' },
+    { id: 'c9', name: 'Tech Work', icon: '🖥', color: 'rgba(30, 41, 59, 0.7)' },
+    { id: 'c10', name: 'Trade💹', icon: '📈', color: 'rgba(239, 68, 68, 0.22)' },
+    { id: 'c11', name: 'Research', icon: '🌐', color: 'rgba(2, 132, 199, 0.25)' },
+    { id: 'c12', name: 'Search', icon: '🔍', color: 'rgba(100, 116, 139, 0.25)' },
+    { id: 'c13', name: 'Coffee', icon: '☕', color: 'rgba(120, 53, 15, 0.3)' },
+    { id: 'c14', name: '抹茶', icon: '🍵', color: 'rgba(22, 101, 52, 0.3)' },
+    { id: 'c15', name: 'Work💼', icon: '🏢', color: 'rgba(15, 118, 110, 0.3)' },
+    { id: 'c16', name: '移動 →', icon: '🧭', color: 'rgba(71, 85, 105, 0.3)' },
+    { id: 'c17', name: '食事🍴', icon: '🍽', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c18', name: '食事🍴 (家族)', icon: '👥', color: 'rgba(76, 29, 149, 0.25)' },
+    { id: 'c19', name: '家事🧺', icon: '🏠', color: 'rgba(15, 76, 129, 0.25)' },
+    { id: 'c20', name: '掃除', icon: '🧹', color: 'rgba(55, 65, 81, 0.35)' },
+    { id: 'c21', name: 'アイロン', icon: '👔', color: 'rgba(30, 58, 138, 0.28)' },
+    { id: 'c22', name: '片付け', icon: '🗄', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c23', name: '試し・メンテ', icon: '🪮', color: 'rgba(51, 65, 85, 0.5)' },
+    { id: 'c24', name: '設定🔧', icon: '⚙', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c25', name: '買い物等🛍リアル', icon: '🛒', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c26', name: '買い物等🛍ネット', icon: '📦', color: 'rgba(15, 76, 129, 0.35)' },
+    { id: 'c27', name: '開封✂️', icon: '📦', color: 'rgba(120, 53, 15, 0.25)' },
+    { id: 'c28', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
+    { id: 'c29', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c30', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c31', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
+    { id: 'c32', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
+    { id: 'c33', name: '仕事関連', icon: '👥', color: 'rgba(6, 78, 59, 0.35)' },
+    { id: 'c34', name: 'Social👥', icon: '🤝', color: 'rgba(30, 58, 138, 0.3)' },
+    { id: 'c35', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c36', name: 'Sweets🍪', icon: '🧁', color: 'rgba(131, 24, 67, 0.25)' },
+    { id: 'c37', name: 'Leisure', icon: '🎉', color: 'rgba(120, 53, 15, 0.28)' },
+    { id: 'c38', name: '旅行等🚃Plan', icon: '✈️', color: 'rgba(3, 105, 161, 0.3)' },
+    { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(120, 53, 15, 0.28)' },
+    { id: 'c41', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
+    { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(88, 28, 135, 0.3)' },
+    { id: 'c43', name: 'Running👟', icon: '🏃', color: 'rgba(88, 28, 135, 0.3)' },
+    { id: 'c44', name: 'Walking', icon: '🚶', color: 'rgba(49, 46, 129, 0.3)' },
+    { id: 'c45', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c46', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
+    { id: 'c47', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
+    { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c49', name: '🍑🍌', icon: '🍑', color: 'rgba(131, 24, 67, 0.3)' },
+    { id: 'c50', name: 'Waiting', icon: '⏳', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_order_v26';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v2';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -644,9 +692,9 @@
     const g = document.getElementById('grid');
     g.innerHTML = cats.map(c => {
       const r = logs.find(l => l.catId === c.id && !l.endAt);
-      const bg = c.color || 'rgba(30, 41, 59, 0.8)';
+      const bg = c.color ? `background:${c.color};` : '';
       return `
-        <div class="card ${r ? 'running' : ''}" style="background:${bg};" onclick="toggleLog(${JSON.stringify(c).replace(/"/g, '&quot;')})">
+        <div class="card ${r ? 'running' : ''}" style="${bg}" onclick="toggleLog(${JSON.stringify(c).replace(/"/g, '&quot;')})">
           <div class="card-icon">${c.icon}</div>
           <div class="card-name">${c.name}</div>
         </div>
@@ -667,16 +715,16 @@
                    .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     
     if (tl.length === 0) {
-      h.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:12px 0;">${vy}/${vm}/${vd} の記録はありません</div>`;
+      h.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:16px 0;">${vy}/${vm}/${vd} の記録はありません</div>`;
     } else {
       h.innerHTML = tl.map(l => {
         const p = l.photos || (l.photo ? [l.photo] : []);
         return `
           <div class="history-item" onclick="openEditModal('${l.id}')">
             <div class="history-left">
-              <span style="font-size:1.1rem;flex-shrink:0;">${l.icon}</span>
+              <span style="font-size:1.2rem;flex-shrink:0;">${l.icon}</span>
               <div style="min-width:0;">
-                <div style="font-weight:600;font-size:0.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.name}</div>
+                <div style="font-weight:700;font-size:0.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.name}</div>
                 <div class="history-meta">${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)}</div>
               </div>
             </div>
@@ -698,7 +746,7 @@
     const n = document.getElementById('catName').value.trim();
     const i = document.getElementById('catIcon').value.trim() || '📌';
     if (!n) return;
-    cats.push({ id: Date.now().toString(), name: n, icon: i, color: 'rgba(56, 189, 248, 0.18)' });
+    cats.push({ id: Date.now().toString(), name: n, icon: i, color: 'rgba(30, 41, 59, 0.6)' });
     document.getElementById('catName').value = '';
     closeCatModal();
     await save();
@@ -972,7 +1020,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理 */
+  /* Evernote出力処理（サムネイル写真表示・高解像度インラインHTML対応） */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
@@ -1015,14 +1063,20 @@
       plain += `${l.icon}\n${l.name}\n${tr}\n`;
 
       if (l.memo) {
-        logHtml += `<div style="font-size:15px;line-height:1.4;white-space:pre-wrap;${FONT_MEIRYO}">${l.memo}</div>`;
+        logHtml += `<div style="font-size:15px;line-height:1.4;white-space:pre-wrap;margin-top:2px;${FONT_MEIRYO}">${l.memo}</div>`;
         plain += `${l.memo}\n`;
       }
-      p.forEach(x => {
-        logHtml += `<div style="margin-top:8px;"><img src="${x}" style="max-width:100%;border-radius:4px;display:block;"></div>`;
-      });
+      
+      /* Evernoteで確実にサムネイル表示されるインライン画像ブロック */
+      if (p.length > 0) {
+        logHtml += `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;">`;
+        p.forEach(x => {
+          logHtml += `<img src="${x}" style="max-width:320px;width:100%;height:auto;border-radius:6px;display:block;margin-bottom:6px;border:1px solid #ddd;" />`;
+        });
+        logHtml += `</div>`;
+      }
+      
       logHtml += '</div>';
-
       html += logHtml;
 
       if (index < tl.length - 1) {
