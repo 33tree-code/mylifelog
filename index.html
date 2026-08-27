@@ -89,52 +89,40 @@
     height: 100%;
   }
   
-  /* 石調テクスチャー共通ベース */
-  .btn-stone {
-    position: relative;
+  .btn-header-item {
+    flex: 1;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    height: 100%;
     border-radius: 8px;
+    font-size: 0.78rem;
     font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     white-space: nowrap;
-    transition: transform 0.05s ease, filter 0.05s ease;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.6);
-  }
-  .btn-stone:active {
-    transform: translateY(1px) scale(0.98);
-  }
-
-  /* ヘッダー石調ボタン（スレートストーン） */
-  .btn-stone-header {
-    background: linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(0,0,0,0.35) 100%), #1e293b;
-    border: 1px solid #475569;
-    color: #f1f5f9;
-    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.2), inset -1px -1px 2px rgba(0, 0, 0, 0.6), 0 2px 4px rgba(0,0,0,0.4);
-  }
-
-  /* カレンダー石調ボタン（ブルーストーン） */
-  .btn-stone-cal {
-    background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(0,0,0,0.3) 100%), #0284c7;
-    border: 1px solid #38bdf8;
-    color: #fff;
-    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.3), inset -1px -1px 2px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0,0,0,0.4);
-  }
-
-  /* Evernote石調ボタン（グリーンストーン） */
-  .btn-stone-evernote {
-    background: linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(0,0,0,0.3) 100%), #00a82d;
-    border: 1px solid #4ade80;
-    color: #fff;
-    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.3), inset -1px -1px 2px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0,0,0,0.4);
   }
 
   .btn-bar-item {
     flex: 1;
+    color: #fff;
+    border: none;
+    font-weight: 600;
     height: 100%;
+    border-radius: 8px;
     font-size: 0.78rem;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
+  .btn-evernote { background: var(--evernote-green); }
+  .btn-cal { background: var(--cal-blue); }
 
   .date-picker-wrap-item {
     flex: 1;
@@ -171,19 +159,9 @@
   .active-badge { font-size: 0.85rem; font-weight: bold; color: var(--running); margin-top: 1px; }
   .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
   .active-timer { font-size: 1.1rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
-  .btn-active-edit { 
-    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.3) 100%), #ef4444;
-    border: 1px solid #f87171;
-    color: #fff; 
-    padding: 5px 9px; 
-    border-radius: 6px; 
-    font-size: 0.74rem; 
-    font-weight: bold; 
-    cursor: pointer;
-    box-shadow: inset 1px 1px 1px rgba(255,255,255,0.3), inset -1px -1px 2px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
-  }
+  .btn-active-edit { background: #ef4444; color: #fff; border: none; padding: 4px 8px; border-radius: 6px; font-size: 0.72rem; font-weight: bold; cursor: pointer; }
 
-  /* カテゴリグリッド（全面石調プレート） */
+  /* カテゴリグリッド */
   .grid { 
     display: grid; 
     grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -201,17 +179,14 @@
     gap: 6px; 
     min-width: 0; 
     width: 100%; 
-    border: 1px solid #334155;
-    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0.35) 100%);
-    box-shadow: inset 1px 1px 1px rgba(255, 255, 255, 0.1), inset -1px -1px 2px rgba(0, 0, 0, 0.5), 0 2px 3px rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
     transition: transform 0.05s ease;
   }
-  .card:active { transform: translateY(1px) scale(0.98); }
+  .card:active { transform: scale(0.98); }
   .card.running { 
     border: 2px solid var(--running) !important; 
-    background-color: rgba(0, 195, 255, 0.22) !important;
-    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(0, 0, 0, 0.3) 100%) !important;
-    box-shadow: 0 0 10px rgba(0, 195, 255, 0.5), inset 1px 1px 2px rgba(255,255,255,0.4);
+    background: var(--running-bg) !important; 
+    box-shadow: 0 0 8px rgba(0, 195, 255, 0.4);
   }
   .card-icon { font-size: 1.15rem; flex-shrink: 0; line-height: 1; }
   .card-name { font-weight: 500; font-size: 0.78rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
@@ -220,17 +195,7 @@
   .history-header h2 { font-size: 0.85rem; color: var(--text-sub); }
   .history-date-label { font-size: 0.8rem; font-weight: bold; color: var(--accent); }
   .history-list { display: flex; flex-direction: column; gap: 6px; }
-  .history-item { 
-    background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(0,0,0,0.25) 100%), var(--card-bg); 
-    border: 1px solid var(--border); 
-    border-radius: 8px; 
-    padding: 8px 12px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    cursor: pointer;
-    box-shadow: inset 1px 1px 1px rgba(255,255,255,0.06), 0 2px 4px rgba(0,0,0,0.2);
-  }
+  .history-item { background: var(--card-bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
   .history-left { display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1; }
   .history-meta { font-size: 0.78rem; color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; }
   .history-dur { font-size: 0.9rem; font-weight: 700; color: var(--accent); flex-shrink: 0; font-variant-numeric: tabular-nums; }
@@ -271,21 +236,10 @@
   }
   
   .modal-btns { display: flex; width: 100%; gap: 6px; margin-top: 10px; }
-  .btn-action { 
-    flex: 1; 
-    padding: 9px 0; 
-    border-radius: 8px; 
-    font-weight: 600; 
-    cursor: pointer; 
-    border: none; 
-    font-size: 0.82rem; 
-    text-align: center; 
-    white-space: nowrap; 
-    box-shadow: inset 1px 1px 1px rgba(255,255,255,0.2), 0 2px 4px rgba(0,0,0,0.3);
-  }
-  .btn-submit { background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.25) 100%), #2563eb; color: #fff; }
-  .btn-danger { background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.25) 100%), #ef4444; color: #fff; }
-  .btn-save-green { background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(0,0,0,0.25) 100%), var(--evernote-green); color: #fff; }
+  .btn-action { flex: 1; padding: 9px 0; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; font-size: 0.82rem; text-align: center; white-space: nowrap; }
+  .btn-submit { background: #2563eb; color: #fff; }
+  .btn-danger { background: #ef4444; color: #fff; }
+  .btn-save-green { background: var(--evernote-green); color: #fff; }
   .btn-cancel-white { background: transparent; border: 2px solid #ffffff !important; color: #ffffff !important; font-weight: bold; }
   
   #settingList { overflow-y: auto; flex: 1; margin-bottom: 12px; padding-right: 2px; }
@@ -315,8 +269,8 @@
     <h1>ライフログ</h1>
   </div>
   <div class="header-btn-group">
-    <button class="btn-stone btn-stone-header" style="flex:1.2; font-size:0.76rem;" onclick="openCatModal()">カテゴリ追加</button>
-    <button class="btn-stone btn-stone-header" style="flex:0.8; font-size:1.05rem;" onclick="openSettingModal()">&nbsp;⚙&nbsp;</button>
+    <button class="btn-header-item" onclick="openCatModal()">カテゴリ＋</button>
+    <button class="btn-header-item" onclick="openSettingModal()">カテゴリ⚙</button>
   </div>
 </div>
 
@@ -326,10 +280,10 @@
     <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.3rem;\'>📅</div>';">
   </div>
   <div class="bar-btn-group">
-    <button class="btn-stone btn-stone-cal btn-bar-item" onclick="setHistoryDate(getYesterdayStr())">前日ログ</button>
-    <button class="btn-stone btn-stone-cal btn-bar-item" onclick="setHistoryDate(getTodayStr())">当日ログ</button>
+    <button class="btn-bar-item btn-cal" onclick="setHistoryDate(getYesterdayStr())">前日ログ</button>
+    <button class="btn-bar-item btn-cal" onclick="setHistoryDate(getTodayStr())">当日ログ</button>
     <div class="date-picker-wrap-item">
-      <button class="btn-stone btn-stone-cal btn-bar-item" style="width:100%;" onclick="openHistoryDatePicker()">日付指定</button>
+      <button class="btn-bar-item btn-cal" style="width:100%;" onclick="openHistoryDatePicker()">日付指定</button>
       <input type="date" id="historyTargetDate" class="hidden-date-input" onchange="setHistoryDate(this.value)">
     </div>
   </div>
@@ -341,10 +295,10 @@
     <img src="evernote.png" alt="Evernote">
   </div>
   <div class="bar-btn-group">
-    <button class="btn-stone btn-stone-evernote btn-bar-item" onclick="exportEvernoteByDate(getYesterdayStr())">前日出力</button>
-    <button class="btn-stone btn-stone-evernote btn-bar-item" onclick="exportEvernoteByDate(getTodayStr())">当日出力</button>
+    <button class="btn-bar-item btn-evernote" onclick="exportEvernoteByDate(getYesterdayStr())">前日出力</button>
+    <button class="btn-bar-item btn-evernote" onclick="exportEvernoteByDate(getTodayStr())">当日出力</button>
     <div class="date-picker-wrap-item">
-      <button class="btn-stone btn-stone-evernote btn-bar-item" style="width:100%;" onclick="openExportDatePicker()">日付指定</button>
+      <button class="btn-bar-item btn-evernote" style="width:100%;" onclick="openExportDatePicker()">日付指定</button>
       <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="exportEvernoteByDate(this.value)">
     </div>
   </div>
@@ -443,23 +397,20 @@
 </div>
 
 <script>
-  /* 最新版 全51項目カテゴリデータ（旅行等🚃PlanをLeisureの直後へ配置） */
   const DEFAULT_CATS = [
     { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(168, 85, 247, 0.18)' },
-    { id: 'c3', name: 'パワーナップ', icon: '⌛', color: 'rgba(236, 72, 153, 0.18)' },
+    { id: 'c3', name: 'Power Nap 💤', icon: '🔋', color: 'rgba(236, 72, 153, 0.18)' },
     { id: 'c6', name: 'ストレッチ🙆', icon: '🧘', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c7', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.18)' },
-    { id: 'c8', name: 'BM', icon: '🚽', color: 'rgba(96, 165, 250, 0.18)' },
+    { id: 'c8', name: 'poop', icon: '🚽', color: 'rgba(96, 165, 250, 0.18)' },
     { id: 'c9', name: '風呂🛀', icon: '🛁', color: 'rgba(34, 211, 238, 0.18)' },
     { id: 'c10', name: '読書📖', icon: '📚', color: 'rgba(251, 146, 60, 0.18)' },
-    { id: 'c14', name: '自己啓発', icon: '🌱', color: 'rgba(234, 179, 8, 0.18)' },
-    { id: 'c11', name: 'Tech Work', icon: '🖥', color: 'rgba(56, 189, 248, 0.18)' },
+    { id: 'c11', name: 'PC・スマホ作業', icon: '🖥', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c12', name: 'Trade💹', icon: '📈', color: 'rgba(74, 222, 128, 0.18)' },
 
-    { id: 'c13', name: 'Research', icon: '🌐', color: 'rgba(34, 211, 238, 0.18)' },
-    { id: 'c15', name: 'Search', icon: '🔍', color: 'rgba(250, 204, 21, 0.18)' },
-    { id: 'c4', name: '珈琲', icon: '☕', color: 'rgba(249, 115, 22, 0.18)' },
-    { id: 'c5', name: '抹茶', icon: '🍵', color: 'rgba(34, 197, 94, 0.18)' },
+    { id: 'c13', name: 'NewsPicks等', icon: '🌐', color: 'rgba(34, 211, 238, 0.18)' },
+    { id: 'c4', name: 'Coffee', icon: '☕', color: 'rgba(249, 115, 22, 0.18)' },
+    { id: 'c5', name: '抹茶 Time', icon: '🍵', color: 'rgba(34, 197, 94, 0.18)' },
     { id: 'c26', name: 'Work💼', icon: '🏢', color: 'rgba(74, 222, 128, 0.18)' },
 
     { id: 'c16', name: '移動 →', icon: '🧭', color: 'rgba(56, 189, 248, 0.18)' },
@@ -477,7 +428,10 @@
     { id: 'c29', name: '開封✂️', icon: '📦', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c30', name: '病院等', icon: '🏥', color: 'rgba(56, 189, 248, 0.18)' },
 
-    { id: 'c25', name: 'Shooting', icon: '📷', color: 'rgba(52, 211, 153, 0.18)' },
+    { id: 'c25', name: '撮影 Time', icon: '📷', color: 'rgba(52, 211, 153, 0.18)' },
+    { id: 'c14', name: 'Growth🚀', icon: '🌱', color: 'rgba(234, 179, 8, 0.18)' },
+    { id: 'c15', name: '調べ物', icon: '🔍', color: 'rgba(250, 204, 21, 0.18)' },
+
     { id: 'c27', name: '所用', icon: '📋', color: 'rgba(96, 165, 250, 0.18)' },
     { id: 'c28', name: '所用 (家族)', icon: '👨‍👩‍👧', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c33', name: 'Family', icon: '👨‍👩‍👧', color: 'rgba(244, 114, 182, 0.18)' },
@@ -485,15 +439,13 @@
     { id: 'c35', name: 'Social👥', icon: '🤝', color: 'rgba(96, 165, 250, 0.18)' },
 
     { id: 'c36', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(251, 191, 36, 0.18)' },
-    { id: 'c37', name: 'Sweets🍪', icon: '🧁', color: 'rgba(249, 115, 22, 0.18)' },
+    { id: 'c37', name: 'Sweets🍪Time', icon: '🧁', color: 'rgba(249, 115, 22, 0.18)' },
     { id: 'c38', name: 'Leisure', icon: '🎉', color: 'rgba(250, 204, 21, 0.18)' },
-    { id: 'c50', name: '旅行等🚃Plan', icon: '✈️', color: 'rgba(34, 211, 238, 0.18)' },
-    { id: 'c_screen', name: 'Screen Time', icon: '📱', color: 'rgba(56, 189, 248, 0.18)' },
     { id: 'c39', name: '動画視聴', icon: '📺', color: 'rgba(249, 115, 22, 0.18)' },
     { id: 'c40', name: 'Money💰関連', icon: '💵', color: 'rgba(234, 179, 8, 0.18)' },
     { id: 'c41', name: '筋トレ💪', icon: '🏋️', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c42', name: 'Running👟', icon: '🏃', color: 'rgba(244, 114, 182, 0.18)' },
-    { id: 'c43', name: 'Walking', icon: '🚶', color: 'rgba(244, 114, 182, 0.18)' },
+    { id: 'c42', name: 'ランニング👟', icon: '🏃', color: 'rgba(244, 114, 182, 0.18)' },
+    { id: 'c43', name: 'ウォーキング', icon: '🚶', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c44', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(45, 212, 191, 0.18)' },
     { id: 'c45', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(52, 211, 153, 0.18)' },
     { id: 'c46', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(74, 222, 128, 0.18)' },
@@ -501,12 +453,13 @@
 
     { id: 'c48', name: '🍌', icon: '🍑', color: 'rgba(244, 114, 182, 0.18)' },
     { id: 'c49', name: '☀', icon: '☀️', color: 'rgba(236, 72, 153, 0.18)' },
-    { id: 'c51', name: 'Waiting', icon: '⏳', color: 'rgba(167, 243, 208, 0.18)' },
+    { id: 'c50', name: '旅行等🚃Plan', icon: '✈️', color: 'rgba(34, 211, 238, 0.18)' },
+    { id: 'c51', name: 'Waiting Time', icon: '⏳', color: 'rgba(167, 243, 208, 0.18)' },
     { id: 'c52', name: 'Relux', icon: '🌳', color: 'rgba(74, 222, 128, 0.18)' },
-    { id: 'c2', name: 'Sleepless', icon: '🦉', color: 'rgba(148, 163, 184, 0.18)' }
+    { id: 'c2', name: 'Sleepless Time', icon: '🦉', color: 'rgba(148, 163, 184, 0.18)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_order_v26';
+  const CURRENT_VER = '2026_08_cats_exact_order_v27';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -693,7 +646,7 @@
       const r = logs.find(l => l.catId === c.id && !l.endAt);
       const bg = c.color || 'rgba(30, 41, 59, 0.8)';
       return `
-        <div class="card ${r ? 'running' : ''}" style="background-color:${bg};" onclick="toggleLog(${JSON.stringify(c).replace(/"/g, '&quot;')})">
+        <div class="card ${r ? 'running' : ''}" style="background:${bg};" onclick="toggleLog(${JSON.stringify(c).replace(/"/g, '&quot;')})">
           <div class="card-icon">${c.icon}</div>
           <div class="card-name">${c.name}</div>
         </div>
@@ -894,7 +847,7 @@
           canvas.height = h;
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
-          resolve(canvas.toDataURL('image/jpeg', 0.75));
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
         };
         img.src = e.target.result;
       };
@@ -1019,7 +972,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理（メモの入力通り改行＆1行空き制御） */
+  /* Evernote出力処理（サムネイル認識最適化・水平線撤去・メモ直結） */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
@@ -1042,9 +995,8 @@
     const FONT_MEIRYO = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
 
     let html = `<div style="${FONT_MEIRYO}">
-      <div style="font-size:24px;font-weight:bold;margin-bottom:10px;${FONT_MEIRYO}">${dateTitle}</div>
-      <hr style="border:0;border-top:1px solid #ccc;margin-bottom:16px;">`;
-    let plain = `${dateTitle}\n====================\n\n`;
+      <div style="font-size:24px;font-weight:bold;margin-bottom:14px;${FONT_MEIRYO}">${dateTitle}</div>`;
+    let plain = `${dateTitle}\n\n`;
 
     tl.forEach((l, index) => {
       const end = l.endAt || new Date().toISOString();
@@ -1054,7 +1006,7 @@
       
       let logHtml = `
         <div style="line-height:1.4;margin:0;padding:0;${FONT_MEIRYO}">
-          <div style="line-height:1;margin-bottom:4px;">
+          <div style="line-height:1;margin-bottom:2px;">
             <img src="${iconPng}" width="48" height="48" style="width:48px;height:48px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
           </div>
           <div style="font-size:22px;font-weight:bold;line-height:1.3;${FONT_MEIRYO}">${l.name}</div>
@@ -1063,19 +1015,11 @@
       plain += `${l.icon}\n${l.name}\n${tr}\n`;
 
       if (l.memo) {
-        logHtml += '<div><br></div>';
-        const lines = l.memo.split('\n');
-        lines.forEach(line => {
-          if (line === '') {
-            logHtml += '<div><br></div>';
-          } else {
-            logHtml += `<div style="font-size:15px;line-height:1.4;margin:0;padding:0;${FONT_MEIRYO}">${line}</div>`;
-          }
-        });
-        plain += `\n${l.memo}\n`;
+        logHtml += `<div style="font-size:15px;line-height:1.4;white-space:pre-wrap;${FONT_MEIRYO}">${l.memo}</div>`;
+        plain += `${l.memo}\n`;
       }
       p.forEach(x => {
-        logHtml += `<div style="margin-top:8px;"><img src="${x}" style="max-width:100%;border-radius:4px;display:block;"></div>`;
+        logHtml += `<div style="margin-top:8px;"><img src="${x}" style="max-width:100%;height:auto;display:block;border-radius:4px;" alt="添付写真"></div>`;
       });
       logHtml += '</div>';
 
@@ -1130,6 +1074,7 @@
     reader.readAsText(file);
   }
 
+  // 初期読み込み
   loadLogsFromDB().then(loaded => {
     logs = loaded;
     render();
