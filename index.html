@@ -35,7 +35,7 @@
     user-select: none;
   }
   
-  /* 上段ヘッダー（左ロゴ＋タイトル、右ボタン2種） */
+  /* 上段ヘッダー（左タイトル・右ボタンの完全分離） */
   .header-top-row {
     display: flex;
     align-items: center;
@@ -446,6 +446,7 @@
 </div>
 
 <script>
+  /* 45カテゴリ（☀・Relux を完全削除） */
   const DEFAULT_CATS = [
     { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'linear-gradient(135deg, rgba(88,28,135,0.4) 0%, rgba(30,41,59,0.8) 100%)' },
     { id: 'c2', name: 'Power Nap 💤', icon: '🔋', color: 'linear-gradient(135deg, rgba(131,24,67,0.4) 0%, rgba(30,41,59,0.8) 100%)' },
@@ -496,13 +497,11 @@
     { id: 'c47', name: '飲み会🍻仕事…', icon: '🍻', color: 'linear-gradient(135deg, rgba(21,128,61,0.4) 0%, rgba(30,41,59,0.8) 100%)' },
     { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'linear-gradient(135deg, rgba(3,105,161,0.4) 0%, rgba(30,41,59,0.8) 100%)' },
     { id: 'c49', name: '🍌', icon: '🍑', color: 'linear-gradient(135deg, rgba(136,19,55,0.4) 0%, rgba(30,41,59,0.8) 100%)' },
-    { id: 'c50', name: '☀', icon: '☀️', color: 'linear-gradient(135deg, rgba(131,24,67,0.4) 0%, rgba(30,41,59,0.8) 100%)' },
     { id: 'c51', name: 'Waiting', icon: '⏳', color: 'linear-gradient(135deg, rgba(4,120,87,0.4) 0%, rgba(30,41,59,0.8) 100%)' },
-    { id: 'c52', name: 'Relux', icon: '🌳', color: 'linear-gradient(135deg, rgba(21,128,61,0.4) 0%, rgba(30,41,59,0.8) 100%)' },
     { id: 'c53', name: 'Sleepless', icon: '🦉', color: 'linear-gradient(135deg, rgba(71,85,105,0.4) 0%, rgba(30,41,59,0.8) 100%)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_final_master_v130_stable';
+  const CURRENT_VER = '2026_08_cats_exact_final_master_v150_no_sun_relux';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -1015,7 +1014,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理（重複画像なし・自然なサムネイル認識・メモ直結） */
+  /* Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
