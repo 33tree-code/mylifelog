@@ -20,7 +20,6 @@
     --running-bg: rgba(0, 229, 255, 0.16);
     --border: #233249;
     
-    /* 立体感・石風テクスチャのベース */
     --stone-highlight: inset 0 1px 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.5);
     --stone-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
     --stone-texture: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0.25) 100%);
@@ -43,7 +42,6 @@
     user-select: none;
   }
   
-  /* 上部バー群 */
   .control-bar-row {
     display: flex;
     align-items: center;
@@ -90,7 +88,6 @@
     height: 100%;
   }
   
-  /* 石風立体ボタン共通スタイル */
   .btn-stone {
     position: relative;
     border-radius: 10px;
@@ -158,7 +155,6 @@
     z-index: 10;
   }
 
-  /* ⚡ 現在記録中エリア */
   .active-section { margin: 8px 0 12px; display: none; }
   .active-card { 
     background: linear-gradient(180deg, rgba(0, 229, 255, 0.22) 0%, rgba(11, 27, 44, 0.85) 100%);
@@ -189,7 +185,6 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   }
 
-  /* カテゴリグリッド（石板風デザイン） */
   .grid { 
     display: grid; 
     grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -233,7 +228,6 @@
   .card-icon { font-size: 1.25rem; flex-shrink: 0; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
   .card-name { font-weight: 600; font-size: 0.84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; color: #f8fafc; z-index: 1; }
   
-  /* 履歴リスト */
   .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 2px; }
   .history-header h2 { font-size: 0.9rem; color: var(--text-sub); font-weight: 700; }
   .history-date-label { font-size: 0.85rem; font-weight: 800; color: var(--accent); }
@@ -257,7 +251,6 @@
   .history-thumbs { display: flex; gap: 5px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
   
-  /* モーダル */
   .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
   .modal-box { 
     background: #151e2e; 
@@ -315,7 +308,6 @@
 </head>
 <body>
 
-<!-- 上段ヘッダー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="logo.png" alt="ロゴ" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'36\' height=\'36\'><rect width=\'36\' height=\'36\' fill=\'%231e293b\' rx=\'8\'/><text x=\'50%\' y=\'55%\' font-size=\'18\' fill=\'%23fff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>⏱</text></svg>';">
@@ -329,7 +321,6 @@
   </div>
 </div>
 
-<!-- 履歴表示切り替えバー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📅</div>';">
@@ -344,7 +335,6 @@
   </div>
 </div>
 
-<!-- Evernote出力バー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="evernote.png" alt="Evernote" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>🐘</div>';">
@@ -374,7 +364,6 @@
 </div>
 <div class="history-list" id="history"></div>
 
-<!-- カテゴリ追加モーダル -->
 <div class="modal" id="catModal">
   <div class="modal-box">
     <h3 style="margin-bottom:12px;font-size:1.05rem;">カテゴリ追加</h3>
@@ -393,7 +382,6 @@
   </div>
 </div>
 
-<!-- ⚙ カテゴリ設定 ＆ バックアップ/復元モーダル -->
 <div class="modal" id="settingModal">
   <div class="modal-box">
     <h3 style="margin-bottom:6px;font-size:1.05rem;">カテゴリ設定・並び替え</h3>
@@ -415,7 +403,6 @@
   </div>
 </div>
 
-<!-- ログ編集モーダル -->
 <div class="modal" id="editModal">
   <div class="modal-box" style="overflow-y:auto;max-height:90vh;">
     <h3 style="margin-bottom:12px;font-size:1.05rem;" id="editModalTitle">ログ編集</h3>
@@ -433,7 +420,7 @@
     
     <div class="form-group">
       <label>メモ</label>
-      <textarea id="editMemo" class="modal-input" rows="3" placeholder="メモを入力..."></textarea>
+      <textarea id="editMemo" class="modal-input" rows="4" placeholder="メモを入力..."></textarea>
     </div>
     
     <div class="form-group">
@@ -452,7 +439,6 @@
 </div>
 
 <script>
-  /* 添付画像（IMG_5995, IMG_5996）通りの完全カテゴリ配置 */
   const DEFAULT_CATS = [
     { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
     { id: 'c2', name: 'Power Nap💤', icon: '🔋', color: 'rgba(34, 197, 94, 0.22)' },
@@ -507,7 +493,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v2';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v3';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -878,7 +864,7 @@
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const maxDim = 1000;
+          const maxDim = 800;
           let w = img.width;
           let h = img.height;
           if (w > maxDim || h > maxDim) {
@@ -958,7 +944,7 @@
     l.startAt = newStart.toISOString();
     if (newEnd) l.endAt = newEnd.toISOString();
     
-    l.memo = document.getElementById('editMemo').value.trim();
+    l.memo = document.getElementById('editMemo').value;
     l.photos = currentPhotos;
     delete l.photo;
     
@@ -1020,7 +1006,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理（サムネイル写真表示・高解像度インラインHTML対応） */
+  /* Evernote出力処理：サムネイル完全対応＆メモ・行間調整 */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
@@ -1040,10 +1026,10 @@
       return;
     }
 
-    const FONT_MEIRYO = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
+    const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
 
-    let html = `<div style="${FONT_MEIRYO}">
-      <div style="font-size:24px;font-weight:bold;margin-bottom:14px;${FONT_MEIRYO}">${dateTitle}</div>`;
+    let html = `<div style="${FONT_STYLE}">`;
+    html += `<div style="font-size:24px;font-weight:bold;margin:0 0 16px 0;${FONT_STYLE}">${dateTitle}</div>`;
     let plain = `${dateTitle}\n\n`;
 
     tl.forEach((l, index) => {
@@ -1053,25 +1039,28 @@
       const iconPng = emojiToPngDataUrl(l.icon);
       
       let logHtml = `
-        <div style="line-height:1.4;margin:0;padding:0;${FONT_MEIRYO}">
+        <div style="margin:0;padding:0;${FONT_STYLE}">
           <div style="line-height:1;margin-bottom:2px;">
-            <img src="${iconPng}" width="48" height="48" style="width:48px;height:48px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
+            <img src="${iconPng}" width="44" height="44" style="width:44px;height:44px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
           </div>
-          <div style="font-size:22px;font-weight:bold;line-height:1.3;${FONT_MEIRYO}">${l.name}</div>
-          <div style="font-size:14px;color:#38bdf8;font-weight:bold;line-height:1.3;${FONT_MEIRYO}">${tr}</div>
+          <div style="font-size:20px;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${l.name}</div>
+          <div style="font-size:15px;color:#00b4d8;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${tr}</div>
       `;
       plain += `${l.icon}\n${l.name}\n${tr}\n`;
 
-      if (l.memo) {
-        logHtml += `<div style="font-size:15px;line-height:1.4;white-space:pre-wrap;margin-top:2px;${FONT_MEIRYO}">${l.memo}</div>`;
-        plain += `${l.memo}\n`;
+      /* メモ欄の処理：時間と1行目の間に確実に1行空け、2行目以降はメモ通りの改行 */
+      if (l.memo && l.memo.trim() !== '') {
+        const memoLines = l.memo.split('\n');
+        const formattedMemo = memoLines.map(line => line === '' ? '<br>' : line).join('<br>');
+        logHtml += `<div style="margin-top:14px;font-size:15px;line-height:1.45;${FONT_STYLE}">${formattedMemo}</div>`;
+        plain += `\n${l.memo}\n`;
       }
       
-      /* Evernoteで確実にサムネイル表示されるインライン画像ブロック */
+      /* サムネイル画像表示（Evernoteに最適化した固定サムネイルHTML） */
       if (p.length > 0) {
-        logHtml += `<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:8px;">`;
+        logHtml += `<div style="margin-top:10px;line-height:0;">`;
         p.forEach(x => {
-          logHtml += `<img src="${x}" style="max-width:320px;width:100%;height:auto;border-radius:6px;display:block;margin-bottom:6px;border:1px solid #ddd;" />`;
+          logHtml += `<img src="${x}" width="120" height="120" style="width:120px !important;height:120px !important;object-fit:cover;border-radius:8px;border:1px solid #475569;display:inline-block;margin-right:8px;margin-bottom:8px;" />`;
         });
         logHtml += `</div>`;
       }
@@ -1079,11 +1068,13 @@
       logHtml += '</div>';
       html += logHtml;
 
+      /* ログ間の1行空け */
       if (index < tl.length - 1) {
-        html += '<div><br></div>';
-        plain += '\n\n';
+        html += '<p style="margin:0;padding:0;line-height:1.4;"><br></p>';
+        plain += '\n';
       }
     });
+    
     html += '</div>';
 
     const ok = await copyToClipboard(html, plain);
@@ -1128,7 +1119,6 @@
     reader.readAsText(file);
   }
 
-  // 初期読み込み
   loadLogsFromDB().then(loaded => {
     logs = loaded;
     render();
