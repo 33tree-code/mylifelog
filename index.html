@@ -28,16 +28,19 @@
   body { 
     background: var(--bg); 
     color: var(--text); 
-    padding: env(safe-area-inset-top, 12px) 10px env(safe-area-inset-bottom, 24px) 10px; 
+    padding: env(safe-area-inset-top, 12px) 8px env(safe-area-inset-bottom, 24px) 8px; 
+    width: 100%;
     max-width: 480px; 
     margin: 0 auto; 
     user-select: none;
+    overflow-x: hidden;
   }
   
+  /* 上段3列バー（全行完全に同一の比率・グリッドで横幅ピッタリ配置） */
   .control-bar-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     margin-bottom: 8px;
     width: 100%;
     height: 42px;
@@ -58,43 +61,40 @@
     display: block;
     box-shadow: 0 3px 8px rgba(0,0,0,0.5);
   }
+
+  .bar-btn-group {
+    display: flex;
+    flex: 1;
+    gap: 6px;
+    height: 100%;
+    min-width: 0;
+  }
+
   .header-left-title {
     flex: 1;
     display: flex;
     align-items: center;
     height: 100%;
-    padding-left: 2px;
+    min-width: 0;
   }
   .header-left-title h1 {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     font-weight: 700;
     letter-spacing: -0.5px;
     white-space: nowrap;
     color: #fff;
     text-shadow: 0 2px 4px rgba(0,0,0,0.6);
   }
-  
-  .header-btn-group {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    height: 100%;
-  }
-  .bar-btn-group {
-    display: flex;
-    flex: 1;
-    gap: 6px;
-    height: 100%;
-  }
 
+  /* 💎 立体テクスチャボタン */
   .btn-header-text {
+    flex: 1;
     background: linear-gradient(180deg, #2a374a 0%, #151e2e 100%);
     border: 1px solid #3b4d66;
     color: #f8fafc;
-    padding: 0 14px;
     height: 100%;
     border-radius: 10px;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -102,13 +102,14 @@
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
     white-space: nowrap;
+    min-width: 0;
     transition: transform 0.05s ease;
   }
   .btn-header-gear {
+    flex: 1;
     background: linear-gradient(180deg, #2a374a 0%, #151e2e 100%);
     border: 1px solid #3b4d66;
     color: #f8fafc;
-    width: 42px;
     height: 100%;
     border-radius: 10px;
     font-size: 1.25rem;
@@ -117,6 +118,7 @@
     justify-content: center;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    min-width: 0;
     transition: transform 0.05s ease;
   }
   .btn-header-text:active, .btn-header-gear:active {
@@ -137,6 +139,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    min-width: 0;
     transition: transform 0.05s ease;
   }
   .btn-bar-item:active {
@@ -160,6 +163,7 @@
     position: relative;
     display: flex;
     height: 100%;
+    min-width: 0;
   }
   .hidden-date-input { 
     position: absolute; 
@@ -171,6 +175,7 @@
     z-index: 10;
   }
 
+  /* ⚡ 現在記録中エリア */
   .active-section { margin-bottom: 12px; display: none; }
   .active-card { 
     background: var(--running-bg); 
@@ -191,6 +196,7 @@
   .active-timer { font-size: 1.15rem; font-weight: 700; color: var(--running); font-variant-numeric: tabular-nums; }
   .btn-active-edit { background: linear-gradient(180deg, #f87171 0%, #ef4444 100%); color: #fff; border: 1px solid #fca5a5; padding: 5px 10px; border-radius: 7px; font-size: 0.75rem; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.4); }
 
+  /* 🎨 カテゴリグリッド */
   .grid { 
     display: grid; 
     grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -233,6 +239,7 @@
   .history-thumbs { display: flex; gap: 4px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 28px; height: 28px; border-radius: 4px; object-fit: cover; }
   
+  /* モーダル */
   .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
   .modal-box { 
     background: #1e293b; 
@@ -290,19 +297,21 @@
 </head>
 <body>
 
+<!-- 上段ヘッダー（下段と完全に同じ4列グリッド構成） -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="logo.png" alt="ロゴ" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'38\' height=\'38\'><rect width=\'38\' height=\'38\' fill=\'%23fff\' rx=\'10\'/></svg>';">
   </div>
-  <div class="header-left-title">
-    <h1>ライフログ</h1>
-  </div>
-  <div class="header-btn-group">
+  <div class="bar-btn-group">
+    <div class="header-left-title">
+      <h1>ライフログ</h1>
+    </div>
     <button class="btn-header-text" onclick="openCatModal()">カテゴリ追加</button>
     <button class="btn-header-gear" onclick="openSettingModal()" title="設定">⚙</button>
   </div>
 </div>
 
+<!-- 履歴表示切り替えバー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📅</div>';">
@@ -317,6 +326,7 @@
   </div>
 </div>
 
+<!-- Evernote出力バー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="evernote.png" alt="Evernote">
@@ -477,7 +487,7 @@
     { id: 'c53', name: 'Sleepless', icon: '🦉', color: 'linear-gradient(135deg, rgba(71,85,105,0.4) 0%, rgba(30,41,59,0.8) 100%)' }
   ];
 
-  const CURRENT_VER = '2026_08_cats_exact_final_master_v105';
+  const CURRENT_VER = '2026_08_cats_exact_final_master_v110';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -990,7 +1000,6 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理（画像通りの正式名称と水色時刻を完全同期） */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
