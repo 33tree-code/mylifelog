@@ -493,7 +493,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v3';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v4';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -1006,7 +1006,30 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理：サムネイル完全対応＆メモ・行間調整 */
+  /* Evernote貼り付け用に画像を正方形サムネイル（160x160）へ完全固定変換する関数 */
+  function createFixedThumbnailDataUrl(base64Str, size = 160) {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        
+        // アスペクト比を維持して中央クロップ
+        const minDim = Math.min(img.width, img.height);
+        const sx = (img.width - minDim) / 2;
+        const sy = (img.height - minDim) / 2;
+        
+        ctx.drawImage(img, sx, sy, minDim, minDim, 0, 0, size, size);
+        resolve(canvas.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = () => resolve(base64Str);
+      img.src = base64Str;
+    });
+  }
+
+  /* Evernote出力処理：サムネイル完全正方形固定 ＆ メモ改行完全一致 */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
@@ -1032,7 +1055,8 @@
     html += `<div style="font-size:24px;font-weight:bold;margin:0 0 16px 0;${FONT_STYLE}">${dateTitle}</div>`;
     let plain = `${dateTitle}\n\n`;
 
-    tl.forEach((l, index) => {
+    for (let index = 0; index < tl.length; index++) {
+      const l = tl[index];
       const end = l.endAt || new Date().toISOString();
       const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(end)} (${formatDurationJP(l.startAt, end)})`;
       const p = l.photos || (l.photo ? [l.photo] : []);
@@ -1048,20 +1072,21 @@
       `;
       plain += `${l.icon}\n${l.name}\n${tr}\n`;
 
-      /* メモ欄の処理：時間と1行目の間に確実に1行空け、2行目以降はメモ通りの改行 */
+      /* メモ処理：時間と1行目の間に空行を1つ配置し、2行目以降はメモ入力通りの改行・空行を再現 */
       if (l.memo && l.memo.trim() !== '') {
-        const memoLines = l.memo.split('\n');
-        const formattedMemo = memoLines.map(line => line === '' ? '<br>' : line).join('<br>');
-        logHtml += `<div style="margin-top:14px;font-size:15px;line-height:1.45;${FONT_STYLE}">${formattedMemo}</div>`;
+        const memoHtml = l.memo.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
+        logHtml += `<div><br></div>`;
+        logHtml += `<div style="font-size:15px;line-height:1.45;white-space:pre-wrap;margin:0;padding:0;${FONT_STYLE}">${memoHtml}</div>`;
         plain += `\n${l.memo}\n`;
       }
       
-      /* サムネイル画像表示（Evernoteに最適化した固定サムネイルHTML） */
+      /* サムネイル画像処理：Evernoteで拡大されないよう160x160の正方形画像にレンダリング */
       if (p.length > 0) {
         logHtml += `<div style="margin-top:10px;line-height:0;">`;
-        p.forEach(x => {
-          logHtml += `<img src="${x}" width="120" height="120" style="width:120px !important;height:120px !important;object-fit:cover;border-radius:8px;border:1px solid #475569;display:inline-block;margin-right:8px;margin-bottom:8px;" />`;
-        });
+        for (const photoSrc of p) {
+          const thumbSrc = await createFixedThumbnailDataUrl(photoSrc, 160);
+          logHtml += `<img src="${thumbSrc}" width="160" height="160" style="width:160px;height:160px;border-radius:6px;display:inline-block;margin-right:8px;margin-bottom:8px;vertical-align:top;" />`;
+        }
         logHtml += `</div>`;
       }
       
@@ -1070,10 +1095,10 @@
 
       /* ログ間の1行空け */
       if (index < tl.length - 1) {
-        html += '<p style="margin:0;padding:0;line-height:1.4;"><br></p>';
+        html += '<div><br></div>';
         plain += '\n';
       }
-    });
+    }
     
     html += '</div>';
 
