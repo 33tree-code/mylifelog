@@ -155,7 +155,6 @@
     z-index: 10;
   }
 
-  /* ⚡ 現在記録中エリア（①のタップ感度改善） */
   .active-section { margin: 8px 0 12px; display: none; }
   .active-card { 
     position: relative;
@@ -444,7 +443,7 @@
 <script>
   const DEFAULT_CATS = [
     { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
-    { id: 'c2', name: 'Power Nap💤', icon: '🔋', color: 'rgba(34, 197, 94, 0.22)' },
+    { id: 'c2', name: 'Power Nap💤', icon: '🔋', color: 'rgba(99, 102, 241, 0.22)' },
     { id: 'c3', name: 'ストレッチ🙆', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
     { id: 'c4', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.22)' },
     { id: 'c5', name: 'BM', icon: '🚽', color: 'rgba(148, 163, 184, 0.22)' },
@@ -452,7 +451,7 @@
     { id: 'c7', name: '読書📖', icon: '📚', color: 'rgba(180, 83, 9, 0.25)' },
     { id: 'c8', name: '自己啓発', icon: '🌱', color: 'rgba(132, 204, 22, 0.22)' },
     { id: 'c9', name: 'Tech Work', icon: '🖥', color: 'rgba(30, 41, 59, 0.7)' },
-    { id: 'c10', name: 'Trade💹', icon: '📈', color: 'rgba(239, 68, 68, 0.22)' },
+    { id: 'c10', name: 'Trade📈', icon: '💹', color: 'rgba(22, 101, 52, 0.35)' },
     { id: 'c11', name: 'Research', icon: '🌐', color: 'rgba(2, 132, 199, 0.25)' },
     { id: 'c12', name: 'Search', icon: '🔍', color: 'rgba(100, 116, 139, 0.25)' },
     { id: 'c13', name: 'Coffee', icon: '☕', color: 'rgba(120, 53, 15, 0.3)' },
@@ -467,9 +466,9 @@
     { id: 'c22', name: '片付け', icon: '🗄', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c23', name: '試し・メンテ', icon: '🪮', color: 'rgba(51, 65, 85, 0.5)' },
     { id: 'c24', name: '設定🔧', icon: '⚙', color: 'rgba(30, 41, 59, 0.6)' },
-    { id: 'c25', name: '買い物等🛍リアル', icon: '🛒', color: 'rgba(19, 78, 74, 0.35)' },
-    { id: 'c26', name: '買い物等🛍ネット', icon: '📦', color: 'rgba(15, 76, 129, 0.35)' },
-    { id: 'c27', name: '開封✂️', icon: '📦', color: 'rgba(120, 53, 15, 0.25)' },
+    { id: 'c25', name: '買い物等🛍リアル', icon: '🛒', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c26', name: '買い物等🛍ネット', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c27', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c28', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c29', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c30', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
@@ -478,25 +477,25 @@
     { id: 'c33', name: '仕事関連', icon: '👥', color: 'rgba(6, 78, 59, 0.35)' },
     { id: 'c34', name: 'Social👥', icon: '🤝', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c35', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
-    { id: 'c36', name: 'Sweets🍪', icon: '🧁', color: 'rgba(131, 24, 67, 0.25)' },
-    { id: 'c37', name: 'Leisure', icon: '🎉', color: 'rgba(120, 53, 15, 0.28)' },
-    { id: 'c38', name: '旅行等🚃Plan', icon: '✈️', color: 'rgba(3, 105, 161, 0.3)' },
-    { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(30, 41, 59, 0.6)' },
-    { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(120, 53, 15, 0.28)' },
+    { id: 'c36', name: 'Sweets🍪', icon: '🧁', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c37', name: 'Leisure', icon: '🎉', color: 'rgba(13, 148, 136, 0.3)' },
+    { id: 'c38', name: '旅行等🚃Plan', icon: '✈️', color: 'rgba(13, 148, 136, 0.3)' },
+    { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(71, 85, 105, 0.4)' },
+    { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c41', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
-    { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(88, 28, 135, 0.3)' },
-    { id: 'c43', name: 'Running👟', icon: '🏃', color: 'rgba(88, 28, 135, 0.3)' },
-    { id: 'c44', name: 'Walking', icon: '🚶', color: 'rgba(49, 46, 129, 0.3)' },
+    { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c43', name: 'Running👟', icon: '🏃', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c44', name: 'Walking', icon: '🚶', color: 'rgba(194, 65, 12, 0.3)' },
     { id: 'c45', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c46', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
     { id: 'c47', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
-    { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c49', name: '🍌', icon: '🍑', color: 'rgba(131, 24, 67, 0.3)' },
     { id: 'c50', name: 'Waiting', icon: '⏳', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v9';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v10';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
