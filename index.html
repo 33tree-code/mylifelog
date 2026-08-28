@@ -20,11 +20,9 @@
     --running-bg: rgba(0, 229, 255, 0.16);
     --border: #233249;
     
-    /* 石のざらつき（ノイズ）と重厚な立体感 */
-    --stone-highlight: inset 0 1px 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 3px 0 rgba(0, 0, 0, 0.6);
-    --stone-shadow: 0 5px 10px rgba(0, 0, 0, 0.5), 0 1px 3px rgba(0, 0, 0, 0.4);
-    /* SVGを用いた微細な石のテクスチャ（粒子感） */
-    --stone-noise: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.06'/%3E%3C/svg%3E");
+    --stone-highlight: inset 0 1px 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.5);
+    --stone-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --stone-texture: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0.25) 100%);
   }
 
   * { 
@@ -102,19 +100,19 @@
     white-space: nowrap;
     transition: all 0.08s ease-out;
     box-shadow: var(--stone-shadow), var(--stone-highlight);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     overflow: hidden;
   }
   .btn-stone::before {
     content: '';
     position: absolute;
     inset: 0;
-    background-image: var(--stone-noise);
+    background: var(--stone-texture);
     pointer-events: none;
   }
   .btn-stone:active {
     transform: translateY(2px) scale(0.98);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), inset 0 2px 5px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.5);
   }
 
   .btn-header-add {
@@ -132,13 +130,13 @@
     flex: 1;
     background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
     color: #fff;
-    border-color: rgba(56, 189, 248, 0.35);
+    border-color: rgba(56, 189, 248, 0.3);
   }
   .btn-evernote { 
     flex: 1;
     background: linear-gradient(180deg, #10b981 0%, #047857 100%);
     color: #fff;
-    border-color: rgba(52, 211, 153, 0.35);
+    border-color: rgba(52, 211, 153, 0.3);
   }
 
   .date-picker-wrap-item {
@@ -157,10 +155,11 @@
     z-index: 10;
   }
 
+  /* ⚡ 現在記録中エリア（①のタップ感度を完全に改善） */
   .active-section { margin: 8px 0 12px; display: none; }
   .active-card { 
     position: relative;
-    background: linear-gradient(180deg, rgba(0, 229, 255, 0.22) 0%, rgba(11, 27, 44, 0.9) 100%);
+    background: linear-gradient(180deg, rgba(0, 229, 255, 0.22) 0%, rgba(11, 27, 44, 0.85) 100%);
     border: 2px solid var(--running); 
     box-shadow: 0 0 14px rgba(0, 229, 255, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3);
     border-radius: 12px; 
@@ -171,20 +170,12 @@
     margin-bottom: 6px; 
     cursor: pointer;
   }
-  .active-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: var(--stone-noise);
-    pointer-events: none;
-    border-radius: 10px;
-  }
   .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; pointer-events: none; }
   .active-icon { font-size: 1.4rem; flex-shrink: 0; }
   .active-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.85rem; font-weight: 700; color: var(--running); margin-top: 1px; }
-  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 2; }
-  .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; }
+  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 2; pointer-events: auto; }
+  .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; pointer-events: none; }
   .btn-active-edit { 
     background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); 
     color: #fff; 
@@ -197,7 +188,6 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   }
 
-  /* カテゴリグリッド（天然石・スレート風の質感） */
   .grid { 
     display: grid; 
     grid-template-columns: repeat(2, minmax(0, 1fr)); 
@@ -216,9 +206,9 @@
     gap: 8px; 
     min-width: 0; 
     width: 100%; 
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: var(--stone-shadow), var(--stone-highlight);
-    background: linear-gradient(180deg, #1c2637 0%, #101722 100%);
+    background: linear-gradient(180deg, #1c2637 0%, #111827 100%);
     overflow: hidden;
     transition: transform 0.06s ease-out, box-shadow 0.06s ease-out;
   }
@@ -226,19 +216,19 @@
     content: '';
     position: absolute;
     inset: 0;
-    background-image: var(--stone-noise);
+    background: var(--stone-texture);
     pointer-events: none;
   }
   .card:active { 
     transform: translateY(2px) scale(0.98); 
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.7), inset 0 2px 6px rgba(0, 0, 0, 0.7);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 2px 5px rgba(0, 0, 0, 0.6);
   }
   .card.running { 
     border: 2px solid var(--running) !important; 
-    background: linear-gradient(180deg, rgba(0, 229, 255, 0.28) 0%, rgba(12, 19, 34, 0.95) 100%) !important; 
-    box-shadow: 0 0 14px rgba(0, 229, 255, 0.5), inset 0 1px 3px rgba(255, 255, 255, 0.5) !important;
+    background: linear-gradient(180deg, rgba(0, 229, 255, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%) !important; 
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
   }
-  .card-icon { font-size: 1.25rem; flex-shrink: 0; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.5)); }
+  .card-icon { font-size: 1.25rem; flex-shrink: 0; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
   .card-name { font-weight: 600; font-size: 0.84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; color: #f8fafc; z-index: 1; }
   
   .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 2px; }
@@ -506,7 +496,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v11';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v12';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
