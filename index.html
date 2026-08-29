@@ -425,7 +425,7 @@
 
     <div class="modal-btns">
       <button class="btn-action btn-cancel-white" onclick="closeReportModal()">閉じる</button>
-      <button class="btn-action btn-evernote" onclick="exportReportToEvernote()">📋 Evernote出力</button>
+      <button class="btn-action btn-evernote" onclick="exportReportToEvernote()">Evernote出力</button>
     </div>
   </div>
 </div>
@@ -562,7 +562,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v14';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v15';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -637,6 +637,13 @@
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
+    return `${y}/${m}/${day}`;
+  }
+
+  function formatDateYMDDash(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
   }
 
@@ -661,8 +668,7 @@
   }
 
   function openCustomRangeModal() {
-    // デフォルトで今日をセット
-    const today = getTodayStr();
+    const today = formatDateYMDDash(new Date());
     document.getElementById('customStartDate').value = today;
     document.getElementById('customEndDate').value = today;
     document.getElementById('customRangeModal').style.display = 'flex';
@@ -749,7 +755,6 @@
     const now = new Date();
 
     if (mode === 'lastWeek') {
-      // 先週の日曜日〜土曜日
       const dayOfWeek = now.getDay();
       const lastSun = new Date(now);
       lastSun.setDate(now.getDate() - dayOfWeek - 7);
@@ -760,20 +765,17 @@
       endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
       titleStr = `${formatDateYMD(startDate)} 〜 ${formatDateYMD(endDate)}`;
     } else if (mode === 'prevMonth') {
-      // 先月1日〜末日
       const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
       const prevMonthNum = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
       startDate = new Date(prevYear, prevMonthNum, 1, 0, 0, 0);
       endDate = new Date(prevYear, prevMonthNum + 1, 0, 23, 59, 59);
       titleStr = `${prevYear}/${String(prevMonthNum + 1).padStart(2, '0')}`;
     } else if (mode === 'custom' && param1 && param2) {
-      // 任意の期間指定 (開始日〜終了日)
       const sDate = new Date(param1);
       const eDate = new Date(param2);
       startDate = new Date(sDate.getFullYear(), sDate.getMonth(), sDate.getDate(), 0, 0, 0);
       endDate = new Date(eDate.getFullYear(), eDate.getMonth(), eDate.getDate(), 23, 59, 59);
       if (startDate > endDate) {
-        // 逆転していたら入れ替え
         const temp = startDate;
         startDate = endDate;
         endDate = temp;
@@ -781,10 +783,8 @@
       titleStr = param1 === param2 ? `${formatDateYMD(startDate)}` : `${formatDateYMD(startDate)} 〜 ${formatDateYMD(endDate)}`;
     }
 
-    // 総時間数（期間のフル時間：例 1週間なら168時間）の計算
     const totalPeriodHours = Math.round((endDate - startDate + 1) / (1000 * 60 * 60));
 
-    // ログの集計計算
     const statsMap = {};
     let totalSecAll = 0;
 
@@ -812,9 +812,8 @@
     currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, sortedStats };
 
     document.getElementById('reportTitle').innerText = titleStr;
-    document.getElementById('reportRangeInfo').innerHTML = `総記録時間: ${formatSecToJP(totalSecAll)} <span style="font-size:0.75rem;color:var(--text-sub);font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間）</span>`;
+    document.getElementById('reportRangeInfo').innerHTML = `総記録時間: ${formatSecToJP(totalSecAll)}<br><span style="font-size:0.78rem;color:var(--text-sub);font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間）</span>`;
 
-    // ランキングHTML生成
     const rankContainer = document.getElementById('reportRankingList');
     if (sortedStats.length === 0) {
       rankContainer.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:12px;">この期間の記録はありません</div>`;
@@ -916,7 +915,8 @@
 
     let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
     html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr}</p>`;
-    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 14px 0;">総記録時間: ${formatSecToJP(totalSecAll)} <span style="font-size:13px;color:#64748b;font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間）</span></p>`;
+    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 4px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
+    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間）</p>`;
 
     if (reportChartInstance) {
       const chartBase64 = reportChartInstance.toBase64Image();
@@ -924,7 +924,7 @@
     }
 
     html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【カテゴリ別内訳】</p>`;
-    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
+    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
 
     sortedStats.forEach(item => {
       const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
@@ -983,7 +983,7 @@
     }).join('');
 
     const h = document.getElementById('history');
-    const [vy, vm, vd] = currentViewingDateYMD.split('-').map(Number);
+    const [vy, vm, vd] = currentViewingDateYMD.split('/').map(Number);
     const viewDate = new Date(vy, vm - 1, vd);
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const w = days[viewDate.getDay()];
