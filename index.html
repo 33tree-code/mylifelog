@@ -9,8 +9,6 @@
 <title>ライフログ</title>
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="icon" href="logo.png">
-<!-- グラフ描画用ライブラリ (Chart.js) -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root {
     --bg: #070b14;
@@ -140,9 +138,9 @@
     color: #fff;
     border-color: rgba(52, 211, 153, 0.3);
   }
-  .btn-report {
+  .btn-analysis {
     flex: 1;
-    background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%);
+    background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
     color: #fff;
     border-color: rgba(167, 139, 250, 0.3);
   }
@@ -181,7 +179,7 @@
   .active-icon { font-size: 1.4rem; flex-shrink: 0; }
   .active-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.85rem; font-weight: 700; color: var(--running); margin-top: 1px; }
-  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 2; pointer-events: auto; }
+  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 2; }
   .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; pointer-events: none; }
   .btn-active-edit { 
     background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); 
@@ -261,7 +259,6 @@
   .history-thumbs { display: flex; gap: 5px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
   
-  /* モーダル一般 */
   .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
   .modal-box { 
     background: #151e2e; 
@@ -319,7 +316,6 @@
 </head>
 <body>
 
-<!-- 上段ヘッダー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="logo.png" alt="ロゴ" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'36\' height=\'36\'><rect width=\'36\' height=\'36\' fill=\'%231e293b\' rx=\'8\'/><text x=\'50%\' y=\'55%\' font-size=\'18\' fill=\'%23fff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>⏱</text></svg>';">
@@ -333,7 +329,6 @@
   </div>
 </div>
 
-<!-- 履歴表示切り替えバー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📅</div>';">
@@ -348,7 +343,6 @@
   </div>
 </div>
 
-<!-- Evernote出力バー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="evernote.png" alt="Evernote" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>🐘</div>';">
@@ -363,15 +357,15 @@
   </div>
 </div>
 
-<!-- 期間集計・分析レポートバー -->
+<!-- 集計・分析バー追加（先週・先月・期間指定） -->
 <div class="control-bar-row">
-  <div class="bar-left-icon">
-    <img src="report-icon.png" alt="集計" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📊</div>';">
-  </div>
+  <div class="bar-left-icon" style="font-size:1.3rem;">📊</div>
   <div class="bar-btn-group">
-    <button class="btn-stone btn-report" onclick="openReportModal('lastWeek')">先週(日-土)</button>
-    <button class="btn-stone btn-report" onclick="openReportModal('prevMonth')">先月</button>
-    <button class="btn-stone btn-report" onclick="openCustomRangeModal()">期間指定</button>
+    <button class="btn-stone btn-analysis" onclick="exportAnalysisLastWeek()">先週(日-土)</button>
+    <button class="btn-stone btn-analysis" onclick="exportAnalysisLastMonth()">先月</button>
+    <div class="date-picker-wrap-item">
+      <button class="btn-stone btn-analysis" style="width:100%;" onclick="openRangeModal()">期間指定</button>
+    </div>
   </div>
 </div>
 
@@ -389,46 +383,6 @@
   <div class="history-date-label" id="currentHistoryDateLabel"></div>
 </div>
 <div class="history-list" id="history"></div>
-
-<!-- 任意の期間指定用モーダル -->
-<div class="modal" id="customRangeModal">
-  <div class="modal-box">
-    <h3 style="margin-bottom:12px;font-size:1.05rem;">集計期間の指定</h3>
-    <div class="form-group">
-      <label>開始日</label>
-      <input type="date" id="customStartDate" class="modal-input">
-    </div>
-    <div class="form-group">
-      <label>終了日</label>
-      <input type="date" id="customEndDate" class="modal-input">
-    </div>
-    <div class="modal-btns">
-      <button class="btn-action btn-cancel-white" onclick="closeCustomRangeModal()">閉じる</button>
-      <button class="btn-action btn-submit" onclick="submitCustomRange()">集計する</button>
-    </div>
-  </div>
-</div>
-
-<!-- 集計レポートモーダル -->
-<div class="modal" id="reportModal">
-  <div class="modal-box" style="max-width:420px;max-height:90vh;overflow-y:auto;">
-    <h3 style="margin-bottom:4px;font-size:1.05rem;" id="reportTitle">集計レポート</h3>
-    <div id="reportRangeInfo" style="font-size:0.85rem;color:var(--accent);margin-bottom:10px;font-weight:bold;line-height:1.4;"></div>
-    
-    <!-- 画面内円グラフ描画用キャンバス -->
-    <div style="background:#0b1120;padding:12px;border-radius:10px;border:1px solid var(--border);display:flex;justify-content:center;align-items:center;margin-bottom:12px;position:relative;height:220px;">
-      <canvas id="reportChartCanvas"></canvas>
-    </div>
-
-    <!-- 集計ランキング一覧 -->
-    <div id="reportRankingList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:200px;overflow-y:auto;padding-right:2px;"></div>
-
-    <div class="modal-btns">
-      <button class="btn-action btn-cancel-white" onclick="closeReportModal()">閉じる</button>
-      <button class="btn-action btn-evernote" onclick="exportReportToEvernote()">Evernote出力</button>
-    </div>
-  </div>
-</div>
 
 <!-- カテゴリ追加モーダル -->
 <div class="modal" id="catModal">
@@ -507,6 +461,25 @@
   </div>
 </div>
 
+<!-- 期間指定モーダル（日付入力欄を1行に調整） -->
+<div class="modal" id="rangeModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">期間指定で集計・出力</h3>
+    <div class="form-group">
+      <label>期間 (開始 〜 終了)</label>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input type="date" id="rangeStartDate" class="modal-input" style="flex:1;">
+        <span style="font-weight:bold;color:var(--text-sub);">〜</span>
+        <input type="date" id="rangeEndDate" class="modal-input" style="flex:1;">
+      </div>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeRangeModal()">閉じる</button>
+      <button class="btn-action btn-submit" onclick="exportAnalysisCustomRange()">出力</button>
+    </div>
+  </div>
+</div>
+
 <script>
   const DEFAULT_CATS = [
     { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
@@ -562,7 +535,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v15';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v13';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -572,8 +545,6 @@
   let logs = [];
   let currentPhotos = [];
   let currentViewingDateYMD = getTodayStr();
-  let currentReportData = null;
-  let reportChartInstance = null;
 
   const DB_NAME = 'LifelogDB';
   const STORE_NAME = 'logs';
@@ -626,21 +597,14 @@
   function getYesterdayStr() {
     const d = new Date();
     d.setDate(d.getDate() - 1);
-    return formatDateYMD(d);
-  }
-
-  function getTodayStr() {
-    return formatDateYMD(new Date());
-  }
-
-  function formatDateYMD(d) {
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    return `${y}/${m}/${day}`;
+    return `${y}-${m}-${day}`;
   }
 
-  function formatDateYMDDash(d) {
+  function getTodayStr() {
+    const d = new Date();
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
@@ -665,28 +629,6 @@
     if (p.showPicker) {
       try { p.showPicker(); } catch(e) { p.click(); }
     } else { p.click(); }
-  }
-
-  function openCustomRangeModal() {
-    const today = formatDateYMDDash(new Date());
-    document.getElementById('customStartDate').value = today;
-    document.getElementById('customEndDate').value = today;
-    document.getElementById('customRangeModal').style.display = 'flex';
-  }
-
-  function closeCustomRangeModal() {
-    document.getElementById('customRangeModal').style.display = 'none';
-  }
-
-  function submitCustomRange() {
-    const sVal = document.getElementById('customStartDate').value;
-    const eVal = document.getElementById('customEndDate').value;
-    if (!sVal || !eVal) {
-      alert('開始日と終了日を選択してください。');
-      return;
-    }
-    closeCustomRangeModal();
-    openReportModal('custom', sVal, eVal);
   }
 
   async function save() {
@@ -749,201 +691,6 @@
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   }
 
-  /* 集計レポート機能のロジック */
-  function openReportModal(mode, param1, param2) {
-    let startDate, endDate, titleStr;
-    const now = new Date();
-
-    if (mode === 'lastWeek') {
-      const dayOfWeek = now.getDay();
-      const lastSun = new Date(now);
-      lastSun.setDate(now.getDate() - dayOfWeek - 7);
-      const lastSat = new Date(lastSun);
-      lastSat.setDate(lastSun.getDate() + 6);
-      
-      startDate = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate(), 0, 0, 0);
-      endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
-      titleStr = `${formatDateYMD(startDate)} 〜 ${formatDateYMD(endDate)}`;
-    } else if (mode === 'prevMonth') {
-      const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
-      const prevMonthNum = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
-      startDate = new Date(prevYear, prevMonthNum, 1, 0, 0, 0);
-      endDate = new Date(prevYear, prevMonthNum + 1, 0, 23, 59, 59);
-      titleStr = `${prevYear}/${String(prevMonthNum + 1).padStart(2, '0')}`;
-    } else if (mode === 'custom' && param1 && param2) {
-      const sDate = new Date(param1);
-      const eDate = new Date(param2);
-      startDate = new Date(sDate.getFullYear(), sDate.getMonth(), sDate.getDate(), 0, 0, 0);
-      endDate = new Date(eDate.getFullYear(), eDate.getMonth(), eDate.getDate(), 23, 59, 59);
-      if (startDate > endDate) {
-        const temp = startDate;
-        startDate = endDate;
-        endDate = temp;
-      }
-      titleStr = param1 === param2 ? `${formatDateYMD(startDate)}` : `${formatDateYMD(startDate)} 〜 ${formatDateYMD(endDate)}`;
-    }
-
-    const totalPeriodHours = Math.round((endDate - startDate + 1) / (1000 * 60 * 60));
-
-    const statsMap = {};
-    let totalSecAll = 0;
-
-    logs.forEach(l => {
-      if (!l.endAt) return;
-      const start = new Date(l.startAt);
-      const end = new Date(l.endAt);
-      
-      if (end >= startDate && start <= endDate) {
-        const effStart = start < startDate ? startDate : start;
-        const effEnd = end > endDate ? endDate : end;
-        const sec = Math.max(0, Math.floor((effEnd - effStart) / 1000));
-        if (sec > 0) {
-          if (!statsMap[l.catId]) {
-            statsMap[l.catId] = { name: l.name, icon: l.icon, sec: 0, count: 0 };
-          }
-          statsMap[l.catId].sec += sec;
-          statsMap[l.catId].count += 1;
-          totalSecAll += sec;
-        }
-      }
-    });
-
-    const sortedStats = Object.values(statsMap).sort((a, b) => b.sec - a.sec);
-    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, sortedStats };
-
-    document.getElementById('reportTitle').innerText = titleStr;
-    document.getElementById('reportRangeInfo').innerHTML = `総記録時間: ${formatSecToJP(totalSecAll)}<br><span style="font-size:0.78rem;color:var(--text-sub);font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間）</span>`;
-
-    const rankContainer = document.getElementById('reportRankingList');
-    if (sortedStats.length === 0) {
-      rankContainer.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:12px;">この期間の記録はありません</div>`;
-    } else {
-      rankContainer.innerHTML = sortedStats.map((item, idx) => {
-        const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
-        return `
-          <div style="background:#0b1120;padding:8px 10px;border-radius:8px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;">
-            <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
-              <span>${item.icon}</span>
-              <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</span>
-            </div>
-            <div style="text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums;">
-              <span style="font-weight:700;color:var(--accent);">${formatSecToJP(item.sec)}</span>
-              <span style="font-size:0.75rem;color:var(--text-sub);margin-left:4px;">(${ratio}%)</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    document.getElementById('reportModal').style.display = 'flex';
-    renderReportChart(sortedStats, totalSecAll);
-  }
-
-  function closeReportModal() {
-    document.getElementById('reportModal').style.display = 'none';
-    if (reportChartInstance) {
-      reportChartInstance.destroy();
-      reportChartInstance = null;
-    }
-  }
-
-  function formatSecToJP(sec) {
-    const totalMin = Math.floor(sec / 60);
-    const h = Math.floor(totalMin / 60);
-    const m = totalMin % 60;
-    if (h === 0) return `${m}分`;
-    return `${h}時間 ${m}分`;
-  }
-
-  function renderReportChart(stats, totalSec) {
-    const ctx = document.getElementById('reportChartCanvas').getContext('2d');
-    if (reportChartInstance) {
-      reportChartInstance.destroy();
-    }
-
-    if (totalSec === 0 || stats.length === 0) {
-      reportChartInstance = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: ['データなし'],
-          datasets: [{ data: [1], backgroundColor: ['#334155'] }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-      });
-      return;
-    }
-
-    const topItems = stats.slice(0, 6);
-    const otherSec = stats.slice(6).reduce((acc, cur) => acc + cur.sec, 0);
-
-    const labels = topItems.map(i => `${i.icon} ${i.name}`);
-    const data = topItems.map(i => i.sec);
-    const colors = ['#38bdf8', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c', '#94a3b8'];
-
-    if (otherSec > 0) {
-      labels.push('その他');
-      data.push(otherSec);
-    }
-
-    reportChartInstance = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: colors,
-          borderWidth: 1,
-          borderColor: '#151e2e'
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: { color: '#f8fafc', boxWidth: 12, font: { size: 11 } }
-          }
-        }
-      }
-    });
-  }
-
-  async function exportReportToEvernote() {
-    if (!currentReportData) return;
-    const { titleStr, totalSecAll, totalPeriodHours, sortedStats } = currentReportData;
-
-    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
-    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr}</p>`;
-    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 4px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
-    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間）</p>`;
-
-    if (reportChartInstance) {
-      const chartBase64 = reportChartInstance.toBase64Image();
-      html += `<p style="margin:0 0 16px 0;"><img src="${chartBase64}" width="320" style="max-width:320px;width:100%;height:auto;display:block;" /></p>`;
-    }
-
-    html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【カテゴリ別内訳】</p>`;
-    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
-
-    sortedStats.forEach(item => {
-      const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
-      const lineStr = `${item.icon} ${item.name} ―― ${formatSecToJP(item.sec)}（${ratio}%）`;
-      html += `<p style="font-size:15px;margin:0 0 4px 0;">${lineStr}</p>`;
-      plain += `${lineStr}\n`;
-    });
-
-    html += `</div>`;
-
-    const ok = await copyToClipboard(html, plain);
-    if (ok) {
-      alert(`【${titleStr}】の集計レポートをコピーしました！\nEvernoteに貼り付けてください。`);
-      closeReportModal();
-    } else {
-      alert('クリップボードへのコピーに失敗しました。');
-    }
-  }
-
   function render() {
     const runningLogs = logs.filter(l => !l.endAt);
     const activeSection = document.getElementById('activeSection');
@@ -983,7 +730,7 @@
     }).join('');
 
     const h = document.getElementById('history');
-    const [vy, vm, vd] = currentViewingDateYMD.split('/').map(Number);
+    const [vy, vm, vd] = currentViewingDateYMD.split('-').map(Number);
     const viewDate = new Date(vy, vm - 1, vd);
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const w = days[viewDate.getDay()];
@@ -1301,10 +1048,12 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* 日次Evernote出力処理 */
+  /* Evernote出力処理（NaNエラー修正済み） */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
-    const [y, m, d] = dateStringYMD.split('-').map(Number);
+    const parts = dateStringYMD.split('-');
+    if (parts.length !== 3) return;
+    const [y, m, d] = parts.map(Number);
     const targetDate = new Date(y, m - 1, d);
 
     const days = ['日', '月', '火', '水', '木', '金', '土'];
@@ -1379,6 +1128,149 @@
     } else {
       alert('クリップボードへのコピーに失敗しました。');
     }
+  }
+
+  /* 集計・分析用の補助関数 */
+  function formatDateYMD(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function exportAnalysisLogs(startDateStr, endDateStr, title) {
+    const start = new Date(startDateStr + 'T00:00:00');
+    const end = new Date(endDateStr + 'T23:59:59');
+
+    const tl = logs.filter(l => {
+      if (!l.endAt) return false;
+      const st = new Date(l.startAt);
+      return st >= start && st <= end;
+    }).sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+
+    if (tl.length === 0) {
+      alert(`指定期間（${title}）の記録はありません`);
+      return;
+    }
+
+    let totalSec = 0;
+    tl.forEach(l => {
+      totalSec += Math.max(0, Math.floor((new Date(l.endAt) - new Date(l.startAt)) / 1000));
+    });
+    const totalMin = Math.floor(totalSec / 60);
+    const th = Math.floor(totalMin / 60);
+    const tm = totalMin % 60;
+    const totalStr = `${th}時間 ${tm}分`;
+
+    const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
+    let html = `<div style="${FONT_STYLE}">`;
+    html += `<p style="font-size:22px;font-weight:bold;margin:0 0 6px 0;${FONT_STYLE}">${title}</p>`;
+    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 16px 0;${FONT_STYLE}">総記録時間: ${totalStr}</p>`;
+    
+    let plain = `${title}\n総記録時間: ${totalStr}\n\n`;
+
+    tl.forEach((l, index) => {
+      const st = new Date(l.startAt);
+      const datePrefix = `${st.getMonth() + 1}/${st.getDate()}`;
+      const tr = `${datePrefix} ${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${formatDurationJP(l.startAt, l.endAt)})`;
+      const p = l.photos || (l.photo ? [l.photo] : []);
+      const iconPng = emojiToPngDataUrl(l.icon);
+
+      let logHtml = `
+        <div style="margin:0;padding:0;${FONT_STYLE}">
+          <p style="line-height:1;margin:0 0 4px 0;">
+            <img src="${iconPng}" width="40" height="40" style="width:40px;height:40px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
+          </p>
+          <p style="font-size:18px;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${l.name}</p>
+          <p style="font-size:14px;color:#00b4d8;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${tr}</p>
+      `;
+      plain += `${l.icon}\n${l.name}\n${tr}\n`;
+
+      if (l.memo && l.memo.trim() !== '') {
+        logHtml += `<p style="margin:0;padding:0;"><br></p>`;
+        const memoLines = l.memo.split('\n');
+        memoLines.forEach(line => {
+          const sanitizedLine = line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          logHtml += `<p style="font-size:14px;line-height:1.45;margin:0;padding:0;${FONT_STYLE}">${sanitizedLine === '' ? '<br>' : sanitizedLine}</p>`;
+        });
+        plain += `\n${l.memo}\n`;
+      }
+
+      if (p.length > 0) {
+        p.forEach(photoSrc => {
+          logHtml += `<p style="margin:8px 0 0 0;padding:0;">
+            <img src="${photoSrc}" style="max-width:100%;height:auto;display:block;" />
+          </p>`;
+        });
+      }
+
+      logHtml += '</div>';
+      html += logHtml;
+
+      if (index < tl.length - 1) {
+        html += '<p style="margin:0;padding:0;"><br></p>';
+        plain += '\n';
+      }
+    });
+
+    html += '</div>';
+
+    copyToClipboard(html, plain).then(ok => {
+      if (ok) alert(`【${title}】の集計データをコピーしました！\nEvernoteに貼り付けてください。`);
+      else alert('コピーに失敗しました。');
+    });
+  }
+
+  /* 先週 (日曜〜土曜) の集計出力 */
+  function exportAnalysisLastWeek() {
+    const now = new Date();
+    const day = now.getDay(); // 0(日)〜6(土)
+    const lastSun = new Date(now);
+    lastSun.setDate(now.getDate() - day - 7);
+    const lastSat = new Date(lastSun);
+    lastSat.setDate(lastSun.getDate() + 6);
+
+    const sStr = formatDateYMD(lastSun);
+    const eStr = formatDateYMD(lastSat);
+    exportAnalysisLogs(sStr, eStr, `先週のログ (${sStr.replace(/-/g,'/')} 〜 ${eStr.replace(/-/g,'/')})`);
+  }
+
+  /* 先月の集計出力 */
+  function exportAnalysisLastMonth() {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth(); // 今月
+    const lastMonthStart = new Date(y, m - 1, 1);
+    const lastMonthEnd = new Date(y, m, 0);
+
+    const sStr = formatDateYMD(lastMonthStart);
+    const eStr = formatDateYMD(lastMonthEnd);
+    exportAnalysisLogs(sStr, eStr, `先月のログ (${y}年${m}月)`);
+  }
+
+  /* 期間指定モーダル制御 */
+  function openRangeModal() {
+    const today = getTodayStr();
+    document.getElementById('rangeStartDate').value = today;
+    document.getElementById('rangeEndDate').value = today;
+    document.getElementById('rangeModal').style.display = 'flex';
+  }
+  function closeRangeModal() {
+    document.getElementById('rangeModal').style.display = 'none';
+  }
+  function exportAnalysisCustomRange() {
+    const s = document.getElementById('rangeStartDate').value;
+    const e = document.getElementById('rangeEndDate').value;
+    if (!s || !e) {
+      alert('開始日と終了日を選択してください');
+      return;
+    }
+    if (s > e) {
+      alert('開始日は終了日より前の日付を指定してください');
+      return;
+    }
+    closeRangeModal();
+    exportAnalysisLogs(s, e, `期間指定ログ (${s.replace(/-/g,'/')} 〜 ${e.replace(/-/g,'/')})`);
   }
 
   function exportBackupData() {
