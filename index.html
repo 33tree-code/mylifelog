@@ -461,10 +461,11 @@
 
 <div class="modal" id="summaryModal">
   <div class="modal-box" style="max-width: 420px;">
-    <h3 style="margin-bottom:12px;font-size:1.05rem;" id="summaryModalTitle">集計結果</h3>
-    <div id="summaryContent" style="font-size:0.85rem; max-height: 60vh; overflow-y: auto; margin-bottom: 12px; padding-right: 4px;"></div>
+    <h3 style="margin-bottom:12px;font-size:1.05rem; display:none;" id="summaryModalTitle">集計結果</h3>
+    <div id="summaryContent" style="font-size:0.85rem; max-height: 65vh; overflow-y: auto; margin-bottom: 12px; padding-right: 4px;"></div>
     <div class="modal-btns">
-      <button class="btn-action btn-submit" onclick="closeSummaryModal()">閉じる</button>
+      <button class="btn-action btn-cancel-white" onclick="closeSummaryModal()">閉じる</button>
+      <button class="btn-action btn-save-green" onclick="exportSummaryToEvernote()">Evernote出力</button>
     </div>
   </div>
 </div>
@@ -542,7 +543,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v13';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v14';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -552,6 +553,7 @@
   let logs = [];
   let currentPhotos = [];
   let currentViewingDateYMD = getTodayStr();
+  let lastSummaryData = null; // Evernote出力用保持
 
   const DB_NAME = 'LifelogDB';
   const STORE_NAME = 'logs';
@@ -742,7 +744,7 @@
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const w = days[viewDate.getDay()];
     
-    document.getElementById('currentHistoryDateLabel').innerText = `${vy}/${String(vm).padStart(2, '0')}/${String(vd).padStart(2, '0')}(${w})` ;
+    document.getElementById('currentHistoryDateLabel').innerText = `${vy}/${String(vm).padStart(2, '0')}/${String(vd).padStart(2, '0')}(${w})`;
 
     const viewDateStr = viewDate.toDateString();
     
@@ -1055,7 +1057,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理 */
+  /* Evernote出力処理（個別日付用） */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
@@ -1135,7 +1137,7 @@
     }
   }
 
-  /* 集計機能 */
+  /* 集計機能（円グラフ＆Evernote出力対応） */
   function openSummaryModal(type) {
     let startD = new Date();
     let endD = new Date();
@@ -1149,6 +1151,7 @@
       endD.setDate(startD.getDate() + 6);
       titleStr = '先週（日〜土）の集計';
     } else if (type === 'lastMonth') {
+      const d = new Date();
       startD = new Date(d.getFullYear(), d.getMonth() - 1, 1);
       endD = new Date(d.getFullYear(), d.getMonth(), 0);
       titleStr = '先月の集計';
@@ -1158,7 +1161,6 @@
   }
 
   function openSummaryRangeModal() {
-    document.getElementById('summaryStartDate5') || document.getElementById('summaryStartDate');
     document.getElementById('summaryRangeModal').style.display = 'flex';
   }
   function closeSummaryRangeModal() {
@@ -1195,9 +1197,13 @@
     const sYmd = `${startD.getFullYear()}/${String(startD.getMonth()+1).padStart(2,'0')}/${String(startD.getDate()).padStart(2,'0')}`;
     const eYmd = `${endD.getFullYear()}/${String(endD.getMonth()+1).padStart(2,'0')}/${String(endD.getDate()).padStart(2,'0')}`;
 
-    document.getElementById('summaryModalTitle').innerText = title;
-    
-    let html = `<div style="font-weight:bold; color:var(--accent); margin-bottom:8px; white-space:nowrap;">${sYmd} 〜 ${eYmd}</div>`;
+    // 対象期間の全日数から総時間(h)を計算
+    const diffDays = Math.round((endD - startD) / (1000 * 60 * 60 * 24)) + 1;
+    const totalPeriodHours = diffDays * 24;
+
+    lastSummaryData = { sYmd, eYmd, title, matched, totalPeriodHours };
+
+    let html = `<div style="font-size:1.1rem; font-weight:bold; color:#fff; margin-bottom:2px;">${sYmd} 〜 ${eYmd}</div>`;
 
     if (matched.length === 0) {
       html += `<div style="color:var(--text-sub); text-align:center; padding:20px 0;">対象期間の記録はありません</div>`;
@@ -1206,8 +1212,8 @@
       return;
     }
 
-    const summaryMap = {};
     let totalSec = 0;
+    const summaryMap = {};
 
     matched.forEach(l => {
       const sec = Math.floor((new Date(l.endAt) - new Date(l.startAt)) / 1000);
@@ -1220,23 +1226,80 @@
     });
 
     const sortedCats = Object.values(summaryMap).sort((a, b) => b.sec - a.sec);
-
     const totalH = Math.floor(totalSec / 3600);
     const totalM = Math.floor((totalSec % 3600) / 60);
-    html += `<div style="font-size:0.95rem; font-weight:bold; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:6px;">総記録時間: ${totalH}時間 ${totalM}分</div>`;
 
+    html += `<div style="font-size:0.9rem; font-weight:bold; color:var(--accent); margin-bottom:1px;">総記録時間: ${totalH}時間 ${totalM}分</div>`;
+    html += `<div style="font-size:0.75rem; color:var(--text-sub); margin-bottom:10px;">(対象期間の合計時間：${totalPeriodHours}時間)</div>`;
+
+    // 円グラフ描画用SVG生成
+    const palette = ['#38bdf8', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c', '#818cf8', '#2dd4bf'];
+    let accumAngle = 0;
+    let svgSlices = '';
+    let legendHtml = '';
+
+    sortedCats.forEach((item, idx) => {
+      const ratio = item.sec / totalSec;
+      const color = palette[idx % palette.length];
+      const pct = (ratio * 100).toFixed(1);
+
+      // SVGドーナツチャートのスライス計算
+      const strokeDasharray = `${ratio * 251.2} 251.2`;
+      const strokeDashoffset = -accumAngle * 251.2;
+      accumAngle += ratio;
+
+      svgSlices += `<circle cx="50" cy="50" r="40" fill="transparent" stroke="${color}" stroke-width="20" stroke-dasharray="${strokeDasharray}" stroke-dashoffset="${strokeDashoffset}" />`;
+      
+      if (idx < 6) {
+        legendHtml += `
+          <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; font-size:0.78rem;">
+            <span style="width:10px; height:10px; background:${color}; border-radius:2px; flex-shrink:0;"></span>
+            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.icon} ${item.name}</span>
+          </div>
+        `;
+      }
+    });
+
+    if (sortedCats.length > 6) {
+      legendHtml += `
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; font-size:0.78rem;">
+          <span style="width:10px; height:10px; background:#94a3b8; border-radius:2px; flex-shrink:0;"></span>
+          <span>その他</span>
+        </div>
+      `;
+    }
+
+    html += `
+      <div style="background:#0c1320; border:1px solid var(--border); border-radius:10px; padding:12px; display:flex; align-items:center; gap:16px; margin-bottom:12px;">
+        <div style="width:110px; height:110px; flex-shrink:0; position:relative;">
+          <svg viewBox="0 0 100 100" style="width:100%; height:100%; transform:rotate(-90deg);">
+            <circle cx="50" cy="50" r="40" fill="transparent" stroke="#1e293b" stroke-width="20" />
+            ${svgSlices}
+          </svg>
+        </div>
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center;">
+          ${legendHtml}
+        </div>
+      </div>
+    `;
+
+    // 詳細リスト表示
     html += `<div style="display:flex; flex-direction:column; gap:6px;">`;
     sortedCats.forEach(item => {
       const h = Math.floor(item.sec / 3600);
       const m = Math.floor((item.sec % 3600) / 60);
       const timeStr = h > 0 ? `${h}時間 ${m}分` : `${m}分`;
+      const ratioPct = ((item.sec / totalSec) * 100).toFixed(1);
       html += `
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#0c1320; padding:6px 10px; border-radius:6px; border:1px solid var(--border);">
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#0c1320; padding:8px 10px; border-radius:8px; border:1px solid var(--border);">
           <div style="display:flex; align-items:center; gap:6px; min-width:0;">
-            <span>${item.icon}</span>
-            <span style="font-weight:600; font-size:0.84rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name} (${item.count}回)</span>
+            <span style="font-size:1.1rem;">${item.icon}</span>
+            <span style="font-weight:600; font-size:0.84rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</span>
           </div>
-          <span style="font-weight:700; color:var(--accent); font-size:0.85rem; flex-shrink:0; margin-left:8px;">${timeStr}</span>
+          <div style="display:flex; align-items:baseline; gap:6px; flex-shrink:0; margin-left:8px;">
+            <span style="font-weight:800; color:var(--accent); font-size:0.88rem;">${timeStr}</span>
+            <span style="font-size:0.75rem; color:var(--text-sub);">(${ratioPct}%)</span>
+          </div>
         </div>
       `;
     });
@@ -1248,6 +1311,63 @@
 
   function closeSummaryModal() {
     document.getElementById('summaryModal').style.display = 'none';
+  }
+
+  /* 集計結果のEvernote出力 */
+  async function exportSummaryToEvernote() {
+    if (!lastSummaryData) return;
+    const { sYmd, eYmd, title, matched, totalPeriodHours } = lastSummaryData;
+
+    let totalSec = 0;
+    const summaryMap = {};
+    matched.forEach(l => {
+      const sec = Math.floor((new Date(l.endAt) - new Date(l.startAt)) / 1000);
+      totalSec += sec;
+      if (!summaryMap[l.catId]) {
+        summaryMap[l.catId] = { name: l.name, icon: l.icon, sec: 0, count: 0 };
+      }
+      summaryMap[l.catId].sec += sec;
+      summaryMap[l.catId].count += 1;
+    });
+
+    const sortedCats = Object.values(summaryMap).sort((a, b) => b.sec - a.sec);
+    const totalH = Math.floor(totalSec / 3600);
+    const totalM = Math.floor((totalSec % 3600) / 60);
+
+    const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
+    const dateHeaderStr = `${sYmd} 〜 ${eYmd} の集計`;
+
+    let html = `<div style="${FONT_STYLE}">`;
+    html += `<p style="font-size:22px;font-weight:bold;margin:0 0 4px 0;${FONT_STYLE}">${dateHeaderStr}</p>`;
+    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 2px 0;${FONT_STYLE}">総記録時間: ${totalH}時間 ${totalM}分</p>`;
+    html += `<p style="font-size:13px;color:#94a3b8;margin:0 0 16px 0;${FONT_STYLE}">(対象期間の合計時間：${totalPeriodHours}時間)</p>`;
+
+    let plain = `${dateHeaderStr}\n総記録時間: ${totalH}時間 ${totalM}分 (対象期間合計: ${totalPeriodHours}時間)\n\n`;
+
+    sortedCats.forEach(item => {
+      const h = Math.floor(item.sec / 3600);
+      const m = Math.floor((item.sec % 3600) / 60);
+      const timeStr = h > 0 ? `${h}時間 ${m}分` : `${m}分`;
+      const ratioPct = ((item.sec / totalSec) * 100).toFixed(1);
+      const iconPng = emojiToPngDataUrl(item.icon);
+
+      html += `
+        <p style="font-size:16px;font-weight:bold;margin:8px 0 2px 0;${FONT_STYLE}">
+          <img src="${iconPng}" width="24" height="24" style="width:24px;height:24px;vertical-align:middle;display:inline-block;" alt="${item.icon}">
+          ${item.name}：${timeStr} (${ratioPct}%) [${item.count}回]
+        </p>
+      `;
+      plain += `${item.icon} ${item.name}: ${timeStr} (${ratioPct}%) / ${item.count}回\n`;
+    });
+
+    html += '</div>';
+
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
+      alert(`【${dateHeaderStr}】の集計データをコピーしました！\nEvernoteに貼り付けてください。`);
+    } else {
+      alert('クリップボードへのコピーに失敗しました。');
+    }
   }
 
   function exportBackupData() {
