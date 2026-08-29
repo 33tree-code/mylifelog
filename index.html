@@ -138,9 +138,9 @@
     color: #fff;
     border-color: rgba(52, 211, 153, 0.3);
   }
-  .btn-analysis {
+  .btn-summary {
     flex: 1;
-    background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+    background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%);
     color: #fff;
     border-color: rgba(167, 139, 250, 0.3);
   }
@@ -175,12 +175,12 @@
     margin-bottom: 6px; 
     cursor: pointer;
   }
-  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; pointer-events: none; }
+  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
   .active-icon { font-size: 1.4rem; flex-shrink: 0; }
   .active-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.85rem; font-weight: 700; color: var(--running); margin-top: 1px; }
   .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 2; }
-  .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; pointer-events: none; }
+  .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; }
   .btn-active-edit { 
     background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); 
     color: #fff; 
@@ -357,14 +357,15 @@
   </div>
 </div>
 
-<!-- 集計・分析バー追加（先週・先月・期間指定） -->
 <div class="control-bar-row">
-  <div class="bar-left-icon" style="font-size:1.3rem;">📊</div>
+  <div class="bar-left-icon">
+    <div class="bar-left-icon" style="font-size:1.4rem;">📊</div>
+  </div>
   <div class="bar-btn-group">
-    <button class="btn-stone btn-analysis" onclick="exportAnalysisLastWeek()">先週(日-土)</button>
-    <button class="btn-stone btn-analysis" onclick="exportAnalysisLastMonth()">先月</button>
+    <button class="btn-stone btn-summary" onclick="openSummaryModal('lastWeek')">先週(日-土)</button>
+    <button class="btn-stone btn-summary" onclick="openSummaryModal('lastMonth')">先月</button>
     <div class="date-picker-wrap-item">
-      <button class="btn-stone btn-analysis" style="width:100%;" onclick="openRangeModal()">期間指定</button>
+      <button class="btn-stone btn-summary" style="width:100%;" onclick="openSummaryRangeModal()">期間指定</button>
     </div>
   </div>
 </div>
@@ -384,7 +385,6 @@
 </div>
 <div class="history-list" id="history"></div>
 
-<!-- カテゴリ追加モーダル -->
 <div class="modal" id="catModal">
   <div class="modal-box">
     <h3 style="margin-bottom:12px;font-size:1.05rem;">カテゴリ追加</h3>
@@ -403,7 +403,6 @@
   </div>
 </div>
 
-<!-- ⚙ カテゴリ設定 ＆ バックアップ/復元モーダル -->
 <div class="modal" id="settingModal">
   <div class="modal-box">
     <h3 style="margin-bottom:6px;font-size:1.05rem;">カテゴリ設定・並び替え</h3>
@@ -425,7 +424,6 @@
   </div>
 </div>
 
-<!-- ログ編集モーダル -->
 <div class="modal" id="editModal">
   <div class="modal-box" style="overflow-y:auto;max-height:90vh;">
     <h3 style="margin-bottom:12px;font-size:1.05rem;" id="editModalTitle">ログ編集</h3>
@@ -461,21 +459,30 @@
   </div>
 </div>
 
-<!-- 期間指定モーダル（日付入力欄を1行に調整） -->
-<div class="modal" id="rangeModal">
+<div class="modal" id="summaryModal">
+  <div class="modal-box" style="max-width: 420px;">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;" id="summaryModalTitle">集計結果</h3>
+    <div id="summaryContent" style="font-size:0.85rem; max-height: 60vh; overflow-y: auto; margin-bottom: 12px; padding-right: 4px;"></div>
+    <div class="modal-btns">
+      <button class="btn-action btn-submit" onclick="closeSummaryModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="summaryRangeModal">
   <div class="modal-box">
-    <h3 style="margin-bottom:12px;font-size:1.05rem;">期間指定で集計・出力</h3>
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">期間を指定して集計</h3>
     <div class="form-group">
-      <label>期間 (開始 〜 終了)</label>
-      <div style="display:flex;align-items:center;gap:6px;">
-        <input type="date" id="rangeStartDate" class="modal-input" style="flex:1;">
-        <span style="font-weight:bold;color:var(--text-sub);">〜</span>
-        <input type="date" id="rangeEndDate" class="modal-input" style="flex:1;">
-      </div>
+      <label>開始日</label>
+      <input type="date" id="summaryStartDate" class="modal-input">
+    </div>
+    <div class="form-group">
+      <label>終了日</label>
+      <input type="date" id="summaryEndDate" class="modal-input">
     </div>
     <div class="modal-btns">
-      <button class="btn-action btn-cancel-white" onclick="closeRangeModal()">閉じる</button>
-      <button class="btn-action btn-submit" onclick="exportAnalysisCustomRange()">出力</button>
+      <button class="btn-action btn-cancel-white" onclick="closeSummaryRangeModal()">閉じる</button>
+      <button class="btn-action btn-submit" onclick="executeCustomSummary()">集計する</button>
     </div>
   </div>
 </div>
@@ -700,16 +707,16 @@
       activeSection.style.display = 'block';
       activeList.innerHTML = runningLogs.map(r => `
         <div class="active-card" onclick="toggleLog({id:'${r.catId}', name:'${r.name}', icon:'${r.icon}'})">
-          <div class="active-left">
+          <div class="active-left" style="pointer-events:none;">
             <span class="active-icon">${r.icon}</span>
             <div style="min-width:0;">
               <div class="active-title">${r.name}</div>
               <div class="active-badge">${formatTimeSingleDigit(r.startAt)}〜</div>
             </div>
           </div>
-          <div class="active-right" onclick="event.stopPropagation();">
-            <div class="active-timer">${formatDurationEN(r.startAt)}</div>
-            <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
+          <div class="active-right">
+            <div class="active-timer" style="pointer-events:none;">${formatDurationEN(r.startAt)}</div>
+            <button class="btn-active-edit" onclick="event.stopPropagation(); openEditModal('${r.id}')">編集</button>
           </div>
         </div>
       `).join('');
@@ -723,8 +730,8 @@
       const bg = c.color ? `background:${c.color};` : '';
       return `
         <div class="card ${r ? 'running' : ''}" style="${bg}" onclick="toggleLog(${JSON.stringify(c).replace(/"/g, '&quot;')})">
-          <div class="card-icon">${c.icon}</div>
-          <div class="card-name">${c.name}</div>
+          <div class="card-icon" style="pointer-events:none;">${c.icon}</div>
+          <div class="card-name" style="pointer-events:none;">${c.name}</div>
         </div>
       `;
     }).join('');
@@ -735,7 +742,7 @@
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const w = days[viewDate.getDay()];
     
-    document.getElementById('currentHistoryDateLabel').innerText = `${vy}/${String(vm).padStart(2, '0')}/${String(vd).padStart(2, '0')}(${w})`;
+    document.getElementById('currentHistoryDateLabel').innerText = `${vy}/${String(vm).padStart(2, '0')}/${String(vd).padStart(2, '0')}(${w})` ;
 
     const viewDateStr = viewDate.toDateString();
     
@@ -1048,12 +1055,10 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理（NaNエラー修正済み） */
+  /* Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
-    const parts = dateStringYMD.split('-');
-    if (parts.length !== 3) return;
-    const [y, m, d] = parts.map(Number);
+    const [y, m, d] = dateStringYMD.split('-').map(Number);
     const targetDate = new Date(y, m - 1, d);
 
     const days = ['日', '月', '火', '水', '木', '金', '土'];
@@ -1130,147 +1135,119 @@
     }
   }
 
-  /* 集計・分析用の補助関数 */
-  function formatDateYMD(d) {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  }
+  /* 集計機能 */
+  function openSummaryModal(type) {
+    let startD = new Date();
+    let endD = new Date();
+    let titleStr = '';
 
-  function exportAnalysisLogs(startDateStr, endDateStr, title) {
-    const start = new Date(startDateStr + 'T00:00:00');
-    const end = new Date(endDateStr + 'T23:59:59');
-
-    const tl = logs.filter(l => {
-      if (!l.endAt) return false;
-      const st = new Date(l.startAt);
-      return st >= start && st <= end;
-    }).sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
-
-    if (tl.length === 0) {
-      alert(`指定期間（${title}）の記録はありません`);
-      return;
+    if (type === 'lastWeek') {
+      const d = new Date();
+      const day = d.getDay();
+      const diffToLastSun = day + 7;
+      startD.setDate(d.getDate() - diffToLastSun);
+      endD.setDate(startD.getDate() + 6);
+      titleStr = '先週（日〜土）の集計';
+    } else if (type === 'lastMonth') {
+      startD = new Date(d.getFullYear(), d.getMonth() - 1, 1);
+      endD = new Date(d.getFullYear(), d.getMonth(), 0);
+      titleStr = '先月の集計';
     }
 
-    let totalSec = 0;
-    tl.forEach(l => {
-      totalSec += Math.max(0, Math.floor((new Date(l.endAt) - new Date(l.startAt)) / 1000));
-    });
-    const totalMin = Math.floor(totalSec / 60);
-    const th = Math.floor(totalMin / 60);
-    const tm = totalMin % 60;
-    const totalStr = `${th}時間 ${tm}分`;
-
-    const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
-    let html = `<div style="${FONT_STYLE}">`;
-    html += `<p style="font-size:22px;font-weight:bold;margin:0 0 6px 0;${FONT_STYLE}">${title}</p>`;
-    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 16px 0;${FONT_STYLE}">総記録時間: ${totalStr}</p>`;
-    
-    let plain = `${title}\n総記録時間: ${totalStr}\n\n`;
-
-    tl.forEach((l, index) => {
-      const st = new Date(l.startAt);
-      const datePrefix = `${st.getMonth() + 1}/${st.getDate()}`;
-      const tr = `${datePrefix} ${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${formatDurationJP(l.startAt, l.endAt)})`;
-      const p = l.photos || (l.photo ? [l.photo] : []);
-      const iconPng = emojiToPngDataUrl(l.icon);
-
-      let logHtml = `
-        <div style="margin:0;padding:0;${FONT_STYLE}">
-          <p style="line-height:1;margin:0 0 4px 0;">
-            <img src="${iconPng}" width="40" height="40" style="width:40px;height:40px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
-          </p>
-          <p style="font-size:18px;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${l.name}</p>
-          <p style="font-size:14px;color:#00b4d8;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${tr}</p>
-      `;
-      plain += `${l.icon}\n${l.name}\n${tr}\n`;
-
-      if (l.memo && l.memo.trim() !== '') {
-        logHtml += `<p style="margin:0;padding:0;"><br></p>`;
-        const memoLines = l.memo.split('\n');
-        memoLines.forEach(line => {
-          const sanitizedLine = line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-          logHtml += `<p style="font-size:14px;line-height:1.45;margin:0;padding:0;${FONT_STYLE}">${sanitizedLine === '' ? '<br>' : sanitizedLine}</p>`;
-        });
-        plain += `\n${l.memo}\n`;
-      }
-
-      if (p.length > 0) {
-        p.forEach(photoSrc => {
-          logHtml += `<p style="margin:8px 0 0 0;padding:0;">
-            <img src="${photoSrc}" style="max-width:100%;height:auto;display:block;" />
-          </p>`;
-        });
-      }
-
-      logHtml += '</div>';
-      html += logHtml;
-
-      if (index < tl.length - 1) {
-        html += '<p style="margin:0;padding:0;"><br></p>';
-        plain += '\n';
-      }
-    });
-
-    html += '</div>';
-
-    copyToClipboard(html, plain).then(ok => {
-      if (ok) alert(`【${title}】の集計データをコピーしました！\nEvernoteに貼り付けてください。`);
-      else alert('コピーに失敗しました。');
-    });
+    runSummary(startD, endD, titleStr);
   }
 
-  /* 先週 (日曜〜土曜) の集計出力 */
-  function exportAnalysisLastWeek() {
-    const now = new Date();
-    const day = now.getDay(); // 0(日)〜6(土)
-    const lastSun = new Date(now);
-    lastSun.setDate(now.getDate() - day - 7);
-    const lastSat = new Date(lastSun);
-    lastSat.setDate(lastSun.getDate() + 6);
-
-    const sStr = formatDateYMD(lastSun);
-    const eStr = formatDateYMD(lastSat);
-    exportAnalysisLogs(sStr, eStr, `先週のログ (${sStr.replace(/-/g,'/')} 〜 ${eStr.replace(/-/g,'/')})`);
+  function openSummaryRangeModal() {
+    document.getElementById('summaryStartDate5') || document.getElementById('summaryStartDate');
+    document.getElementById('summaryRangeModal').style.display = 'flex';
+  }
+  function closeSummaryRangeModal() {
+    document.getElementById('summaryRangeModal').style.display = 'none';
   }
 
-  /* 先月の集計出力 */
-  function exportAnalysisLastMonth() {
-    const now = new Date();
-    const y = now.getFullYear();
-    const m = now.getMonth(); // 今月
-    const lastMonthStart = new Date(y, m - 1, 1);
-    const lastMonthEnd = new Date(y, m, 0);
-
-    const sStr = formatDateYMD(lastMonthStart);
-    const eStr = formatDateYMD(lastMonthEnd);
-    exportAnalysisLogs(sStr, eStr, `先月のログ (${y}年${m}月)`);
-  }
-
-  /* 期間指定モーダル制御 */
-  function openRangeModal() {
-    const today = getTodayStr();
-    document.getElementById('rangeStartDate').value = today;
-    document.getElementById('rangeEndDate').value = today;
-    document.getElementById('rangeModal').style.display = 'flex';
-  }
-  function closeRangeModal() {
-    document.getElementById('rangeModal').style.display = 'none';
-  }
-  function exportAnalysisCustomRange() {
-    const s = document.getElementById('rangeStartDate').value;
-    const e = document.getElementById('rangeEndDate').value;
-    if (!s || !e) {
+  function executeCustomSummary() {
+    const sStr = document.getElementById('summaryStartDate').value;
+    const eStr = document.getElementById('summaryEndDate').value;
+    if (!sStr || !eStr) {
       alert('開始日と終了日を選択してください');
       return;
     }
-    if (s > e) {
+    const startD = new Date(sStr);
+    const endD = new Date(eStr);
+    if (startD > endD) {
       alert('開始日は終了日より前の日付を指定してください');
       return;
     }
-    closeRangeModal();
-    exportAnalysisLogs(s, e, `期間指定ログ (${s.replace(/-/g,'/')} 〜 ${e.replace(/-/g,'/')})`);
+    closeSummaryRangeModal();
+    const titleStr = `${sStr.replace(/-/g, '/')} 〜 ${eStr.replace(/-/g, '/')}`;
+    runSummary(startD, endD, titleStr);
+  }
+
+  function runSummary(startD, endD, title) {
+    startD.setHours(0,0,0,0);
+    endD.setHours(23,59,59,999);
+
+    const matched = logs.filter(l => {
+      const st = new Date(l.startAt);
+      return l.endAt && st >= startD && st <= endD;
+    });
+
+    const sYmd = `${startD.getFullYear()}/${String(startD.getMonth()+1).padStart(2,'0')}/${String(startD.getDate()).padStart(2,'0')}`;
+    const eYmd = `${endD.getFullYear()}/${String(endD.getMonth()+1).padStart(2,'0')}/${String(endD.getDate()).padStart(2,'0')}`;
+
+    document.getElementById('summaryModalTitle').innerText = title;
+    
+    let html = `<div style="font-weight:bold; color:var(--accent); margin-bottom:8px; white-space:nowrap;">${sYmd} 〜 ${eYmd}</div>`;
+
+    if (matched.length === 0) {
+      html += `<div style="color:var(--text-sub); text-align:center; padding:20px 0;">対象期間の記録はありません</div>`;
+      document.getElementById('summaryContent').innerHTML = html;
+      document.getElementById('summaryModal').style.display = 'flex';
+      return;
+    }
+
+    const summaryMap = {};
+    let totalSec = 0;
+
+    matched.forEach(l => {
+      const sec = Math.floor((new Date(l.endAt) - new Date(l.startAt)) / 1000);
+      totalSec += sec;
+      if (!summaryMap[l.catId]) {
+        summaryMap[l.catId] = { name: l.name, icon: l.icon, sec: 0, count: 0 };
+      }
+      summaryMap[l.catId].sec += sec;
+      summaryMap[l.catId].count += 1;
+    });
+
+    const sortedCats = Object.values(summaryMap).sort((a, b) => b.sec - a.sec);
+
+    const totalH = Math.floor(totalSec / 3600);
+    const totalM = Math.floor((totalSec % 3600) / 60);
+    html += `<div style="font-size:0.95rem; font-weight:bold; margin-bottom:10px; border-bottom:1px solid var(--border); padding-bottom:6px;">総記録時間: ${totalH}時間 ${totalM}分</div>`;
+
+    html += `<div style="display:flex; flex-direction:column; gap:6px;">`;
+    sortedCats.forEach(item => {
+      const h = Math.floor(item.sec / 3600);
+      const m = Math.floor((item.sec % 3600) / 60);
+      const timeStr = h > 0 ? `${h}時間 ${m}分` : `${m}分`;
+      html += `
+        <div style="display:flex; justify-content:space-between; align-items:center; background:#0c1320; padding:6px 10px; border-radius:6px; border:1px solid var(--border);">
+          <div style="display:flex; align-items:center; gap:6px; min-width:0;">
+            <span>${item.icon}</span>
+            <span style="font-weight:600; font-size:0.84rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name} (${item.count}回)</span>
+          </div>
+          <span style="font-weight:700; color:var(--accent); font-size:0.85rem; flex-shrink:0; margin-left:8px;">${timeStr}</span>
+        </div>
+      `;
+    });
+    html += `</div>`;
+
+    document.getElementById('summaryContent').innerHTML = html;
+    document.getElementById('summaryModal').style.display = 'flex';
+  }
+
+  function closeSummaryModal() {
+    document.getElementById('summaryModal').style.display = 'none';
   }
 
   function exportBackupData() {
