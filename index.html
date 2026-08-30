@@ -138,12 +138,6 @@
     color: #fff;
     border-color: rgba(52, 211, 153, 0.3);
   }
-  .btn-summary {
-    flex: 1;
-    background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%);
-    color: #fff;
-    border-color: rgba(167, 139, 250, 0.3);
-  }
 
   .date-picker-wrap-item {
     flex: 1;
@@ -175,12 +169,12 @@
     margin-bottom: 6px; 
     cursor: pointer;
   }
-  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
+  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; pointer-events: none; }
   .active-icon { font-size: 1.4rem; flex-shrink: 0; }
   .active-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.85rem; font-weight: 700; color: var(--running); margin-top: 1px; }
-  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 2; }
-  .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; }
+  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 2; pointer-events: auto; }
+  .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; pointer-events: none; }
   .btn-active-edit { 
     background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); 
     color: #fff; 
@@ -357,19 +351,6 @@
   </div>
 </div>
 
-<div class="control-bar-row">
-  <div class="bar-left-icon">
-    <div class="bar-left-icon" style="font-size:1.4rem;">📊</div>
-  </div>
-  <div class="bar-btn-group">
-    <button class="btn-stone btn-summary" onclick="openSummaryModal('lastWeek')">先週(日-土)</button>
-    <button class="btn-stone btn-summary" onclick="openSummaryModal('lastMonth')">先月</button>
-    <div class="date-picker-wrap-item">
-      <button class="btn-stone btn-summary" style="width:100%;" onclick="openSummaryRangeModal()">期間指定</button>
-    </div>
-  </div>
-</div>
-
 <div class="active-section" id="activeSection">
   <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--running);font-weight:bold;margin-bottom:6px;">
     <span>⚡ 現在記録中</span>
@@ -459,35 +440,6 @@
   </div>
 </div>
 
-<div class="modal" id="summaryModal">
-  <div class="modal-box" style="max-width: 420px;">
-    <h3 style="margin-bottom:12px;font-size:1.05rem; display:none;" id="summaryModalTitle">集計結果</h3>
-    <div id="summaryContent" style="font-size:0.85rem; max-height: 65vh; overflow-y: auto; margin-bottom: 12px; padding-right: 4px;"></div>
-    <div class="modal-btns">
-      <button class="btn-action btn-cancel-white" onclick="closeSummaryModal()">閉じる</button>
-      <button class="btn-action btn-save-green" onclick="exportSummaryToEvernote()">Evernote出力</button>
-    </div>
-  </div>
-</div>
-
-<div class="modal" id="summaryRangeModal">
-  <div class="modal-box">
-    <h3 style="margin-bottom:12px;font-size:1.05rem;">期間を指定して集計</h3>
-    <div class="form-group">
-      <label>開始日</label>
-      <input type="date" id="summaryStartDate" class="modal-input">
-    </div>
-    <div class="form-group">
-      <label>終了日</label>
-      <input type="date" id="summaryEndDate" class="modal-input">
-    </div>
-    <div class="modal-btns">
-      <button class="btn-action btn-cancel-white" onclick="closeSummaryRangeModal()">閉じる</button>
-      <button class="btn-action btn-submit" onclick="executeCustomSummary()">集計する</button>
-    </div>
-  </div>
-</div>
-
 <script>
   const DEFAULT_CATS = [
     { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
@@ -543,7 +495,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v15';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v12';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -553,7 +505,6 @@
   let logs = [];
   let currentPhotos = [];
   let currentViewingDateYMD = getTodayStr();
-  let lastSummaryData = null;
 
   const DB_NAME = 'LifelogDB';
   const STORE_NAME = 'logs';
@@ -709,16 +660,16 @@
       activeSection.style.display = 'block';
       activeList.innerHTML = runningLogs.map(r => `
         <div class="active-card" onclick="toggleLog({id:'${r.catId}', name:'${r.name}', icon:'${r.icon}'})">
-          <div class="active-left" style="pointer-events:none;">
+          <div class="active-left">
             <span class="active-icon">${r.icon}</span>
             <div style="min-width:0;">
               <div class="active-title">${r.name}</div>
               <div class="active-badge">${formatTimeSingleDigit(r.startAt)}〜</div>
             </div>
           </div>
-          <div class="active-right">
-            <div class="active-timer" style="pointer-events:none;">${formatDurationEN(r.startAt)}</div>
-            <button class="btn-active-edit" onclick="event.stopPropagation(); openEditModal('${r.id}')">編集</button>
+          <div class="active-right" onclick="event.stopPropagation();">
+            <div class="active-timer">${formatDurationEN(r.startAt)}</div>
+            <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
           </div>
         </div>
       `).join('');
@@ -732,8 +683,8 @@
       const bg = c.color ? `background:${c.color};` : '';
       return `
         <div class="card ${r ? 'running' : ''}" style="${bg}" onclick="toggleLog(${JSON.stringify(c).replace(/"/g, '&quot;')})">
-          <div class="card-icon" style="pointer-events:none;">${c.icon}</div>
-          <div class="card-name" style="pointer-events:none;">${c.name}</div>
+          <div class="card-icon">${c.icon}</div>
+          <div class="card-name">${c.name}</div>
         </div>
       `;
     }).join('');
@@ -1057,7 +1008,6 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* 個別日付用Evernote出力 */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
@@ -1132,278 +1082,6 @@
     const ok = await copyToClipboard(html, plain);
     if (ok) {
       alert(`【${dateTitle}】をコピーしました！\nEvernoteに貼り付けてください。`);
-    } else {
-      alert('クリップボードへのコピーに失敗しました。');
-    }
-  }
-
-  /* 集計機能（画面内表示・円グラフ生成） */
-  function openSummaryModal(type) {
-    let startD = new Date();
-    let endD = new Date();
-    let titleStr = '';
-
-    if (type === 'lastWeek') {
-      const d = new Date();
-      const day = d.getDay();
-      const diffToLastSun = day + 7;
-      startD.setDate(d.getDate() - diffToLastSun);
-      endD.setDate(startD.getDate() + 6);
-      titleStr = '先週（日〜土）の集計';
-    } else if (type === 'lastMonth') {
-      const d = new Date();
-      startD = new Date(d.getFullYear(), d.getMonth() - 1, 1);
-      endD = new Date(d.getFullYear(), d.getMonth(), 0);
-      titleStr = '先月の集計';
-    }
-
-    runSummary(startD, endD, titleStr);
-  }
-
-  function openSummaryRangeModal() {
-    document.getElementById('summaryRangeModal').style.display = 'flex';
-  }
-  function closeSummaryRangeModal() {
-    document.getElementById('summaryRangeModal').style.display = 'none';
-  }
-
-  function executeCustomSummary() {
-    const sStr = document.getElementById('summaryStartDate').value;
-    const eStr = document.getElementById('summaryEndDate').value;
-    if (!sStr || !eStr) {
-      alert('開始日と終了日を選択してください');
-      return;
-    }
-    const startD = new Date(sStr);
-    const endD = new Date(eStr);
-    if (startD > endD) {
-      alert('開始日は終了日より前の日付を指定してください');
-      return;
-    }
-    closeSummaryRangeModal();
-    const titleStr = `${sStr.replace(/-/g, '/')} 〜 ${eStr.replace(/-/g, '/')}`;
-    runSummary(startD, endD, titleStr);
-  }
-
-  function runSummary(startD, endD, title) {
-    startD.setHours(0,0,0,0);
-    endD.setHours(23,59,59,999);
-
-    const matched = logs.filter(l => {
-      const st = new Date(l.startAt);
-      return l.endAt && st >= startD && st <= endD;
-    });
-
-    const sYmd = `${startD.getFullYear()}/${String(startD.getMonth()+1).padStart(2,'0')}/${String(startD.getDate()).padStart(2,'0')}`;
-    const eYmd = `${endD.getFullYear()}/${String(endD.getMonth()+1).padStart(2,'0')}/${String(endD.getDate()).padStart(2,'0')}`;
-
-    const diffDays = Math.round((endD - startD) / (1000 * 60 * 60 * 24)) + 1;
-    const totalPeriodHours = diffDays * 24;
-
-    lastSummaryData = { sYmd, eYmd, title, matched, totalPeriodHours };
-
-    let html = `<div style="font-size:1.1rem; font-weight:bold; color:#fff; margin-bottom:2px;">${sYmd} 〜 ${eYmd}</div>`;
-
-    if (matched.length === 0) {
-      html += `<div style="color:var(--text-sub); text-align:center; padding:20px 0;">対象期間の記録はありません</div>`;
-      document.getElementById('summaryContent').innerHTML = html;
-      document.getElementById('summaryModal').style.display = 'flex';
-      return;
-    }
-
-    let totalSec = 0;
-    const summaryMap = {};
-
-    matched.forEach(l => {
-      const sec = Math.floor((new Date(l.endAt) - new Date(l.startAt)) / 1000);
-      totalSec += sec;
-      if (!summaryMap[l.catId]) {
-        summaryMap[l.catId] = { name: l.name, icon: l.icon, sec: 0, count: 0 };
-      }
-      summaryMap[l.catId].sec += sec;
-      summaryMap[l.catId].count += 1;
-    });
-
-    const sortedCats = Object.values(summaryMap).sort((a, b) => b.sec - a.sec);
-    const totalH = Math.floor(totalSec / 3600);
-    const totalM = Math.floor((totalSec % 3600) / 60);
-
-    html += `<div style="font-size:0.9rem; font-weight:bold; color:var(--accent); margin-bottom:1px;">総記録時間: ${totalH}時間 ${totalM}分</div>`;
-    html += `<div style="font-size:0.75rem; color:var(--text-sub); margin-bottom:10px;">(対象期間の合計時間：${totalPeriodHours}時間)</div>`;
-
-    const palette = ['#38bdf8', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c', '#818cf8', '#2dd4bf'];
-    let accumAngle = 0;
-    let svgSlices = '';
-    let legendHtml = '';
-
-    sortedCats.forEach((item, idx) => {
-      const ratio = item.sec / totalSec;
-      const color = palette[idx % palette.length];
-      const strokeDasharray = `${ratio * 251.2} 251.2`;
-      const strokeDashoffset = -accumAngle * 251.2;
-      accumAngle += ratio;
-
-      svgSlices += `<circle cx="50" cy="50" r="40" fill="transparent" stroke="${color}" stroke-width="20" stroke-dasharray="${strokeDasharray}" stroke-dashoffset="${strokeDashoffset}" />`;
-      
-      if (idx < 6) {
-        legendHtml += `
-          <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; font-size:0.78rem;">
-            <span style="width:10px; height:10px; background:${color}; border-radius:2px; flex-shrink:0;"></span>
-            <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.icon} ${item.name}</span>
-          </div>
-        `;
-      }
-    });
-
-    if (sortedCats.length > 6) {
-      legendHtml += `
-        <div style="display:flex; align-items:center; gap:6px; margin-bottom:4px; font-size:0.78rem;">
-          <span style="width:10px; height:10px; background:#94a3b8; border-radius:2px; flex-shrink:0;"></span>
-          <span>その他</span>
-        </div>
-      `;
-    }
-
-    html += `
-      <div style="background:#0c1320; border:1px solid var(--border); border-radius:10px; padding:12px; display:flex; align-items:center; gap:16px; margin-bottom:12px;">
-        <div style="width:110px; height:110px; flex-shrink:0; position:relative;">
-          <svg viewBox="0 0 100 100" style="width:100%; height:100%; transform:rotate(-90deg);">
-            <circle cx="50" cy="50" r="40" fill="transparent" stroke="#1e293b" stroke-width="20" />
-            ${svgSlices}
-          </svg>
-        </div>
-        <div style="flex:1; min-width:0; display:flex; flex-direction:column; justify-content:center;">
-          ${legendHtml}
-        </div>
-      </div>
-    `;
-
-    html += `<div style="display:flex; flex-direction:column; gap:6px;">`;
-    sortedCats.forEach(item => {
-      const h = Math.floor(item.sec / 3600);
-      const m = Math.floor((item.sec % 3600) / 60);
-      const timeStr = h > 0 ? `${h}時間 ${m}分` : `${m}分`;
-      const ratioPct = ((item.sec / totalSec) * 100).toFixed(1);
-      html += `
-        <div style="display:flex; justify-content:space-between; align-items:center; background:#0c1320; padding:8px 10px; border-radius:8px; border:1px solid var(--border);">
-          <div style="display:flex; align-items:center; gap:6px; min-width:0;">
-            <span style="font-size:1.1rem;">${item.icon}</span>
-            <span style="font-weight:600; font-size:0.84rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</span>
-          </div>
-          <div style="display:flex; align-items:baseline; gap:6px; flex-shrink:0; margin-left:8px;">
-            <span style="font-weight:800; color:var(--accent); font-size:0.88rem;">${timeStr}</span>
-            <span style="font-size:0.75rem; color:var(--text-sub);">(${ratioPct}%)</span>
-          </div>
-        </div>
-      `;
-    });
-    html += `</div>`;
-
-    document.getElementById('summaryContent').innerHTML = html;
-    document.getElementById('summaryModal').style.display = 'flex';
-  }
-
-  function closeSummaryModal() {
-    document.getElementById('summaryModal').style.display = 'none';
-  }
-
-  /* 🔥 集計結果をEvernote用（画像2枚目のレイアウト・グラフ付き）にコピー出力 */
-  async function exportSummaryToEvernote() {
-    if (!lastSummaryData) return;
-    const { sYmd, eYmd, matched, totalPeriodHours } = lastSummaryData;
-
-    let totalSec = 0;
-    const summaryMap = {};
-    matched.forEach(l => {
-      const sec = Math.floor((new Date(l.endAt) - new Date(l.startAt)) / 1000);
-      totalSec += sec;
-      if (!summaryMap[l.catId]) {
-        summaryMap[l.catId] = { name: l.name, icon: l.icon, sec: 0, count: 0 };
-      }
-      summaryMap[l.catId].sec += sec;
-      summaryMap[l.catId].count += 1;
-    });
-
-    const sortedCats = Object.values(summaryMap).sort((a, b) => b.sec - a.sec);
-    const totalH = Math.floor(totalSec / 3600);
-    const totalM = Math.floor((totalSec % 3600) / 60);
-    const dateHeaderStr = `${sYmd} 〜 ${eYmd}`;
-
-    const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
-    const palette = ['#38bdf8', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c', '#818cf8', '#2dd4bf'];
-
-    // SVG円グラフをDataURL（画像）に変換してEvernoteに綺麗に貼り付ける仕組み
-    const svgCanvas = document.createElement('canvas');
-    svgCanvas.width = 300;
-    svgCanvas.height = 300;
-    const sCtx = svgCanvas.getContext('2d');
-    
-    // 簡易的に円グラフをCanvasに描画してデータURL化
-    let startAngle = -Math.PI / 2;
-    sortedCats.forEach((item, idx) => {
-      const ratio = item.sec / totalSec;
-      const endAngle = startAngle + ratio * 2 * Math.PI;
-      sCtx.beginPath();
-      sCtx.moveTo(150, 150);
-      sCtx.arc(150, 150, 120, startAngle, endAngle);
-      sCtx.closePath();
-      sCtx.fillStyle = palette[idx % palette.length];
-      sCtx.fill();
-      startAngle = endAngle;
-    });
-    // ドーナツ中央の穴
-    sCtx.beginPath();
-    sCtx.arc(150, 150, 75, 0, 2 * Math.PI);
-    sCtx.fillStyle = '#151e2e';
-    sCtx.fill();
-
-    const chartImgDataUrl = svgCanvas.toDataURL('image/png');
-
-    // Evernote用HTML構築（画像2枚目の構造に完全に一致させる）
-    let html = `<div style="background-color:#070b14;color:#f1f5f9;padding:20px;${FONT_STYLE}">`;
-    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 4px 0;${FONT_STYLE}">${dateHeaderStr}</p>`;
-    html += `<p style="font-size:20px;font-weight:bold;color:#38bdf8;margin:0 0 2px 0;${FONT_STYLE}">総記録時間: ${totalH}時間 ${totalM}分</p>`;
-    html += `<p style="font-size:14px;color:#94a3b8;margin:0 0 20px 0;${FONT_STYLE}">(対象期間の合計時間：${totalPeriodHours}時間)</p>`;
-
-    // グラフと凡例の横並びテーブル
-    html += `<table style="width:100%;border-collapse:collapse;margin-bottom:24px;background-color:#151e2e;border-radius:12px;border:1px solid #233249;"><tr>`;
-    html += `<td style="width:140px;padding:16px;text-align:center;"><img src="${chartImgDataUrl}" width="120" height="120" style="width:120px;height:120px;display:block;margin:0 auto;" /></td>`;
-    html += `<td style="padding:16px;vertical-align:middle;">`;
-    
-    sortedCats.slice(0, 6).forEach((item, idx) => {
-      const col = palette[idx % palette.length];
-      html += `<div style="font-size:13px;margin-bottom:6px;${FONT_STYLE}"><span style="display:inline-block;width:10px;height:10px;background-color:${col};margin-right:6px;border-radius:2px;"></span>${item.icon} ${item.name}</div>`;
-    });
-    if (sortedCats.length > 6) {
-      html += `<div style="font-size:13px;margin-bottom:6px;${FONT_STYLE}"><span style="display:inline-block;width:10px;height:10px;background-color:#94a3b8;margin-right:6px;border-radius:2px;"></span>その他</div>`;
-    }
-    html += `</td></tr></table>`;
-
-    html += `<p style="font-size:16px;font-weight:bold;margin:0 0 12px 0;${FONT_STYLE}">【カテゴリ別内訳】</p>`;
-
-    let plain = `${dateHeaderStr} の集計\n総記録時間: ${totalH}時間 ${totalM}分 (対象期間合計: ${totalPeriodHours}時間)\n\n【カテゴリ別内訳】\n`;
-
-    sortedCats.forEach(item => {
-      const h = Math.floor(item.sec / 3600);
-      const m = Math.floor((item.sec % 3600) / 60);
-      const timeStr = h > 0 ? `${h}時間 ${m}分` : `${m}分`;
-      const ratioPct = ((item.sec / totalSec) * 100).toFixed(1);
-      const iconPng = emojiToPngDataUrl(item.icon);
-
-      html += `
-        <p style="font-size:15px;margin:0 0 8px 0;${FONT_STYLE}">
-          <img src="${iconPng}" width="22" height="22" style="width:22px;height:22px;vertical-align:middle;display:inline-block;margin-right:4px;" alt="${item.icon}">
-          <b>${item.name}</b> — ${timeStr} (${ratioPct}%)
-        </p>
-      `;
-      plain += `${item.icon} ${item.name} — ${timeStr} (${ratioPct}%)\n`;
-    });
-
-    html += '</div>';
-
-    const ok = await copyToClipboard(html, plain);
-    if (ok) {
-      alert(`【${dateHeaderStr} 集計】をEvernote用（グラフ付き）にコピーしました！\nEvernoteに貼り付けてください。`);
     } else {
       alert('クリップボードへのコピーに失敗しました。');
     }
