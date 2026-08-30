@@ -161,7 +161,6 @@
     opacity: 0; 
     cursor: pointer; 
     z-index: 10;
-    pointer-events: none;
   }
 
   .active-section { margin: 8px 0 12px; display: none; }
@@ -343,7 +342,7 @@
     <button class="btn-stone btn-cal" onclick="setHistoryDate(getYesterdayStr())">前日ログ</button>
     <button class="btn-stone btn-cal" onclick="setHistoryDate(getTodayStr())">当日ログ</button>
     <div class="date-picker-wrap-item">
-      <label for="historyTargetDate" class="btn-stone btn-cal" style="width:100%;display:flex;align-items:center;justify-content:center;margin:0;cursor:pointer;">日付指定</label>
+      <button class="btn-stone btn-cal" style="width:100%;" onclick="openHistoryDatePicker()">日付指定</button>
       <input type="date" id="historyTargetDate" class="hidden-date-input" onchange="handleHistoryDateChange(this)">
     </div>
   </div>
@@ -357,10 +356,8 @@
   <div class="bar-btn-group">
     <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getYesterdayStr())">前日出力</button>
     <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getTodayStr())">当日出力</button>
-    <div class="date-picker-wrap-item">
-      <label for="exportTargetDate" class="btn-stone btn-evernote" style="width:100%;display:flex;align-items:center;justify-content:center;margin:0;cursor:pointer;">日付指定</label>
-      <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="handleExportDateChange(this)">
-    </div>
+    <!-- Evernoteの日付指定は安全な専用モーダルに変更 -->
+    <button class="btn-stone btn-evernote" onclick="openExportDateModal()">日付指定</button>
   </div>
 </div>
 
@@ -390,6 +387,21 @@
   <div class="history-date-label" id="currentHistoryDateLabel"></div>
 </div>
 <div class="history-list" id="history"></div>
+
+<!-- Evernote出力用日付指定モーダル -->
+<div class="modal" id="exportDateModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">Evernote出力日の指定</h3>
+    <div class="form-group">
+      <label>出力する日付</label>
+      <input type="date" id="exportModalDate" class="modal-input">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeExportDateModal()">閉じる</button>
+      <button class="btn-action btn-submit" onclick="submitExportDateModal()">出力する</button>
+    </div>
+  </div>
+</div>
 
 <!-- 任意の期間指定用モーダル -->
 <div class="modal" id="customRangeModal">
@@ -663,13 +675,37 @@
     inputEl.value = '';
   }
 
-  function handleExportDateChange(inputEl) {
-    if (!inputEl.value) return;
-    const parts = inputEl.value.split('-');
+  function openHistoryDatePicker() {
+    const p = document.getElementById('historyTargetDate');
+    p.value = '';
+    if (p.showPicker) {
+      try { p.showPicker(); } catch(e) { p.click(); }
+    } else {
+      p.click();
+    }
+  }
+
+  // Evernote出力用日付指定モーダルの制御
+  function openExportDateModal() {
+    document.getElementById('exportModalDate').value = formatDateYMDDash(new Date());
+    document.getElementById('exportDateModal').style.display = 'flex';
+  }
+
+  function closeExportDateModal() {
+    document.getElementById('exportDateModal').style.display = 'none';
+  }
+
+  function submitExportDateModal() {
+    const val = document.getElementById('exportModalDate').value;
+    if (!val) {
+      alert('日付を選択してください。');
+      return;
+    }
+    closeExportDateModal();
+    const parts = val.split('-');
     if (parts.length === 3) {
       exportEvernoteByDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
     }
-    inputEl.value = '';
   }
 
   function openCustomRangeModal() {
