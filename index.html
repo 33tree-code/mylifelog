@@ -543,7 +543,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v14';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v15';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -553,7 +553,7 @@
   let logs = [];
   let currentPhotos = [];
   let currentViewingDateYMD = getTodayStr();
-  let lastSummaryData = null; // Evernote出力用保持
+  let lastSummaryData = null;
 
   const DB_NAME = 'LifelogDB';
   const STORE_NAME = 'logs';
@@ -1057,7 +1057,7 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* Evernote出力処理（個別日付用） */
+  /* 個別日付用Evernote出力 */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('-').map(Number);
@@ -1137,7 +1137,7 @@
     }
   }
 
-  /* 集計機能（円グラフ＆Evernote出力対応） */
+  /* 集計機能（画面内表示・円グラフ生成） */
   function openSummaryModal(type) {
     let startD = new Date();
     let endD = new Date();
@@ -1197,7 +1197,6 @@
     const sYmd = `${startD.getFullYear()}/${String(startD.getMonth()+1).padStart(2,'0')}/${String(startD.getDate()).padStart(2,'0')}`;
     const eYmd = `${endD.getFullYear()}/${String(endD.getMonth()+1).padStart(2,'0')}/${String(endD.getDate()).padStart(2,'0')}`;
 
-    // 対象期間の全日数から総時間(h)を計算
     const diffDays = Math.round((endD - startD) / (1000 * 60 * 60 * 24)) + 1;
     const totalPeriodHours = diffDays * 24;
 
@@ -1232,7 +1231,6 @@
     html += `<div style="font-size:0.9rem; font-weight:bold; color:var(--accent); margin-bottom:1px;">総記録時間: ${totalH}時間 ${totalM}分</div>`;
     html += `<div style="font-size:0.75rem; color:var(--text-sub); margin-bottom:10px;">(対象期間の合計時間：${totalPeriodHours}時間)</div>`;
 
-    // 円グラフ描画用SVG生成
     const palette = ['#38bdf8', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c', '#818cf8', '#2dd4bf'];
     let accumAngle = 0;
     let svgSlices = '';
@@ -1241,9 +1239,6 @@
     sortedCats.forEach((item, idx) => {
       const ratio = item.sec / totalSec;
       const color = palette[idx % palette.length];
-      const pct = (ratio * 100).toFixed(1);
-
-      // SVGドーナツチャートのスライス計算
       const strokeDasharray = `${ratio * 251.2} 251.2`;
       const strokeDashoffset = -accumAngle * 251.2;
       accumAngle += ratio;
@@ -1283,7 +1278,6 @@
       </div>
     `;
 
-    // 詳細リスト表示
     html += `<div style="display:flex; flex-direction:column; gap:6px;">`;
     sortedCats.forEach(item => {
       const h = Math.floor(item.sec / 3600);
@@ -1313,10 +1307,10 @@
     document.getElementById('summaryModal').style.display = 'none';
   }
 
-  /* 集計結果のEvernote出力 */
+  /* 🔥 集計結果をEvernote用（画像2枚目のレイアウト・グラフ付き）にコピー出力 */
   async function exportSummaryToEvernote() {
     if (!lastSummaryData) return;
-    const { sYmd, eYmd, title, matched, totalPeriodHours } = lastSummaryData;
+    const { sYmd, eYmd, matched, totalPeriodHours } = lastSummaryData;
 
     let totalSec = 0;
     const summaryMap = {};
@@ -1333,16 +1327,61 @@
     const sortedCats = Object.values(summaryMap).sort((a, b) => b.sec - a.sec);
     const totalH = Math.floor(totalSec / 3600);
     const totalM = Math.floor((totalSec % 3600) / 60);
+    const dateHeaderStr = `${sYmd} 〜 ${eYmd}`;
 
     const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
-    const dateHeaderStr = `${sYmd} 〜 ${eYmd} の集計`;
+    const palette = ['#38bdf8', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c', '#818cf8', '#2dd4bf'];
 
-    let html = `<div style="${FONT_STYLE}">`;
-    html += `<p style="font-size:22px;font-weight:bold;margin:0 0 4px 0;${FONT_STYLE}">${dateHeaderStr}</p>`;
-    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 2px 0;${FONT_STYLE}">総記録時間: ${totalH}時間 ${totalM}分</p>`;
-    html += `<p style="font-size:13px;color:#94a3b8;margin:0 0 16px 0;${FONT_STYLE}">(対象期間の合計時間：${totalPeriodHours}時間)</p>`;
+    // SVG円グラフをDataURL（画像）に変換してEvernoteに綺麗に貼り付ける仕組み
+    const svgCanvas = document.createElement('canvas');
+    svgCanvas.width = 300;
+    svgCanvas.height = 300;
+    const sCtx = svgCanvas.getContext('2d');
+    
+    // 簡易的に円グラフをCanvasに描画してデータURL化
+    let startAngle = -Math.PI / 2;
+    sortedCats.forEach((item, idx) => {
+      const ratio = item.sec / totalSec;
+      const endAngle = startAngle + ratio * 2 * Math.PI;
+      sCtx.beginPath();
+      sCtx.moveTo(150, 150);
+      sCtx.arc(150, 150, 120, startAngle, endAngle);
+      sCtx.closePath();
+      sCtx.fillStyle = palette[idx % palette.length];
+      sCtx.fill();
+      startAngle = endAngle;
+    });
+    // ドーナツ中央の穴
+    sCtx.beginPath();
+    sCtx.arc(150, 150, 75, 0, 2 * Math.PI);
+    sCtx.fillStyle = '#151e2e';
+    sCtx.fill();
 
-    let plain = `${dateHeaderStr}\n総記録時間: ${totalH}時間 ${totalM}分 (対象期間合計: ${totalPeriodHours}時間)\n\n`;
+    const chartImgDataUrl = svgCanvas.toDataURL('image/png');
+
+    // Evernote用HTML構築（画像2枚目の構造に完全に一致させる）
+    let html = `<div style="background-color:#070b14;color:#f1f5f9;padding:20px;${FONT_STYLE}">`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 4px 0;${FONT_STYLE}">${dateHeaderStr}</p>`;
+    html += `<p style="font-size:20px;font-weight:bold;color:#38bdf8;margin:0 0 2px 0;${FONT_STYLE}">総記録時間: ${totalH}時間 ${totalM}分</p>`;
+    html += `<p style="font-size:14px;color:#94a3b8;margin:0 0 20px 0;${FONT_STYLE}">(対象期間の合計時間：${totalPeriodHours}時間)</p>`;
+
+    // グラフと凡例の横並びテーブル
+    html += `<table style="width:100%;border-collapse:collapse;margin-bottom:24px;background-color:#151e2e;border-radius:12px;border:1px solid #233249;"><tr>`;
+    html += `<td style="width:140px;padding:16px;text-align:center;"><img src="${chartImgDataUrl}" width="120" height="120" style="width:120px;height:120px;display:block;margin:0 auto;" /></td>`;
+    html += `<td style="padding:16px;vertical-align:middle;">`;
+    
+    sortedCats.slice(0, 6).forEach((item, idx) => {
+      const col = palette[idx % palette.length];
+      html += `<div style="font-size:13px;margin-bottom:6px;${FONT_STYLE}"><span style="display:inline-block;width:10px;height:10px;background-color:${col};margin-right:6px;border-radius:2px;"></span>${item.icon} ${item.name}</div>`;
+    });
+    if (sortedCats.length > 6) {
+      html += `<div style="font-size:13px;margin-bottom:6px;${FONT_STYLE}"><span style="display:inline-block;width:10px;height:10px;background-color:#94a3b8;margin-right:6px;border-radius:2px;"></span>その他</div>`;
+    }
+    html += `</td></tr></table>`;
+
+    html += `<p style="font-size:16px;font-weight:bold;margin:0 0 12px 0;${FONT_STYLE}">【カテゴリ別内訳】</p>`;
+
+    let plain = `${dateHeaderStr} の集計\n総記録時間: ${totalH}時間 ${totalM}分 (対象期間合計: ${totalPeriodHours}時間)\n\n【カテゴリ別内訳】\n`;
 
     sortedCats.forEach(item => {
       const h = Math.floor(item.sec / 3600);
@@ -1352,19 +1391,19 @@
       const iconPng = emojiToPngDataUrl(item.icon);
 
       html += `
-        <p style="font-size:16px;font-weight:bold;margin:8px 0 2px 0;${FONT_STYLE}">
-          <img src="${iconPng}" width="24" height="24" style="width:24px;height:24px;vertical-align:middle;display:inline-block;" alt="${item.icon}">
-          ${item.name}：${timeStr} (${ratioPct}%) [${item.count}回]
+        <p style="font-size:15px;margin:0 0 8px 0;${FONT_STYLE}">
+          <img src="${iconPng}" width="22" height="22" style="width:22px;height:22px;vertical-align:middle;display:inline-block;margin-right:4px;" alt="${item.icon}">
+          <b>${item.name}</b> — ${timeStr} (${ratioPct}%)
         </p>
       `;
-      plain += `${item.icon} ${item.name}: ${timeStr} (${ratioPct}%) / ${item.count}回\n`;
+      plain += `${item.icon} ${item.name} — ${timeStr} (${ratioPct}%)\n`;
     });
 
     html += '</div>';
 
     const ok = await copyToClipboard(html, plain);
     if (ok) {
-      alert(`【${dateHeaderStr}】の集計データをコピーしました！\nEvernoteに貼り付けてください。`);
+      alert(`【${dateHeaderStr} 集計】をEvernote用（グラフ付き）にコピーしました！\nEvernoteに貼り付けてください。`);
     } else {
       alert('クリップボードへのコピーに失敗しました。');
     }
