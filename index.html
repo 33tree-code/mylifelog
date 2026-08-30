@@ -228,7 +228,7 @@
     box-shadow: 0 0 12px rgba(0, 229, 255, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
   }
   .card-icon { font-size: 1.25rem; flex-shrink: 0; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
-  .card-name { font-weight: 600; font-size: 0.84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; color: #f8fafc; z-index: 1; }
+  .card-name { font-weight: 600; font-size: 0.84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; color: #f8fafc; z-index: 1; pointer-events: none; }
   
   .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 2px; }
   .history-header h2 { font-size: 0.9rem; color: var(--text-sub); font-weight: 700; }
@@ -495,7 +495,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v12';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v13';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -695,7 +695,7 @@
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const w = days[viewDate.getDay()];
     
-    document.getElementById('currentHistoryDateLabel').innerText = `${vy}/${String(vm).padStart(2, '0')}/${String(vd).padStart(2, '0')}(${w})`;
+    document.getElementById('currentHistoryDateLabel').innerText = `${vy}/${String(vm).padStart(2, '0')}/${String(vd).padStart(2, '0')}(${w})`.replace(/\s+/g, '');
 
     const viewDateStr = viewDate.toDateString();
     
@@ -1015,7 +1015,7 @@
 
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     const w = days[targetDate.getDay()];
-    const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})のログ`;
+    const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})のログ`.replace(/\s+/g, '');
 
     const targetDateStr = targetDate.toDateString();
     
