@@ -138,6 +138,12 @@
     color: #fff;
     border-color: rgba(52, 211, 153, 0.3);
   }
+  .btn-summary {
+    flex: 1;
+    background: linear-gradient(180deg, #7c3aed 0%, #6d28d9 100%);
+    color: #fff;
+    border-color: rgba(167, 139, 250, 0.3);
+  }
 
   .date-picker-wrap-item {
     flex: 1;
@@ -171,8 +177,8 @@
   }
   .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; pointer-events: none; }
   .active-icon { font-size: 1.4rem; flex-shrink: 0; }
-  .active-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-  .active-badge { font-size: 0.85rem; font-weight: 700; color: var(--running); margin-top: 1px; }
+  .active-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; pointer-events: none; }
+  .active-badge { font-size: 0.85rem; font-weight: 700; color: var(--running); margin-top: 1px; pointer-events: none; }
   .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 2; pointer-events: auto; }
   .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; pointer-events: none; }
   .btn-active-edit { 
@@ -227,7 +233,7 @@
     background: linear-gradient(180deg, rgba(0, 229, 255, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%) !important; 
     box-shadow: 0 0 12px rgba(0, 229, 255, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
   }
-  .card-icon { font-size: 1.25rem; flex-shrink: 0; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
+  .card-icon { font-size: 1.25rem; flex-shrink: 0; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); pointer-events: none; }
   .card-name { font-weight: 600; font-size: 0.84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; color: #f8fafc; z-index: 1; pointer-events: none; }
   
   .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 2px; }
@@ -347,6 +353,20 @@
     <div class="date-picker-wrap-item">
       <button class="btn-stone btn-evernote" style="width:100%;" onclick="openExportDatePicker()">日付指定</button>
       <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="exportEvernoteByDate(this.value)">
+    </div>
+  </div>
+</div>
+
+<div class="control-bar-row">
+  <div class="bar-left-icon">
+    <img src="summary.png" alt="集計" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📊</div>';">
+  </div>
+  <div class="bar-btn-group">
+    <button class="btn-stone btn-summary" onclick="exportSummaryLastWeek()">先週(日-土)</button>
+    <button class="btn-stone btn-summary" onclick="exportSummaryLastMonth()">先月</button>
+    <div class="date-picker-wrap-item">
+      <button class="btn-stone btn-summary" style="width:100%;" onclick="openSummaryDatePicker()">期間指定</button>
+      <input type="date" id="summaryTargetDate" class="hidden-date-input" onchange="exportSummaryCustom(this.value)">
     </div>
   </div>
 </div>
@@ -495,7 +515,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v13';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v14';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -586,6 +606,13 @@
 
   function openExportDatePicker() {
     const p = document.getElementById('exportTargetDate');
+    if (p.showPicker) {
+      try { p.showPicker(); } catch(e) { p.click(); }
+    } else { p.click(); }
+  }
+
+  function openSummaryDatePicker() {
+    const p = document.getElementById('summaryTargetDate');
     if (p.showPicker) {
       try { p.showPicker(); } catch(e) { p.click(); }
     } else { p.click(); }
@@ -1086,6 +1113,11 @@
       alert('クリップボードへのコピーに失敗しました。');
     }
   }
+
+  // 集計出力用のプレースホルダー関数（必要に応じて調整）
+  function exportSummaryLastWeek() { alert('先週（日-土）の集計出力機能'); }
+  function exportSummaryLastMonth() { alert('先月の集計出力機能'); }
+  function exportSummaryCustom(val) { if(val) alert(val + ' からの期間指定集計'); }
 
   function exportBackupData() {
     const data = { cats, logs, exportedAt: new Date().toISOString() };
