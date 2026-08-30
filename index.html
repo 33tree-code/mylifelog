@@ -161,6 +161,7 @@
     opacity: 0; 
     cursor: pointer; 
     z-index: 10;
+    pointer-events: none;
   }
 
   .active-section { margin: 8px 0 12px; display: none; }
@@ -342,7 +343,7 @@
     <button class="btn-stone btn-cal" onclick="setHistoryDate(getYesterdayStr())">前日ログ</button>
     <button class="btn-stone btn-cal" onclick="setHistoryDate(getTodayStr())">当日ログ</button>
     <div class="date-picker-wrap-item">
-      <button class="btn-stone btn-cal" style="width:100%;" onclick="openHistoryDatePicker()">日付指定</button>
+      <label for="historyTargetDate" class="btn-stone btn-cal" style="width:100%;display:flex;align-items:center;justify-content:center;margin:0;cursor:pointer;">日付指定</label>
       <input type="date" id="historyTargetDate" class="hidden-date-input" onchange="handleHistoryDateChange(this)">
     </div>
   </div>
@@ -357,7 +358,7 @@
     <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getYesterdayStr())">前日出力</button>
     <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getTodayStr())">当日出力</button>
     <div class="date-picker-wrap-item">
-      <button class="btn-stone btn-evernote" style="width:100%;" onclick="openExportDatePicker()">日付指定</button>
+      <label for="exportTargetDate" class="btn-stone btn-evernote" style="width:100%;display:flex;align-items:center;justify-content:center;margin:0;cursor:pointer;">日付指定</label>
       <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="handleExportDateChange(this)">
     </div>
   </div>
@@ -669,22 +670,6 @@
       exportEvernoteByDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
     }
     inputEl.value = '';
-  }
-
-  function openHistoryDatePicker() {
-    const p = document.getElementById('historyTargetDate');
-    p.value = ''; // 毎回値をクリアして確実にピッカーが反応するようにする
-    if (p.showPicker) {
-      try { p.showPicker(); } catch(e) { p.click(); }
-    } else { p.click(); }
-  }
-
-  function openExportDatePicker() {
-    const p = document.getElementById('exportTargetDate');
-    p.value = ''; // 毎回値をクリアして確実にピッカーが反応するようにする
-    if (p.showPicker) {
-      try { p.showPicker(); } catch(e) { p.click(); }
-    } else { p.click(); }
   }
 
   function openCustomRangeModal() {
