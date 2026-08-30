@@ -653,14 +653,13 @@
     render();
   }
 
-  // iPhoneなどのhiddenインプット変更時、YYYY-MM-DDをYYYY/MM/DDに安全に変換してセットするラッパー
   function handleHistoryDateChange(inputEl) {
     if (!inputEl.value) return;
     const parts = inputEl.value.split('-');
     if (parts.length === 3) {
       setHistoryDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
     }
-    inputEl.value = ''; // 次回同日選択でも発火するようにリセット
+    inputEl.value = '';
   }
 
   function handleExportDateChange(inputEl) {
@@ -669,11 +668,12 @@
     if (parts.length === 3) {
       exportEvernoteByDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
     }
-    inputEl.value = ''; // 次回同日選択でも発火するようにリセット
+    inputEl.value = '';
   }
 
   function openHistoryDatePicker() {
     const p = document.getElementById('historyTargetDate');
+    p.value = ''; // 毎回値をクリアして確実にピッカーが反応するようにする
     if (p.showPicker) {
       try { p.showPicker(); } catch(e) { p.click(); }
     } else { p.click(); }
@@ -681,6 +681,7 @@
 
   function openExportDatePicker() {
     const p = document.getElementById('exportTargetDate');
+    p.value = ''; // 毎回値をクリアして確実にピッカーが反応するようにする
     if (p.showPicker) {
       try { p.showPicker(); } catch(e) { p.click(); }
     } else { p.click(); }
