@@ -356,7 +356,6 @@
   <div class="bar-btn-group">
     <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getYesterdayStr())">前日出力</button>
     <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getTodayStr())">当日出力</button>
-    <!-- Evernoteの日付指定は安全な専用モーダルに変更 -->
     <button class="btn-stone btn-evernote" onclick="openExportDateModal()">日付指定</button>
   </div>
 </div>
@@ -547,7 +546,7 @@
     { id: 'c23', name: '試し・メンテ', icon: '🪮', color: 'rgba(51, 65, 85, 0.5)' },
     { id: 'c24', name: '設定🔧', icon: '⚙', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c25', name: '買い物等🛍リアル', icon: '🛒', color: 'rgba(30, 64, 175, 0.25)' },
-    { id: 'c26', name: '買い物等🛍ネット', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c26', name: 'Net Shopping', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c27', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c28', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c29', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
@@ -575,7 +574,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v15';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v16';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
