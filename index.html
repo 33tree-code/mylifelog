@@ -343,7 +343,7 @@
     <button class="btn-stone btn-cal" onclick="setHistoryDate(getTodayStr())">当日ログ</button>
     <div class="date-picker-wrap-item">
       <button class="btn-stone btn-cal" style="width:100%;" onclick="openHistoryDatePicker()">日付指定</button>
-      <input type="date" id="historyTargetDate" class="hidden-date-input" onchange="setHistoryDate(this.value)">
+      <input type="date" id="historyTargetDate" class="hidden-date-input" onchange="handleHistoryDateChange(this)">
     </div>
   </div>
 </div>
@@ -358,7 +358,7 @@
     <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getTodayStr())">当日出力</button>
     <div class="date-picker-wrap-item">
       <button class="btn-stone btn-evernote" style="width:100%;" onclick="openExportDatePicker()">日付指定</button>
-      <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="exportEvernoteByDate(this.value)">
+      <input type="date" id="exportTargetDate" class="hidden-date-input" onchange="handleExportDateChange(this)">
     </div>
   </div>
 </div>
@@ -653,6 +653,25 @@
     render();
   }
 
+  // iPhoneなどのhiddenインプット変更時、YYYY-MM-DDをYYYY/MM/DDに安全に変換してセットするラッパー
+  function handleHistoryDateChange(inputEl) {
+    if (!inputEl.value) return;
+    const parts = inputEl.value.split('-');
+    if (parts.length === 3) {
+      setHistoryDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
+    }
+    inputEl.value = ''; // 次回同日選択でも発火するようにリセット
+  }
+
+  function handleExportDateChange(inputEl) {
+    if (!inputEl.value) return;
+    const parts = inputEl.value.split('-');
+    if (parts.length === 3) {
+      exportEvernoteByDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
+    }
+    inputEl.value = ''; // 次回同日選択でも発火するようにリセット
+  }
+
   function openHistoryDatePicker() {
     const p = document.getElementById('historyTargetDate');
     if (p.showPicker) {
@@ -783,7 +802,7 @@
       titleStr = param1 === param2 ? `${formatDateYMD(startDate)}` : `${formatDateYMD(startDate)} 〜 ${formatDateYMD(endDate)}`;
     }
 
-    const totalPeriodHours = Math.round((endDate - startDate + 1) / (1000 * 60 * 60));
+    const totalPeriodHours = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60)));
 
     const statsMap = {};
     let totalSecAll = 0;
@@ -1304,7 +1323,8 @@
   /* 日次Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
-    const [y, m, d] = dateStringYMD.split('-').map(Number);
+    const [y, m, d] = dateStringYMD.split('/').map(Number);
+    if (!y || !m || !d) return;
     const targetDate = new Date(y, m - 1, d);
 
     const days = ['日', '月', '火', '水', '木', '金', '土'];
