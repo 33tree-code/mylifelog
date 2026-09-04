@@ -9,7 +9,6 @@
 <title>ライフログ</title>
 <link rel="apple-touch-icon" href="logo.png">
 <link rel="icon" href="logo.png">
-<!-- グラフ描画用ライブラリ (Chart.js) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
   :root {
@@ -170,29 +169,45 @@
     border: 2px solid var(--running); 
     box-shadow: 0 0 14px rgba(0, 229, 255, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3);
     border-radius: 12px; 
-    padding: 10px 14px; 
+    padding: 10px 12px; 
     display: flex; 
     justify-content: space-between; 
     align-items: center; 
     margin-bottom: 6px; 
-    cursor: pointer;
   }
-  .active-left { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; pointer-events: none; }
-  .active-icon { font-size: 1.4rem; flex-shrink: 0; }
-  .active-title { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-  .active-badge { font-size: 0.85rem; font-weight: 700; color: var(--running); margin-top: 1px; }
-  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; z-index: 2; pointer-events: auto; }
-  .active-timer { font-size: 1.15rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; pointer-events: none; }
-  .btn-active-edit { 
-    background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); 
+  .active-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+  .active-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .active-title { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+  .active-badge { font-size: 0.8rem; font-weight: 700; color: var(--running); margin-top: 1px; }
+  
+  .active-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .active-timer-col { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
+  .active-timer { font-size: 1.05rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; line-height: 1.2; }
+  
+  .active-btn-group { display: flex; gap: 4px; }
+  .btn-active-stop { 
+    background: linear-gradient(180deg, #10b981 0%, #047857 100%); 
     color: #fff; 
     border: none; 
-    padding: 5px 10px; 
+    padding: 6px 9px; 
     border-radius: 7px; 
     font-size: 0.75rem; 
     font-weight: 700; 
     cursor: pointer; 
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    white-space: nowrap;
+  }
+  .btn-active-edit { 
+    background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%); 
+    color: #fff; 
+    border: none; 
+    padding: 6px 9px; 
+    border-radius: 7px; 
+    font-size: 0.75rem; 
+    font-weight: 700; 
+    cursor: pointer; 
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    white-space: nowrap;
   }
 
   .grid { 
@@ -319,7 +334,6 @@
 </head>
 <body>
 
-<!-- 上段ヘッダー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="logo.png" alt="ロゴ" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'36\' height=\'36\'><rect width=\'36\' height=\'36\' fill=\'%231e293b\' rx=\'8\'/><text x=\'50%\' y=\'55%\' font-size=\'18\' fill=\'%23fff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>⏱</text></svg>';">
@@ -333,7 +347,6 @@
   </div>
 </div>
 
-<!-- 履歴表示切り替えバー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📅</div>';">
@@ -348,7 +361,6 @@
   </div>
 </div>
 
-<!-- Evernote出力バー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="evernote.png" alt="Evernote" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>🐘</div>';">
@@ -360,7 +372,6 @@
   </div>
 </div>
 
-<!-- 期間集計・分析レポートバー -->
 <div class="control-bar-row">
   <div class="bar-left-icon">
     <img src="report-icon.png" alt="集計" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📊</div>';">
@@ -387,7 +398,6 @@
 </div>
 <div class="history-list" id="history"></div>
 
-<!-- Evernote出力用日付指定モーダル -->
 <div class="modal" id="exportDateModal">
   <div class="modal-box">
     <h3 style="margin-bottom:12px;font-size:1.05rem;">Evernote出力日の指定</h3>
@@ -402,7 +412,6 @@
   </div>
 </div>
 
-<!-- 任意の期間指定用モーダル -->
 <div class="modal" id="customRangeModal">
   <div class="modal-box">
     <h3 style="margin-bottom:12px;font-size:1.05rem;">集計期間の指定</h3>
@@ -421,18 +430,15 @@
   </div>
 </div>
 
-<!-- 集計レポートモーダル -->
 <div class="modal" id="reportModal">
   <div class="modal-box" style="max-width:420px;max-height:90vh;overflow-y:auto;">
     <h3 style="margin-bottom:4px;font-size:1.05rem;" id="reportTitle">集計レポート</h3>
     <div id="reportRangeInfo" style="font-size:0.85rem;color:var(--accent);margin-bottom:10px;font-weight:bold;line-height:1.4;"></div>
     
-    <!-- 画面内円グラフ描画用キャンバス -->
     <div style="background:#0b1120;padding:12px;border-radius:10px;border:1px solid var(--border);display:flex;justify-content:center;align-items:center;margin-bottom:12px;position:relative;height:220px;">
       <canvas id="reportChartCanvas"></canvas>
     </div>
 
-    <!-- 集計ランキング一覧 -->
     <div id="reportRankingList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:200px;overflow-y:auto;padding-right:2px;"></div>
 
     <div class="modal-btns">
@@ -442,7 +448,6 @@
   </div>
 </div>
 
-<!-- カテゴリ追加モーダル -->
 <div class="modal" id="catModal">
   <div class="modal-box">
     <h3 style="margin-bottom:12px;font-size:1.05rem;">カテゴリ追加</h3>
@@ -461,7 +466,6 @@
   </div>
 </div>
 
-<!-- ⚙ カテゴリ設定 ＆ バックアップ/復元モーダル -->
 <div class="modal" id="settingModal">
   <div class="modal-box">
     <h3 style="margin-bottom:6px;font-size:1.05rem;">カテゴリ設定・並び替え</h3>
@@ -483,7 +487,6 @@
   </div>
 </div>
 
-<!-- ログ編集モーダル -->
 <div class="modal" id="editModal">
   <div class="modal-box" style="overflow-y:auto;max-height:90vh;">
     <h3 style="margin-bottom:12px;font-size:1.05rem;" id="editModalTitle">ログ編集</h3>
@@ -574,7 +577,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v16';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v17';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -684,7 +687,6 @@
     }
   }
 
-  // Evernote出力用日付指定モーダルの制御
   function openExportDateModal() {
     document.getElementById('exportModalDate').value = formatDateYMDDash(new Date());
     document.getElementById('exportDateModal').style.display = 'flex';
@@ -992,7 +994,7 @@
     if (runningLogs.length > 0) {
       activeSection.style.display = 'block';
       activeList.innerHTML = runningLogs.map(r => `
-        <div class="active-card" onclick="toggleLog({id:'${r.catId}', name:'${r.name}', icon:'${r.icon}'})">
+        <div class="active-card">
           <div class="active-left">
             <span class="active-icon">${r.icon}</span>
             <div style="min-width:0;">
@@ -1000,9 +1002,14 @@
               <div class="active-badge">${formatTimeSingleDigit(r.startAt)}〜</div>
             </div>
           </div>
-          <div class="active-right" onclick="event.stopPropagation();">
-            <div class="active-timer">${formatDurationEN(r.startAt)}</div>
-            <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
+          <div class="active-right">
+            <div class="active-timer-col">
+              <div class="active-timer">${formatDurationEN(r.startAt)}</div>
+            </div>
+            <div class="active-btn-group">
+              <button class="btn-active-stop" onclick="stopRunningLog('${r.id}')">終了</button>
+              <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
+            </div>
           </div>
         </div>
       `).join('');
@@ -1058,6 +1065,15 @@
           </div>
         `;
       }).join('');
+    }
+  }
+
+  // アクティブな計測を確実に1タップで終了させる専用関数
+  async function stopRunningLog(id) {
+    const i = logs.findIndex(l => l.id === id && !l.endAt);
+    if (i >= 0) {
+      logs[i].endAt = new Date().toISOString();
+      await save();
     }
   }
 
