@@ -184,7 +184,7 @@
   .active-timer-col { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
   .active-timer { font-size: 1.05rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; line-height: 1.2; }
   
-  .active-btn-group { display: flex; gap: 4px; }
+  .active-btn-group { display: flex; gap: 4px; align-items: center; }
   .btn-active-stop { 
     background: linear-gradient(180deg, #4da67c 0%, #357a5b 100%); 
     color: #fff; 
@@ -617,7 +617,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v18';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v19';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -1045,10 +1045,12 @@
           <div class="active-right">
             <div class="active-btn-group">
               <button class="btn-active-stop" onclick="stopRunningLog('${r.id}')">終了</button>
-              <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
             </div>
             <div class="active-timer-col">
               <div class="active-timer">${formatDurationEN(r.startAt)}</div>
+            </div>
+            <div class="active-btn-group">
+              <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
             </div>
           </div>
         </div>
