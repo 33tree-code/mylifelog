@@ -135,7 +135,7 @@
   }
   .btn-evernote { 
     flex: 1;
-    background: linear-gradient(180deg, #10b981 0%, #047857 100%);
+    background: linear-gradient(180deg, #3aa376 0%, #22704e 100%);
     color: #fff;
     border-color: rgba(52, 211, 153, 0.3);
   }
@@ -144,25 +144,6 @@
     background: linear-gradient(180deg, #7c3aed 0%, #5b21b6 100%);
     color: #fff;
     border-color: rgba(167, 139, 250, 0.3);
-  }
-
-  /* 若竹色 (Wakatake): 終了ボタン用 */
-  .btn-wakatake {
-    background: linear-gradient(180deg, #43a047 0%, #2e7d32 100%);
-    color: #fff;
-    border-color: rgba(67, 160, 71, 0.4);
-  }
-  /* ターコイズブルー (Turquoise Blue): 編集・保存ボタン用 */
-  .btn-turquoise {
-    background: linear-gradient(180deg, #29b6f6 0%, #0288d1 100%);
-    color: #fff;
-    border-color: rgba(41, 182, 246, 0.4);
-  }
-  /* マゼンタ (Magenta): 削除ボタン用 */
-  .btn-magenta {
-    background: linear-gradient(180deg, #ec407a 0%, #c2185b 100%);
-    color: #fff;
-    border-color: rgba(236, 64, 122, 0.4);
   }
 
   .date-picker-wrap-item {
@@ -199,25 +180,52 @@
   .active-title { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.8rem; font-weight: 700; color: var(--running); margin-top: 1px; }
   
-  .active-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-  .active-timer { font-size: 1.05rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .active-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .active-timer-col { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
+  .active-timer { font-size: 1.05rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; line-height: 1.2; }
   
-  .active-btn-group { display: flex; gap: 5px; }
+  .active-btn-group { display: flex; gap: 4px; }
   .btn-active-stop { 
-    padding: 6px 10px; 
+    background: linear-gradient(180deg, #4da67c 0%, #357a5b 100%); 
+    color: #fff; 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    padding: 6px 9px; 
     border-radius: 7px; 
-    font-size: 0.78rem; 
+    font-size: 0.75rem; 
     font-weight: 700; 
     cursor: pointer; 
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    position: relative;
+    overflow: hidden;
     white-space: nowrap;
   }
+  .btn-active-stop::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
   .btn-active-edit { 
-    padding: 6px 10px; 
+    background: linear-gradient(180deg, #42a5b3 0%, #2c7582 100%); 
+    color: #fff; 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    padding: 6px 9px; 
     border-radius: 7px; 
-    font-size: 0.78rem; 
+    font-size: 0.75rem; 
     font-weight: 700; 
     cursor: pointer; 
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    position: relative;
+    overflow: hidden;
     white-space: nowrap;
+  }
+  .btn-active-edit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
   }
 
   .grid { 
@@ -320,9 +328,34 @@
   }
   
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
-  .btn-action { flex: 1; padding: 10px 0; border-radius: 8px; font-weight: 700; cursor: pointer; border: none; font-size: 0.85rem; text-align: center; white-space: nowrap; box-shadow: var(--stone-shadow); }
-  .btn-cancel-white { background: transparent; border: 1.5px solid rgba(255,255,255,0.4) !important; color: #fff !important; }
+  .btn-action { 
+    flex: 1; 
+    padding: 10px 0; 
+    border-radius: 8px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    font-size: 0.85rem; 
+    text-align: center; 
+    white-space: nowrap; 
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-action::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
   
+  /* モーダル内ボタンのカラー設定（石風テクスチャ適用） */
+  .btn-modal-danger { background: linear-gradient(180deg, #d9538c 0%, #b5336e 100%); color: #fff; }
+  .btn-cancel-white { background: linear-gradient(180deg, #323e54 0%, #1c2536 100%) !important; color: #fff !important; }
+  .btn-modal-stop { background: linear-gradient(180deg, #4da67c 0%, #357a5b 100%); color: #fff; }
+  .btn-modal-save { background: linear-gradient(180deg, #42a5b3 0%, #2c7582 100%); color: #fff; }
+
   #settingList { overflow-y: auto; flex: 1; margin-bottom: 12px; padding-right: 2px; }
   .sort-item { display: flex; align-items: center; gap: 6px; background: #0c1320; padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border); }
   .sort-item.dragging { opacity: 0.3; border: 1px dashed var(--accent); }
@@ -381,4 +414,1110 @@
 
 <div class="control-bar-row">
   <div class="bar-left-icon">
-    <img src="report-icon.png" alt="集計" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📊</div>';
+    <img src="report-icon.png" alt="集計" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📊</div>';">
+  </div>
+  <div class="bar-btn-group">
+    <button class="btn-stone btn-report" onclick="openReportModal('lastWeek')">先週(日-土)</button>
+    <button class="btn-stone btn-report" onclick="openReportModal('prevMonth')">先月</button>
+    <button class="btn-stone btn-report" onclick="openCustomRangeModal()">期間指定</button>
+  </div>
+</div>
+
+<div class="active-section" id="activeSection">
+  <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--running);font-weight:bold;margin-bottom:6px;">
+    <span>⚡ 現在記録中</span>
+  </div>
+  <div id="activeList"></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="history-header">
+  <h2>履歴一覧</h2>
+  <div class="history-date-label" id="currentHistoryDateLabel"></div>
+</div>
+<div class="history-list" id="history"></div>
+
+<div class="modal" id="exportDateModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">Evernote出力日の指定</h3>
+    <div class="form-group">
+      <label>出力する日付</label>
+      <input type="date" id="exportModalDate" class="modal-input">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeExportDateModal()">閉じる</button>
+      <button class="btn-action btn-modal-save" onclick="submitExportDateModal()">出力する</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="customRangeModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">集計期間の指定</h3>
+    <div class="form-group">
+      <label>開始日</label>
+      <input type="date" id="customStartDate" class="modal-input">
+    </div>
+    <div class="form-group">
+      <label>終了日</label>
+      <input type="date" id="customEndDate" class="modal-input">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeCustomRangeModal()">閉じる</button>
+      <button class="btn-action btn-modal-save" onclick="submitCustomRange()">集計する</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="reportModal">
+  <div class="modal-box" style="max-width:420px;max-height:90vh;overflow-y:auto;">
+    <h3 style="margin-bottom:4px;font-size:1.05rem;" id="reportTitle">集計レポート</h3>
+    <div id="reportRangeInfo" style="font-size:0.85rem;color:var(--accent);margin-bottom:10px;font-weight:bold;line-height:1.4;"></div>
+    
+    <div style="background:#0b1120;padding:12px;border-radius:10px;border:1px solid var(--border);display:flex;justify-content:center;align-items:center;margin-bottom:12px;position:relative;height:220px;">
+      <canvas id="reportChartCanvas"></canvas>
+    </div>
+
+    <div id="reportRankingList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:200px;overflow-y:auto;padding-right:2px;"></div>
+
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeReportModal()">閉じる</button>
+      <button class="btn-action btn-evernote" onclick="exportReportToEvernote()">Evernote出力</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="catModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">カテゴリ追加</h3>
+    <div class="form-group">
+      <label>アイコン（絵文字）</label>
+      <input type="text" id="catIcon" class="modal-input" value="📌" maxlength="2">
+    </div>
+    <div class="form-group">
+      <label>カテゴリ名</label>
+      <input type="text" id="catName" class="modal-input">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeCatModal()">閉じる</button>
+      <button class="btn-action btn-modal-save" onclick="addCategory()">追加</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="settingModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:6px;font-size:1.05rem;">カテゴリ設定・並び替え</h3>
+    <div style="font-size:0.75rem;color:var(--text-sub);margin-bottom:10px;">「≡」を長押しドラッグで移動、文字を直接編集できます</div>
+    <div id="settingList"></div>
+    
+    <div style="font-size:0.8rem;color:var(--accent);font-weight:bold;margin-top:6px;">データ保護・復元</div>
+    <div class="backup-box">
+      <button class="btn-action" style="background:#243248;color:#fff;" onclick="exportBackupData()">💾 保存 (JSON)</button>
+      <label class="btn-action" style="background:#243248;color:#fff;text-align:center;cursor:pointer;padding-top:10px;">
+        📂 復元
+        <input type="file" accept=".json" style="display:none;" onchange="importBackupData(event)">
+      </label>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn-action btn-modal-save" onclick="closeSettingModal()">完了</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="editModal">
+  <div class="modal-box" style="overflow-y:auto;max-height:90vh;">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;" id="editModalTitle">ログ編集</h3>
+    <input type="hidden" id="editLogId">
+    
+    <div class="form-group">
+      <label>開始時刻</label>
+      <input type="time" id="editStartTime" class="modal-input">
+    </div>
+    
+    <div class="form-group">
+      <label>終了時刻 <span style="font-size:0.7rem;color:var(--accent);">※未入力で終了保存すると現在時刻</span></label>
+      <input type="time" id="editEndTime" class="modal-input">
+    </div>
+    
+    <div class="form-group">
+      <label>メモ</label>
+      <textarea id="editMemo" class="modal-input" rows="4" placeholder="メモを入力..."></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label>写真追加</label>
+      <input type="file" id="editPhoto" class="modal-input" accept="image/*" multiple onchange="handlePhotoUpload(event)">
+    </div>
+    <div id="imagePreviewContainer" class="preview-grid"></div>
+
+    <div class="modal-btns">
+      <button class="btn-action btn-modal-danger" onclick="deleteCurrentLog()">削除</button>
+      <button class="btn-action btn-cancel-white" onclick="closeEditModal()">閉じる</button>
+      <button class="btn-action btn-modal-stop" id="btnStopAndSave" style="display:none;" onclick="saveLogEdit(true)">終了</button>
+      <button class="btn-action btn-modal-save" onclick="saveLogEdit(false)">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DEFAULT_CATS = [
+    { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
+    { id: 'c2', name: 'Power Nap💤', icon: '🔋', color: 'rgba(99, 102, 241, 0.22)' },
+    { id: 'c3', name: 'ストレッチ🙆', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
+    { id: 'c4', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.22)' },
+    { id: 'c5', name: 'BM', icon: '🚽', color: 'rgba(148, 163, 184, 0.22)' },
+    { id: 'c6', name: '風呂🛀', icon: '🛁', color: 'rgba(34, 211, 238, 0.22)' },
+    { id: 'c7', name: '読書📖', icon: '📚', color: 'rgba(180, 83, 9, 0.25)' },
+    { id: 'c8', name: '自己啓発', icon: '🌱', color: 'rgba(132, 204, 22, 0.22)' },
+    { id: 'c9', name: 'Tech Work', icon: '🖥', color: 'rgba(30, 41, 59, 0.7)' },
+    { id: 'c10', name: 'Trade📈', icon: '💹', color: 'rgba(22, 101, 52, 0.35)' },
+    { id: 'c11', name: 'Research', icon: '🌐', color: 'rgba(2, 132, 199, 0.25)' },
+    { id: 'c12', name: 'Search', icon: '🔍', color: 'rgba(100, 116, 139, 0.25)' },
+    { id: 'c13', name: 'Coffee', icon: '☕', color: 'rgba(120, 53, 15, 0.3)' },
+    { id: 'c14', name: '抹茶', icon: '🍵', color: 'rgba(22, 101, 52, 0.3)' },
+    { id: 'c15', name: 'Work💼', icon: '🏢', color: 'rgba(15, 118, 110, 0.3)' },
+    { id: 'c16', name: '移動 →', icon: '🧭', color: 'rgba(71, 85, 105, 0.3)' },
+    { id: 'c17', name: '食事🍴', icon: '🍽', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c18', name: '食事🍴 (家族)', icon: '👥', color: 'rgba(76, 29, 149, 0.25)' },
+    { id: 'c19', name: '家事🧺', icon: '🏠', color: 'rgba(15, 76, 129, 0.25)' },
+    { id: 'c20', name: '掃除', icon: '🧹', color: 'rgba(55, 65, 81, 0.35)' },
+    { id: 'c21', name: 'アイロン', icon: '👔', color: 'rgba(30, 58, 138, 0.28)' },
+    { id: 'c22', name: '片付け', icon: '🗄', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c23', name: '試し・メンテ', icon: '🪮', color: 'rgba(51, 65, 85, 0.5)' },
+    { id: 'c24', name: '設定🔧', icon: '⚙', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c25', name: '買い物等🛍リアル', icon: '🛒', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c26', name: 'Net Shopping', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c27', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c28', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
+    { id: 'c29', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c30', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c31', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
+    { id: 'c32', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
+    { id: 'c33', name: '仕事関連', icon: '👥', color: 'rgba(6, 78, 59, 0.35)' },
+    { id: 'c34', name: 'Social👥', icon: '🤝', color: 'rgba(30, 58, 138, 0.3)' },
+    { id: 'c35', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c36', name: 'Sweets🍪', icon: '🧁', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c37', name: 'Leisure', icon: '🎉', color: 'rgba(13, 148, 136, 0.3)' },
+    { id: 'c38', name: '旅行等🚃Plan', icon: '✈️', color: 'rgba(13, 148, 136, 0.3)' },
+    { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(71, 85, 105, 0.4)' },
+    { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(71, 85, 105, 0.4)' },
+    { id: 'c41', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
+    { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c43', name: 'Running👟', icon: '🏃', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c44', name: 'Walking', icon: '🚶', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c45', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c46', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
+    { id: 'c47', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
+    { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c49', name: '🍌', icon: '🍑', color: 'rgba(131, 24, 67, 0.3)' },
+    { id: 'c50', name: 'Waiting', icon: '⏳', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
+  ];
+
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v18';
+  if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
+    localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
+    localStorage.setItem('ll_cats_ver', CURRENT_VER);
+  }
+
+  let cats = JSON.parse(localStorage.getItem('ll_cats') || JSON.stringify(DEFAULT_CATS));
+  let logs = [];
+  let currentPhotos = [];
+  let currentViewingDateYMD = getTodayStr();
+  let currentReportData = null;
+  let reportChartInstance = null;
+
+  const DB_NAME = 'LifelogDB';
+  const STORE_NAME = 'logs';
+
+  function initDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, 1);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = (e) => reject(e);
+    });
+  }
+
+  async function loadLogsFromDB() {
+    const db = await initDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        let result = req.result || [];
+        const localLogs = JSON.parse(localStorage.getItem('ll_logs') || '[]');
+        if (result.length === 0 && localLogs.length > 0) {
+          result = localLogs;
+          saveLogsToDB(result);
+        }
+        resolve(result);
+      };
+      req.onerror = () => resolve([]);
+    });
+  }
+
+  async function saveLogsToDB(newLogs) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      store.clear();
+      newLogs.forEach(item => store.put(item));
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = (e) => reject(e);
+    });
+  }
+
+  function getYesterdayStr() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return formatDateYMD(d);
+  }
+
+  function getTodayStr() {
+    return formatDateYMD(new Date());
+  }
+
+  function formatDateYMD(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}/${m}/${day}`;
+  }
+
+  function formatDateYMDDash(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function setHistoryDate(ymd) {
+    if (!ymd) return;
+    currentViewingDateYMD = ymd;
+    render();
+  }
+
+  function handleHistoryDateChange(inputEl) {
+    if (!inputEl.value) return;
+    const parts = inputEl.value.split('-');
+    if (parts.length === 3) {
+      setHistoryDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
+    }
+    inputEl.value = '';
+  }
+
+  function openHistoryDatePicker() {
+    const p = document.getElementById('historyTargetDate');
+    p.value = '';
+    if (p.showPicker) {
+      try { p.showPicker(); } catch(e) { p.click(); }
+    } else {
+      p.click();
+    }
+  }
+
+  function openExportDateModal() {
+    document.getElementById('exportModalDate').value = formatDateYMDDash(new Date());
+    document.getElementById('exportDateModal').style.display = 'flex';
+  }
+
+  function closeExportDateModal() {
+    document.getElementById('exportDateModal').style.display = 'none';
+  }
+
+  function submitExportDateModal() {
+    const val = document.getElementById('exportModalDate').value;
+    if (!val) {
+      alert('日付を選択してください。');
+      return;
+    }
+    closeExportDateModal();
+    const parts = val.split('-');
+    if (parts.length === 3) {
+      exportEvernoteByDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
+    }
+  }
+
+  function openCustomRangeModal() {
+    const today = formatDateYMDDash(new Date());
+    document.getElementById('customStartDate').value = today;
+    document.getElementById('customEndDate').value = today;
+    document.getElementById('customRangeModal').style.display = 'flex';
+  }
+
+  function closeCustomRangeModal() {
+    document.getElementById('customRangeModal').style.display = 'none';
+  }
+
+  function submitCustomRange() {
+    const sVal = document.getElementById('customStartDate').value;
+    const eVal = document.getElementById('customEndDate').value;
+    if (!sVal || !eVal) {
+      alert('開始日と終了日を選択してください。');
+      return;
+    }
+    closeCustomRangeModal();
+    openReportModal('custom', sVal, eVal);
+  }
+
+  async function save() {
+    logs.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    localStorage.setItem('ll_cats', JSON.stringify(cats));
+    await saveLogsToDB(logs);
+    render();
+  }
+
+  async function toggleLog(c) {
+    const i = logs.findIndex(l => l.catId === c.id && !l.endAt);
+    if (i >= 0) {
+      logs[i].endAt = new Date().toISOString();
+    } else {
+      logs.push({
+        id: Date.now().toString(),
+        catId: c.id,
+        name: c.name,
+        icon: c.icon,
+        startAt: new Date().toISOString(),
+        endAt: null,
+        memo: '',
+        photos: []
+      });
+    }
+    await save();
+  }
+
+  function formatDurationEN(s, e) {
+    const start = new Date(s);
+    const end = e ? new Date(e) : new Date();
+    const sec = Math.max(0, Math.floor((end - start) / 1000));
+    const totalMin = Math.floor(sec / 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    if (h === 0) return `${m}min`;
+    return `${h}h ${m}m`;
+  }
+
+  function formatDurationJP(s, e) {
+    const start = new Date(s);
+    const end = e ? new Date(e) : new Date();
+    const sec = Math.max(0, Math.floor((end - start) / 1000));
+    const totalMin = Math.floor(sec / 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    if (h === 0) return `${m}分`;
+    return `${h}時間 ${m}分`;
+  }
+
+  function formatTimeSingleDigit(s) {
+    if (!s) return '';
+    const d = new Date(s);
+    return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+
+  function timeInputFormat(s) {
+    if (!s) return '';
+    const d = new Date(s);
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+
+  /* 集計レポート機能のロジック */
+  function openReportModal(mode, param1, param2) {
+    let startDate, endDate, titleStr;
+    const now = new Date();
+
+    if (mode === 'lastWeek') {
+      const dayOfWeek = now.getDay();
+      const lastSun = new Date(now);
+      lastSun.setDate(now.getDate() - dayOfWeek - 7);
+      const lastSat = new Date(lastSun);
+      lastSat.setDate(lastSun.getDate() + 6);
+      
+      startDate = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate(), 0, 0, 0);
+      endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
+      titleStr = `${formatDateYMD(startDate)} 〜 ${formatDateYMD(endDate)}`;
+    } else if (mode === 'prevMonth') {
+      const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+      const prevMonthNum = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+      startDate = new Date(prevYear, prevMonthNum, 1, 0, 0, 0);
+      endDate = new Date(prevYear, prevMonthNum + 1, 0, 23, 59, 59);
+      titleStr = `${prevYear}/${String(prevMonthNum + 1).padStart(2, '0')}`;
+    } else if (mode === 'custom' && param1 && param2) {
+      const sDate = new Date(param1);
+      const eDate = new Date(param2);
+      startDate = new Date(sDate.getFullYear(), sDate.getMonth(), sDate.getDate(), 0, 0, 0);
+      endDate = new Date(eDate.getFullYear(), eDate.getMonth(), eDate.getDate(), 23, 59, 59);
+      if (startDate > endDate) {
+        const temp = startDate;
+        startDate = endDate;
+        endDate = temp;
+      }
+      titleStr = param1 === param2 ? `${formatDateYMD(startDate)}` : `${formatDateYMD(startDate)} 〜 ${formatDateYMD(endDate)}`;
+    }
+
+    const totalPeriodHours = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60)));
+
+    const statsMap = {};
+    let totalSecAll = 0;
+
+    logs.forEach(l => {
+      if (!l.endAt) return;
+      const start = new Date(l.startAt);
+      const end = new Date(l.endAt);
+      
+      if (end >= startDate && start <= endDate) {
+        const effStart = start < startDate ? startDate : start;
+        const effEnd = end > endDate ? endDate : end;
+        const sec = Math.max(0, Math.floor((effEnd - effStart) / 1000));
+        if (sec > 0) {
+          if (!statsMap[l.catId]) {
+            statsMap[l.catId] = { name: l.name, icon: l.icon, sec: 0, count: 0 };
+          }
+          statsMap[l.catId].sec += sec;
+          statsMap[l.catId].count += 1;
+          totalSecAll += sec;
+        }
+      }
+    });
+
+    const sortedStats = Object.values(statsMap).sort((a, b) => b.sec - a.sec);
+    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, sortedStats };
+
+    document.getElementById('reportTitle').innerText = titleStr;
+    document.getElementById('reportRangeInfo').innerHTML = `総記録時間: ${formatSecToJP(totalSecAll)}<br><span style="font-size:0.78rem;color:var(--text-sub);font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間）</span>`;
+
+    const rankContainer = document.getElementById('reportRankingList');
+    if (sortedStats.length === 0) {
+      rankContainer.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:12px;">この期間の記録はありません</div>`;
+    } else {
+      rankContainer.innerHTML = sortedStats.map((item, idx) => {
+        const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
+        return `
+          <div style="background:#0b1120;padding:8px 10px;border-radius:8px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;">
+            <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
+              <span>${item.icon}</span>
+              <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</span>
+            </div>
+            <div style="text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums;">
+              <span style="font-weight:700;color:var(--accent);">${formatSecToJP(item.sec)}</span>
+              <span style="font-size:0.75rem;color:var(--text-sub);margin-left:4px;">(${ratio}%)</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('reportModal').style.display = 'flex';
+    renderReportChart(sortedStats, totalSecAll);
+  }
+
+  function closeReportModal() {
+    document.getElementById('reportModal').style.display = 'none';
+    if (reportChartInstance) {
+      reportChartInstance.destroy();
+      reportChartInstance = null;
+    }
+  }
+
+  function formatSecToJP(sec) {
+    const totalMin = Math.floor(sec / 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    if (h === 0) return `${m}分`;
+    return `${h}時間 ${m}分`;
+  }
+
+  function renderReportChart(stats, totalSec) {
+    const ctx = document.getElementById('reportChartCanvas').getContext('2d');
+    if (reportChartInstance) {
+      reportChartInstance.destroy();
+    }
+
+    if (totalSec === 0 || stats.length === 0) {
+      reportChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['データなし'],
+          datasets: [{ data: [1], backgroundColor: ['#334155'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+      return;
+    }
+
+    const topItems = stats.slice(0, 6);
+    const otherSec = stats.slice(6).reduce((acc, cur) => acc + cur.sec, 0);
+
+    const labels = topItems.map(i => `${i.icon} ${i.name}`);
+    const data = topItems.map(i => i.sec);
+    const colors = ['#38bdf8', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c', '#94a3b8'];
+
+    if (otherSec > 0) {
+      labels.push('その他');
+      data.push(otherSec);
+    }
+
+    reportChartInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors,
+          borderWidth: 1,
+          borderColor: '#151e2e'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { color: '#f8fafc', boxWidth: 12, font: { size: 11 } }
+          }
+        }
+      }
+    });
+  }
+
+  async function exportReportToEvernote() {
+    if (!currentReportData) return;
+    const { titleStr, totalSecAll, totalPeriodHours, sortedStats } = currentReportData;
+
+    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr}</p>`;
+    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 4px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
+    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間）</p>`;
+
+    if (reportChartInstance) {
+      const chartBase64 = reportChartInstance.toBase64Image();
+      html += `<p style="margin:0 0 16px 0;"><img src="${chartBase64}" width="320" style="max-width:320px;width:100%;height:auto;display:block;" /></p>`;
+    }
+
+    html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【カテゴリ別内訳】</p>`;
+    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
+
+    sortedStats.forEach(item => {
+      const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
+      const lineStr = `${item.icon} ${item.name} ―― ${formatSecToJP(item.sec)}（${ratio}%）`;
+      html += `<p style="font-size:15px;margin:0 0 4px 0;">${lineStr}</p>`;
+      plain += `${lineStr}\n`;
+    });
+
+    html += `</div>`;
+
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
+      alert(`【${titleStr}】の集計レポートをコピーしました！\nEvernoteに貼り付けてください。`);
+      closeReportModal();
+    } else {
+      alert('クリップボードへのコピーに失敗しました。');
+    }
+  }
+
+  function render() {
+    const runningLogs = logs.filter(l => !l.endAt);
+    const activeSection = document.getElementById('activeSection');
+    const activeList = document.getElementById('activeList');
+
+    if (runningLogs.length > 0) {
+      activeSection.style.display = 'block';
+      activeList.innerHTML = runningLogs.map(r => `
+        <div class="active-card">
+          <div class="active-left">
+            <span class="active-icon">${r.icon}</span>
+            <div style="min-width:0;">
+              <div class="active-title">${r.name}</div>
+              <div class="active-badge">${formatTimeSingleDigit(r.startAt)}〜</div>
+            </div>
+          </div>
+          <div class="active-right">
+            <div class="active-btn-group">
+              <button class="btn-active-stop" onclick="stopRunningLog('${r.id}')">終了</button>
+              <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
+            </div>
+            <div class="active-timer-col">
+              <div class="active-timer">${formatDurationEN(r.startAt)}</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      activeSection.style.display = 'none';
+    }
+
+    const g = document.getElementById('grid');
+    g.innerHTML = cats.map(c => {
+      const r = logs.find(l => l.catId === c.id && !l.endAt);
+      const bg = c.color ? `background:${c.color};` : '';
+      return `
+        <div class="card ${r ? 'running' : ''}" style="${bg}" onclick="toggleLog(${JSON.stringify(c).replace(/"/g, '&quot;')})">
+          <div class="card-icon">${c.icon}</div>
+          <div class="card-name">${c.name}</div>
+        </div>
+      `;
+    }).join('');
+
+    const h = document.getElementById('history');
+    const [vy, vm, vd] = currentViewingDateYMD.split('/').map(Number);
+    const viewDate = new Date(vy, vm - 1, vd);
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const w = days[viewDate.getDay()];
+    
+    document.getElementById('currentHistoryDateLabel').innerText = `${vy}/${String(vm).padStart(2, '0')}/${String(vd).padStart(2, '0')}(${w})`;
+
+    const viewDateStr = viewDate.toDateString();
+    
+    const tl = logs.filter(l => l.endAt && (new Date(l.startAt).toDateString() === viewDateStr || new Date(l.endAt).toDateString() === viewDateStr))
+                   .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    
+    if (tl.length === 0) {
+      h.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:16px 0;">${vy}/${vm}/${vd} の記録はありません</div>`;
+    } else {
+      h.innerHTML = tl.map(l => {
+        const p = l.photos || (l.photo ? [l.photo] : []);
+        return `
+          <div class="history-item" onclick="openEditModal('${l.id}')">
+            <div class="history-left">
+              <span style="font-size:1.2rem;flex-shrink:0;">${l.icon}</span>
+              <div style="min-width:0;">
+                <div style="font-weight:700;font-size:0.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.name}</div>
+                <div class="history-meta">${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+              <div class="history-thumbs">
+                ${p.map(x => `<img src="${x}" class="history-img-thumb">`).join('')}
+              </div>
+              <div class="history-dur">${formatDurationEN(l.startAt, l.endAt)}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // アクティブな計測を確実に1タップで終了させる専用関数
+  async function stopRunningLog(id) {
+    const i = logs.findIndex(l => l.id === id && !l.endAt);
+    if (i >= 0) {
+      logs[i].endAt = new Date().toISOString();
+      await save();
+    }
+  }
+
+  function openCatModal() { document.getElementById('catModal').style.display = 'flex'; }
+  function closeCatModal() { document.getElementById('catModal').style.display = 'none'; }
+  async function addCategory() {
+    const n = document.getElementById('catName').value.trim();
+    const i = document.getElementById('catIcon').value.trim() || '📌';
+    if (!n) return;
+    cats.push({ id: Date.now().toString(), name: n, icon: i, color: 'rgba(30, 41, 59, 0.6)' });
+    document.getElementById('catName').value = '';
+    closeCatModal();
+    await save();
+  }
+
+  function openSettingModal() {
+    renderSettingList();
+    document.getElementById('settingModal').style.display = 'flex';
+  }
+  function closeSettingModal() { 
+    document.getElementById('settingModal').style.display = 'none'; 
+    render();
+  }
+  
+  let draggedIndex = null;
+  let touchActiveHandle = null;
+
+  function renderSettingList() {
+    const el = document.getElementById('settingList');
+    el.innerHTML = cats.map((c, i) => `
+      <div class="sort-item" data-index="${i}">
+        <span class="drag-handle" data-index="${i}">≡</span>
+        <input type="text" class="sort-icon-input" value="${c.icon}" maxlength="2" onchange="updateCatItem('${c.id}', 'icon', this.value)">
+        <input type="text" class="sort-name-input" value="${c.name}" onchange="updateCatItem('${c.id}', 'name', this.value)">
+        <button type="button" class="btn-del-cat" onclick="deleteCat('${c.id}')">✕</button>
+      </div>
+    `).join('');
+
+    const handles = el.querySelectorAll('.drag-handle');
+    handles.forEach(handle => {
+      handle.addEventListener('touchstart', onHandleTouchStart, {passive: false});
+      handle.addEventListener('touchmove', onHandleTouchMove, {passive: false});
+      handle.addEventListener('touchend', onHandleTouchEnd);
+    });
+  }
+
+  function onHandleTouchStart(e) {
+    touchActiveHandle = this;
+    draggedIndex = parseInt(this.getAttribute('data-index'));
+    const item = this.closest('.sort-item');
+    if (item) item.classList.add('dragging');
+    e.stopPropagation();
+  }
+
+  function onHandleTouchMove(e) {
+    if (!touchActiveHandle) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+    const item = elem ? elem.closest('.sort-item') : null;
+    if (item) {
+      const targetIndex = parseInt(item.getAttribute('data-index'));
+      if (draggedIndex !== null && targetIndex !== draggedIndex) {
+        const movedItem = cats.splice(draggedIndex, 1)[0];
+        cats.splice(targetIndex, 0, movedItem);
+        draggedIndex = targetIndex;
+        localStorage.setItem('ll_cats', JSON.stringify(cats));
+        renderSettingList();
+      }
+    }
+  }
+
+  function onHandleTouchEnd() {
+    if (touchActiveHandle) {
+      const item = touchActiveHandle.closest('.sort-item');
+      if (item) item.classList.remove('dragging');
+    }
+    touchActiveHandle = null;
+    draggedIndex = null;
+    render();
+  }
+  
+  function updateCatItem(id, key, val) {
+    const cat = cats.find(c => c.id === id);
+    if (!cat) return;
+    cat[key] = val.trim();
+    localStorage.setItem('ll_cats', JSON.stringify(cats));
+    render();
+  }
+  
+  function deleteCat(id) {
+    cats = cats.filter(c => c.id !== id);
+    localStorage.setItem('ll_cats', JSON.stringify(cats));
+    renderSettingList();
+    render();
+  }
+
+  function openEditModal(id) {
+    const l = logs.find(x => x.id === id);
+    if (!l) return;
+    document.getElementById('editLogId').value = l.id;
+    document.getElementById('editModalTitle').innerText = `${l.icon} ${l.name} の編集`;
+    document.getElementById('editStartTime').value = timeInputFormat(l.startAt);
+    
+    const btnStopAndSave = document.getElementById('btnStopAndSave');
+    
+    if (l.endAt) {
+      btnStopAndSave.style.display = 'none';
+      document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
+    } else {
+      btnStopAndSave.style.display = 'block';
+      document.getElementById('editEndTime').value = '';
+    }
+    
+    document.getElementById('editMemo').value = l.memo || '';
+    currentPhotos = l.photos ? [...l.photos] : (l.photo ? [l.photo] : []);
+    renderPreviewPhotos();
+    document.getElementById('editPhoto').value = '';
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  function renderPreviewPhotos() {
+    document.getElementById('imagePreviewContainer').innerHTML = currentPhotos.map((p, i) => `
+      <div class="preview-img-wrap">
+        <img src="${p}">
+        <button type="button" onclick="removePhoto(${i})">削除</button>
+      </div>
+    `).join('');
+  }
+
+  function removePhoto(i) {
+    currentPhotos.splice(i, 1);
+    renderPreviewPhotos();
+  }
+
+  function compressImage(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1000;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handlePhotoUpload(e) {
+    const files = Array.from(e.target.files);
+    for (const f of files) {
+      const compressed = await compressImage(f);
+      currentPhotos.push(compressed);
+    }
+    renderPreviewPhotos();
+  }
+
+  function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+
+  async function saveLogEdit(isStopBtn = false) {
+    const id = document.getElementById('editLogId').value;
+    const l = logs.find(x => x.id === id);
+    if (!l) return;
+    
+    const s = document.getElementById('editStartTime').value;
+    const e = document.getElementById('editEndTime').value;
+    
+    let newStart = new Date(l.startAt);
+    if (s) {
+      const [sh, sm] = s.split(':');
+      newStart.setHours(parseInt(sh, 10), parseInt(sm, 10), 0, 0);
+    }
+    
+    let newEnd = l.endAt ? new Date(l.endAt) : null;
+    
+    if (isStopBtn) {
+      if (e) {
+        const [eh, em] = e.split(':');
+        newEnd = new Date(newStart);
+        newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
+        if (newEnd < newStart) newEnd.setDate(newEnd.getDate() + 1);
+      } else {
+        newEnd = new Date();
+        if (newEnd < newStart) newEnd.setDate(newEnd.getDate() + 1);
+      }
+    } else if (e) {
+      const [eh, em] = e.split(':');
+      newEnd = new Date(newStart);
+      newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
+      
+      if (newEnd < newStart) {
+        newEnd.setDate(newEnd.getDate() + 1);
+      }
+      
+      if ((newEnd - newStart) >= 24 * 60 * 60 * 1000) {
+        alert('記録時間が24時間以上になっています。時間をご確認ください。');
+        return;
+      }
+    }
+    
+    l.startAt = newStart.toISOString();
+    if (newEnd) l.endAt = newEnd.toISOString();
+    
+    l.memo = document.getElementById('editMemo').value;
+    l.photos = currentPhotos;
+    delete l.photo;
+    
+    closeEditModal();
+    await save();
+  }
+
+  async function deleteCurrentLog() {
+    logs = logs.filter(l => l.id !== document.getElementById('editLogId').value);
+    closeEditModal();
+    await save();
+  }
+
+  function copyToClipboard(html, plain) {
+    return new Promise(resolve => {
+      const handler = e => {
+        e.clipboardData.setData('text/html', html);
+        e.clipboardData.setData('text/plain', plain);
+        e.preventDefault();
+      };
+      document.addEventListener('copy', handler);
+      const success = document.execCommand('copy');
+      document.removeEventListener('copy', handler);
+
+      if (success) {
+        resolve(true);
+        return;
+      }
+
+      if (navigator.clipboard && window.ClipboardItem) {
+        const bh = new Blob([html], { type: 'text/html' });
+        const bp = new Blob([plain], { type: 'text/plain' });
+        navigator.clipboard.write([new ClipboardItem({ 'text/html': bh, 'text/plain': bp })])
+          .then(() => resolve(true))
+          .catch(() => {
+            navigator.clipboard.writeText(plain)
+              .then(() => resolve(true))
+              .catch(() => resolve(false));
+          });
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(plain)
+          .then(() => resolve(true))
+          .catch(() => resolve(false));
+      } else {
+        resolve(false);
+      }
+    });
+  }
+
+  function emojiToPngDataUrl(emoji) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 96;
+    canvas.height = 96;
+    const ctx = canvas.getContext('2d');
+    ctx.font = '72px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, 48, 54);
+    return canvas.toDataURL('image/png');
+  }
+
+  /* 日次Evernote出力処理 */
+  async function exportEvernoteByDate(dateStringYMD) {
+    if (!dateStringYMD) return;
+    const [y, m, d] = dateStringYMD.split('/').map(Number);
+    if (!y || !m || !d) return;
+    const targetDate = new Date(y, m - 1, d);
+
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const w = days[targetDate.getDay()];
+    const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})のログ`;
+
+    const targetDateStr = targetDate.toDateString();
+    
+    const tl = logs.filter(l => new Date(l.startAt).toDateString() === targetDateStr)
+                   .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    
+    if (tl.length === 0) {
+      alert(`指定日（${dateTitle}）の記録はありません`);
+      return;
+    }
+
+    const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
+
+    let html = `<div style="${FONT_STYLE}">`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 16px 0;${FONT_STYLE}">${dateTitle}</p>`;
+    let plain = `${dateTitle}\n\n`;
+
+    for (let index = 0; index < tl.length; index++) {
+      const l = tl[index];
+      const end = l.endAt || new Date().toISOString();
+      const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(end)} (${formatDurationJP(l.startAt, end)})`;
+      const p = l.photos || (l.photo ? [l.photo] : []);
+      const iconPng = emojiToPngDataUrl(l.icon);
+      
+      let logHtml = `
+        <div style="margin:0;padding:0;${FONT_STYLE}">
+          <p style="line-height:1;margin:0 0 4px 0;">
+            <img src="${iconPng}" width="44" height="44" style="width:44px;height:44px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
+          </p>
+          <p style="font-size:20px;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${l.name}</p>
+          <p style="font-size:15px;color:#00b4d8;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${tr}</p>
+      `;
+      plain += `${l.icon}\n${l.name}\n${tr}\n`;
+
+      if (l.memo && l.memo.trim() !== '') {
+        logHtml += `<p style="margin:0;padding:0;"><br></p>`;
+        const memoLines = l.memo.split('\n');
+        memoLines.forEach(line => {
+          const sanitizedLine = line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          logHtml += `<p style="font-size:15px;line-height:1.45;margin:0;padding:0;${FONT_STYLE}">${sanitizedLine === '' ? '<br>' : sanitizedLine}</p>`;
+        });
+        plain += `\n${l.memo}\n`;
+      }
+      
+      if (p.length > 0) {
+        p.forEach(photoSrc => {
+          logHtml += `<p style="margin:8px 0 0 0;padding:0;">
+            <img src="${photoSrc}" style="max-width:100%;height:auto;display:block;" />
+          </p>`;
+        });
+      }
+      
+      logHtml += '</div>';
+      html += logHtml;
+
+      if (index < tl.length - 1) {
+        html += '<p style="margin:0;padding:0;"><br></p>';
+        plain += '\n';
+      }
+    }
+    
+    html += '</div>';
+
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
+      alert(`【${dateTitle}】をコピーしました！\nEvernoteに貼り付けてください。`);
+    } else {
+      alert('クリップボードへのコピーに失敗しました。');
+    }
+  }
+
+  function exportBackupData() {
+    const data = { cats, logs, exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `lifelog_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+  }
+
+  function importBackupData(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async evt => {
+      try {
+        const data = JSON.parse(evt.target.result);
+        if (data.cats && data.logs) {
+          if (confirm('現在の記録を上書きしてバックアップから復元しますか？')) {
+            cats = data.cats;
+            logs = data.logs;
+            await save();
+            alert('データを復元しました！');
+            closeSettingModal();
+          }
+        } else {
+          alert('正しいバックアップファイルではありません。');
+        }
+      } catch (err) {
+        alert('ファイルの読み込みに失敗しました。');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  loadLogsFromDB().then(loaded => {
+    logs = loaded;
+    render();
+  });
+
+  setInterval(render, 1000);
+</script>
+</body>
+</html>
