@@ -146,22 +146,6 @@
     border-color: rgba(167, 139, 250, 0.3);
   }
 
-  .date-picker-wrap-item {
-    flex: 1;
-    position: relative;
-    display: flex;
-    height: 100%;
-  }
-  .hidden-date-input { 
-    position: absolute; 
-    inset: 0;
-    width: 100%; 
-    height: 100%; 
-    opacity: 0; 
-    cursor: pointer; 
-    z-index: 10;
-  }
-
   .active-section { margin: 8px 0 12px; display: none; }
   .active-card { 
     position: relative;
@@ -393,10 +377,7 @@
   <div class="bar-btn-group">
     <button class="btn-stone btn-cal" onclick="setHistoryDate(getYesterdayStr())">前日ログ</button>
     <button class="btn-stone btn-cal" onclick="setHistoryDate(getTodayStr())">当日ログ</button>
-    <div class="date-picker-wrap-item">
-      <button class="btn-stone btn-cal" style="width:100%;" onclick="openHistoryDatePicker()">日付指定</button>
-      <input type="date" id="historyTargetDate" class="hidden-date-input" onchange="handleHistoryDateChange(this)">
-    </div>
+    <button class="btn-stone btn-cal" onclick="openHistoryDateModal()">日付指定</button>
   </div>
 </div>
 
@@ -436,6 +417,21 @@
   <div class="history-date-label" id="currentHistoryDateLabel"></div>
 </div>
 <div class="history-list" id="history"></div>
+
+<!-- カレンダー日付指定モーダル -->
+<div class="modal" id="historyDateModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">表示する日付の指定</h3>
+    <div class="form-group">
+      <label>日付を選択</label>
+      <input type="date" id="historyModalDate" class="modal-input">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeHistoryDateModal()">閉じる</button>
+      <button class="btn-action btn-modal-save" onclick="submitHistoryDateModal()">表示する</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal" id="exportDateModal">
   <div class="modal-box">
@@ -616,7 +612,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v24';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v25';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -707,22 +703,26 @@
     render();
   }
 
-  function handleHistoryDateChange(inputEl) {
-    if (!inputEl.value) return;
-    const parts = inputEl.value.split('-');
-    if (parts.length === 3) {
-      setHistoryDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
-    }
-    inputEl.value = '';
+  function openHistoryDateModal() {
+    const [y, m, d] = currentViewingDateYMD.split('/');
+    document.getElementById('historyModalDate').value = `${y}-${m}-${d}`;
+    document.getElementById('historyDateModal').style.display = 'flex';
   }
 
-  function openHistoryDatePicker() {
-    const p = document.getElementById('historyTargetDate');
-    p.value = '';
-    if (p.showPicker) {
-      try { p.showPicker(); } catch(e) { p.click(); }
-    } else {
-      p.click();
+  function closeHistoryDateModal() {
+    document.getElementById('historyDateModal').style.display = 'none';
+  }
+
+  function submitHistoryDateModal() {
+    const val = document.getElementById('historyModalDate').value;
+    if (!val) {
+      alert('日付を選択してください。');
+      return;
+    }
+    closeHistoryDateModal();
+    const parts = val.split('-');
+    if (parts.length === 3) {
+      setHistoryDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
     }
   }
 
