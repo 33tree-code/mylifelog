@@ -159,7 +159,7 @@
     align-items: center; 
     margin-bottom: 6px; 
   }
-  .active-left { display: flex; align-items: center; gap: 8px; flex: 1.4; min-width: 0; }
+  .active-left { display: flex; align-items: center; gap: 8px; flex: 1.8; min-width: 0; }
   .active-icon { font-size: 1.3rem; flex-shrink: 0; }
   .active-title { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.8rem; font-weight: 700; color: var(--running); margin-top: 1px; }
@@ -169,12 +169,12 @@
     display: flex; 
     align-items: center; 
     justify-content: flex-end; 
-    width: 78px; 
+    width: 62px; 
     text-align: right; 
     font-variant-numeric: tabular-nums;
   }
   .active-timer-text {
-    font-size: 1.05rem; 
+    font-size: 0.95rem; 
     font-weight: 800; 
     color: var(--running); 
     white-space: nowrap;
@@ -585,7 +585,7 @@
   const DEFAULT_CATS = [
     { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
     { id: 'c2', name: 'Power Nap💤', icon: '🔋', color: 'rgba(99, 102, 241, 0.22)' },
-    { id: 'c3', name: 'ストレッチ🙆 (forearm / 前腕)', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
+    { id: 'c3', name: 'ストレッチ (forearm / 前腕)', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
     { id: 'c4', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.22)' },
     { id: 'c5', name: 'BM', icon: '🚽', color: 'rgba(148, 163, 184, 0.22)' },
     { id: 'c6', name: '風呂🛀', icon: '🛁', color: 'rgba(34, 211, 238, 0.22)' },
@@ -636,7 +636,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v27';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v28';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -832,8 +832,8 @@
 
   function formatDurationEN(s, e) {
     const { h, m } = getDurationParts(s, e);
-    if (h === 0) return `${m}min`;
-    return `${h}h ${m}m`;
+    if (h === 0) return `${m}m`;
+    return `${h}h ${String(m).padStart(2, '0')}m`;
   }
 
   function formatDurationJP(s, e) {
@@ -1057,8 +1057,7 @@
     if (runningLogs.length > 0) {
       activeSection.style.display = 'block';
       activeList.innerHTML = runningLogs.map(r => {
-        const { h, m } = getDurationParts(r.startAt, null);
-        let timeStr = (h === 0) ? `${m}min` : `${h}h ${String(m).padStart(2, '0')}m`;
+        const timeStr = formatDurationEN(r.startAt, null);
         return `
           <div class="active-card">
             <div class="active-left">
@@ -1116,8 +1115,7 @@
     } else {
       h.innerHTML = tl.map(l => {
         const p = l.photos || (l.photo ? [l.photo] : []);
-        const { h: dh, m: dm } = getDurationParts(l.startAt, l.endAt);
-        let durStr = (dh === 0) ? `${dm}min` : `${dh}h ${String(dm).padStart(2, '0')}m`;
+        const durStr = formatDurationEN(l.startAt, l.endAt);
         return `
           <div class="history-item" onclick="openEditModal('${l.id}')">
             <div class="history-left">
@@ -1526,7 +1524,7 @@
     const data = { cats, logs: filteredLogs, viewingDate: currentViewingDateYMD, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
-    a.href = URL.createURL(blob);
+    a.href = URL.createObjectURL(blob);
     a.download = `lifelog_backup_${targetDateStr}.json`;
     a.click();
   }
