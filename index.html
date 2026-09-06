@@ -159,14 +159,14 @@
     align-items: center; 
     margin-bottom: 6px; 
   }
-  .active-left { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; }
+  .active-left { display: flex; align-items: center; gap: 8px; flex: 1.2; min-width: 0; }
   .active-icon { font-size: 1.3rem; flex-shrink: 0; }
   .active-title { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.8rem; font-weight: 700; color: var(--running); margin-top: 1px; }
   
   .active-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-  .active-timer-col { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; width: 68px; text-align: right; }
-  .active-timer { font-size: 1.05rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; line-height: 1.2; }
+  .active-timer-col { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 78px; text-align: center; }
+  .active-timer { font-size: 1.05rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; line-height: 1.2; display: inline-block; text-align: left; }
   
   .active-btn-group { display: flex; gap: 4px; align-items: center; }
   .btn-active-stop { 
@@ -273,7 +273,7 @@
   .history-item:active { transform: scale(0.99); }
   .history-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
   .history-meta { font-size: 0.8rem; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
-  .history-dur { font-size: 0.92rem; font-weight: 800; color: var(--accent); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+  .history-dur { font-size: 0.92rem; font-weight: 800; color: var(--accent); flex-shrink: 0; font-variant-numeric: tabular-nums; width: 78px; text-align: right; }
   
   .history-thumbs { display: flex; gap: 5px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
@@ -612,7 +612,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v25';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v26';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
