@@ -165,8 +165,35 @@
   .active-badge { font-size: 0.8rem; font-weight: 700; color: var(--running); margin-top: 1px; }
   
   .active-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-  .active-timer-col { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 78px; text-align: center; }
-  .active-timer { font-size: 1.05rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; line-height: 1.2; display: inline-block; text-align: left; }
+  .active-timer-col { 
+    display: flex; 
+    flex-direction: column; 
+    align-items: flex-end; 
+    justify-content: center; 
+    width: 60px; 
+    text-align: right; 
+    font-variant-numeric: tabular-nums;
+  }
+  .active-timer-row {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+    line-height: 1.2;
+  }
+  .active-timer-num {
+    text-align: right;
+    font-size: 1.05rem; 
+    font-weight: 800; 
+    color: var(--running); 
+  }
+  .active-timer-unit {
+    text-align: left;
+    font-size: 1.05rem; 
+    font-weight: 800; 
+    color: var(--running); 
+    width: 24px;
+    flex-shrink: 0;
+  }
   
   .active-btn-group { display: flex; gap: 4px; align-items: center; }
   .btn-active-stop { 
@@ -273,7 +300,33 @@
   .history-item:active { transform: scale(0.99); }
   .history-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
   .history-meta { font-size: 0.8rem; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
-  .history-dur { font-size: 0.92rem; font-weight: 800; color: var(--accent); flex-shrink: 0; font-variant-numeric: tabular-nums; width: 78px; text-align: right; }
+  
+  .history-dur-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .history-dur-row {
+    display: flex;
+    justify-content: flex-end;
+    line-height: 1.2;
+  }
+  .history-dur-num {
+    text-align: right;
+    font-size: 0.92rem; 
+    font-weight: 800; 
+    color: var(--accent);
+  }
+  .history-dur-unit {
+    text-align: left;
+    font-size: 0.92rem; 
+    font-weight: 800; 
+    color: var(--accent);
+    width: 22px;
+    flex-shrink: 0;
+  }
   
   .history-thumbs { display: flex; gap: 5px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
@@ -796,24 +849,24 @@
     await save();
   }
 
-  function formatDurationEN(s, e) {
+  function getDurationParts(s, e) {
     const start = new Date(s);
     const end = e ? new Date(e) : new Date();
     const sec = Math.max(0, Math.floor((end - start) / 1000));
     const totalMin = Math.floor(sec / 60);
     const h = Math.floor(totalMin / 60);
     const m = totalMin % 60;
+    return { h, m };
+  }
+
+  function formatDurationEN(s, e) {
+    const { h, m } = getDurationParts(s, e);
     if (h === 0) return `${m}min`;
     return `${h}h ${m}m`;
   }
 
   function formatDurationJP(s, e) {
-    const start = new Date(s);
-    const end = e ? new Date(e) : new Date();
-    const sec = Math.max(0, Math.floor((end - start) / 1000));
-    const totalMin = Math.floor(sec / 60);
-    const h = Math.floor(totalMin / 60);
-    const m = totalMin % 60;
+    const { h, m } = getDurationParts(s, e);
     if (h === 0) return `${m}分`;
     return `${h}時間 ${m}分`;
   }
@@ -1032,28 +1085,48 @@
 
     if (runningLogs.length > 0) {
       activeSection.style.display = 'block';
-      activeList.innerHTML = runningLogs.map(r => `
-        <div class="active-card">
-          <div class="active-left">
-            <span class="active-icon">${r.icon}</span>
-            <div style="min-width:0;">
-              <div class="active-title">${r.name}</div>
-              <div class="active-badge">${formatTimeSingleDigit(r.startAt)}〜</div>
+      activeList.innerHTML = runningLogs.map(r => {
+        const { h, m } = getDurationParts(r.startAt, null);
+        let timeHtml = '';
+        if (h === 0) {
+          timeHtml = `
+            <div class="active-timer-row">
+              <span class="active-timer-num">${m}</span><span class="active-timer-unit">min</span>
+            </div>
+          `;
+        } else {
+          timeHtml = `
+            <div class="active-timer-row">
+              <span class="active-timer-num">${h}</span><span class="active-timer-unit">h</span>
+            </div>
+            <div class="active-timer-row">
+              <span class="active-timer-num">${m}</span><span class="active-timer-unit">m</span>
+            </div>
+          `;
+        }
+        return `
+          <div class="active-card">
+            <div class="active-left">
+              <span class="active-icon">${r.icon}</span>
+              <div style="min-width:0;">
+                <div class="active-title">${r.name}</div>
+                <div class="active-badge">${formatTimeSingleDigit(r.startAt)}〜</div>
+              </div>
+            </div>
+            <div class="active-right">
+              <div class="active-btn-group">
+                <button class="btn-active-stop" onclick="stopRunningLog('${r.id}')">終了</button>
+              </div>
+              <div class="active-timer-col">
+                ${timeHtml}
+              </div>
+              <div class="active-btn-group">
+                <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
+              </div>
             </div>
           </div>
-          <div class="active-right">
-            <div class="active-btn-group">
-              <button class="btn-active-stop" onclick="stopRunningLog('${r.id}')">終了</button>
-            </div>
-            <div class="active-timer-col">
-              <div class="active-timer">${formatDurationEN(r.startAt)}</div>
-            </div>
-            <div class="active-btn-group">
-              <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
-            </div>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     } else {
       activeSection.style.display = 'none';
     }
@@ -1088,6 +1161,24 @@
     } else {
       h.innerHTML = tl.map(l => {
         const p = l.photos || (l.photo ? [l.photo] : []);
+        const { h: dh, m: dm } = getDurationParts(l.startAt, l.endAt);
+        let durHtml = '';
+        if (dh === 0) {
+          durHtml = `
+            <div class="history-dur-row">
+              <span class="history-dur-num">${dm}</span><span class="history-dur-unit">min</span>
+            </div>
+          `;
+        } else {
+          durHtml = `
+            <div class="history-dur-row">
+              <span class="history-dur-num">${dh}</span><span class="history-dur-unit">h</span>
+            </div>
+            <div class="history-dur-row">
+              <span class="history-dur-num">${dm}</span><span class="history-dur-unit">m</span>
+            </div>
+          `;
+        }
         return `
           <div class="history-item" onclick="openEditModal('${l.id}')">
             <div class="history-left">
@@ -1101,7 +1192,9 @@
               <div class="history-thumbs">
                 ${p.map(x => `<img src="${x}" class="history-img-thumb">`).join('')}
               </div>
-              <div class="history-dur">${formatDurationEN(l.startAt, l.endAt)}</div>
+              <div class="history-dur-col">
+                ${durHtml}
+              </div>
             </div>
           </div>
         `;
