@@ -159,7 +159,7 @@
     align-items: center; 
     margin-bottom: 6px; 
   }
-  .active-left { display: flex; align-items: center; gap: 8px; flex: 1.2; min-width: 0; }
+  .active-left { display: flex; align-items: center; gap: 8px; flex: 1.35; min-width: 0; }
   .active-icon { font-size: 1.3rem; flex-shrink: 0; }
   .active-title { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.8rem; font-weight: 700; color: var(--running); margin-top: 1px; }
@@ -170,7 +170,7 @@
     flex-direction: column; 
     align-items: flex-end; 
     justify-content: center; 
-    width: 60px; 
+    width: 54px; 
     text-align: right; 
     font-variant-numeric: tabular-nums;
   }
@@ -191,7 +191,7 @@
     font-size: 1.05rem; 
     font-weight: 800; 
     color: var(--running); 
-    width: 24px;
+    width: 22px;
     flex-shrink: 0;
   }
   
@@ -665,7 +665,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v26';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v27';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -1091,7 +1091,7 @@
         if (h === 0) {
           timeHtml = `
             <div class="active-timer-row">
-              <span class="active-timer-num">${m}</span><span class="active-timer-unit">min</span>
+              <span class="active-timer-num">${m}min</span>
             </div>
           `;
         } else {
@@ -1166,7 +1166,7 @@
         if (dh === 0) {
           durHtml = `
             <div class="history-dur-row">
-              <span class="history-dur-num">${dm}</span><span class="history-dur-unit">min</span>
+              <span class="history-dur-num">${dm}min</span>
             </div>
           `;
         } else {
