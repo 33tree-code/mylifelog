@@ -154,12 +154,12 @@
   }
   .hidden-date-input { 
     position: absolute; 
-    top: 0;
-    left: 0;
-    width: 0; 
-    height: 0; 
+    inset: 0;
+    width: 100%; 
+    height: 100%; 
     opacity: 0; 
-    pointer-events: none;
+    cursor: pointer; 
+    z-index: 10;
   }
 
   .active-section { margin: 8px 0 12px; display: none; }
@@ -616,7 +616,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v23';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v24';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
