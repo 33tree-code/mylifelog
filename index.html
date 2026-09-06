@@ -154,12 +154,12 @@
   }
   .hidden-date-input { 
     position: absolute; 
-    inset: 0;
-    width: 100%; 
-    height: 100%; 
+    top: 0;
+    left: 0;
+    width: 0; 
+    height: 0; 
     opacity: 0; 
-    cursor: pointer; 
-    z-index: 20;
+    pointer-events: none;
   }
 
   .active-section { margin: 8px 0 12px; display: none; }
@@ -394,7 +394,7 @@
     <button class="btn-stone btn-cal" onclick="setHistoryDate(getYesterdayStr())">前日ログ</button>
     <button class="btn-stone btn-cal" onclick="setHistoryDate(getTodayStr())">当日ログ</button>
     <div class="date-picker-wrap-item">
-      <button class="btn-stone btn-cal" style="width:100%; pointer-events: none;">日付指定</button>
+      <button class="btn-stone btn-cal" style="width:100%;" onclick="openHistoryDatePicker()">日付指定</button>
       <input type="date" id="historyTargetDate" class="hidden-date-input" onchange="handleHistoryDateChange(this)">
     </div>
   </div>
@@ -616,7 +616,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v22';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v23';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
