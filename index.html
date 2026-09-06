@@ -181,7 +181,7 @@
   .active-badge { font-size: 0.8rem; font-weight: 700; color: var(--running); margin-top: 1px; }
   
   .active-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-  .active-timer-col { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; }
+  .active-timer-col { display: flex; flex-direction: column; align-items: flex-end; justify-content: center; width: 68px; text-align: right; }
   .active-timer { font-size: 1.05rem; font-weight: 800; color: var(--running); font-variant-numeric: tabular-nums; line-height: 1.2; }
   
   .active-btn-group { display: flex; gap: 4px; align-items: center; }
@@ -350,7 +350,6 @@
     pointer-events: none;
   }
   
-  /* モーダル内ボタンのカラー設定（石風テクスチャ適用） */
   .btn-modal-danger { background: linear-gradient(180deg, #d9538c 0%, #b5336e 100%); color: #fff; }
   .btn-cancel-white { background: linear-gradient(180deg, #323e54 0%, #1c2536 100%) !important; color: #fff !important; }
   .btn-modal-stop { background: linear-gradient(180deg, #4da67c 0%, #357a5b 100%); color: #fff; }
@@ -566,7 +565,7 @@
   const DEFAULT_CATS = [
     { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
     { id: 'c2', name: 'Power Nap💤', icon: '🔋', color: 'rgba(99, 102, 241, 0.22)' },
-    { id: 'c3', name: 'ストレッチ🙆', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
+    { id: 'c3', name: 'ストレッチ (forearm / 前腕)', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
     { id: 'c4', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.22)' },
     { id: 'c5', name: 'BM', icon: '🚽', color: 'rgba(148, 163, 184, 0.22)' },
     { id: 'c6', name: '風呂🛀', icon: '🛁', color: 'rgba(34, 211, 238, 0.22)' },
@@ -617,7 +616,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v20';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v21';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     localStorage.setItem('ll_cats', JSON.stringify(DEFAULT_CATS));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -1481,11 +1480,22 @@
   }
 
   function exportBackupData() {
-    const data = { cats, logs, exportedAt: new Date().toISOString() };
+    const [y, m, d] = currentViewingDateYMD.split('/');
+    const targetDateStr = `${y}-${m}-${d}`;
+    const targetDateObj = new Date(Number(y), Number(m) - 1, Number(d));
+    const targetDateString = targetDateObj.toDateString();
+
+    const filteredLogs = logs.filter(l => {
+      const sDate = new Date(l.startAt).toDateString();
+      const eDate = l.endAt ? new Date(l.endAt).toDateString() : null;
+      return sDate === targetDateString || eDate === targetDateString;
+    });
+
+    const data = { cats, logs: filteredLogs, viewingDate: currentViewingDateYMD, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `lifelog_backup_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `lifelog_backup_${targetDateStr}.json`;
     a.click();
   }
 
