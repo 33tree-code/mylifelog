@@ -159,7 +159,7 @@
     align-items: center; 
     margin-bottom: 6px; 
   }
-  .active-left { display: flex; align-items: center; gap: 8px; flex: 1.35; min-width: 0; }
+  .active-left { display: flex; align-items: center; gap: 8px; flex: 1.4; min-width: 0; }
   .active-icon { font-size: 1.3rem; flex-shrink: 0; }
   .active-title { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.8rem; font-weight: 700; color: var(--running); margin-top: 1px; }
@@ -167,32 +167,17 @@
   .active-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
   .active-timer-col { 
     display: flex; 
-    flex-direction: column; 
-    align-items: flex-end; 
-    justify-content: center; 
-    width: 54px; 
+    align-items: center; 
+    justify-content: flex-end; 
+    width: 78px; 
     text-align: right; 
     font-variant-numeric: tabular-nums;
   }
-  .active-timer-row {
-    display: flex;
-    justify-content: flex-end;
-    width: 100%;
-    line-height: 1.2;
-  }
-  .active-timer-num {
-    text-align: right;
+  .active-timer-text {
     font-size: 1.05rem; 
     font-weight: 800; 
     color: var(--running); 
-  }
-  .active-timer-unit {
-    text-align: left;
-    font-size: 1.05rem; 
-    font-weight: 800; 
-    color: var(--running); 
-    width: 22px;
-    flex-shrink: 0;
+    white-space: nowrap;
   }
   
   .active-btn-group { display: flex; gap: 4px; align-items: center; }
@@ -303,29 +288,15 @@
   
   .history-dur-col {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
+    align-items: center;
     font-variant-numeric: tabular-nums;
     flex-shrink: 0;
   }
-  .history-dur-row {
-    display: flex;
-    justify-content: flex-end;
-    line-height: 1.2;
-  }
-  .history-dur-num {
-    text-align: right;
+  .history-dur-text {
     font-size: 0.92rem; 
     font-weight: 800; 
     color: var(--accent);
-  }
-  .history-dur-unit {
-    text-align: left;
-    font-size: 0.92rem; 
-    font-weight: 800; 
-    color: var(--accent);
-    width: 22px;
-    flex-shrink: 0;
+    white-space: nowrap;
   }
   
   .history-thumbs { display: flex; gap: 5px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
@@ -614,7 +585,7 @@
   const DEFAULT_CATS = [
     { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
     { id: 'c2', name: 'Power Nap💤', icon: '🔋', color: 'rgba(99, 102, 241, 0.22)' },
-    { id: 'c3', name: 'ストレッチ (forearm / 前腕)', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
+    { id: 'c3', name: 'ストレッチ🙆 (forearm / 前腕)', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
     { id: 'c4', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.22)' },
     { id: 'c5', name: 'BM', icon: '🚽', color: 'rgba(148, 163, 184, 0.22)' },
     { id: 'c6', name: '風呂🛀', icon: '🛁', color: 'rgba(34, 211, 238, 0.22)' },
@@ -1087,23 +1058,7 @@
       activeSection.style.display = 'block';
       activeList.innerHTML = runningLogs.map(r => {
         const { h, m } = getDurationParts(r.startAt, null);
-        let timeHtml = '';
-        if (h === 0) {
-          timeHtml = `
-            <div class="active-timer-row">
-              <span class="active-timer-num">${m}min</span>
-            </div>
-          `;
-        } else {
-          timeHtml = `
-            <div class="active-timer-row">
-              <span class="active-timer-num">${h}</span><span class="active-timer-unit">h</span>
-            </div>
-            <div class="active-timer-row">
-              <span class="active-timer-num">${m}</span><span class="active-timer-unit">m</span>
-            </div>
-          `;
-        }
+        let timeStr = (h === 0) ? `${m}min` : `${h}h ${String(m).padStart(2, '0')}m`;
         return `
           <div class="active-card">
             <div class="active-left">
@@ -1118,7 +1073,7 @@
                 <button class="btn-active-stop" onclick="stopRunningLog('${r.id}')">終了</button>
               </div>
               <div class="active-timer-col">
-                ${timeHtml}
+                <span class="active-timer-text">${timeStr}</span>
               </div>
               <div class="active-btn-group">
                 <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
@@ -1162,23 +1117,7 @@
       h.innerHTML = tl.map(l => {
         const p = l.photos || (l.photo ? [l.photo] : []);
         const { h: dh, m: dm } = getDurationParts(l.startAt, l.endAt);
-        let durHtml = '';
-        if (dh === 0) {
-          durHtml = `
-            <div class="history-dur-row">
-              <span class="history-dur-num">${dm}min</span>
-            </div>
-          `;
-        } else {
-          durHtml = `
-            <div class="history-dur-row">
-              <span class="history-dur-num">${dh}</span><span class="history-dur-unit">h</span>
-            </div>
-            <div class="history-dur-row">
-              <span class="history-dur-num">${dm}</span><span class="history-dur-unit">m</span>
-            </div>
-          `;
-        }
+        let durStr = (dh === 0) ? `${dm}min` : `${dh}h ${String(dm).padStart(2, '0')}m`;
         return `
           <div class="history-item" onclick="openEditModal('${l.id}')">
             <div class="history-left">
@@ -1193,7 +1132,7 @@
                 ${p.map(x => `<img src="${x}" class="history-img-thumb">`).join('')}
               </div>
               <div class="history-dur-col">
-                ${durHtml}
+                <span class="history-dur-text">${durStr}</span>
               </div>
             </div>
           </div>
@@ -1587,7 +1526,7 @@
     const data = { cats, logs: filteredLogs, viewingDate: currentViewingDateYMD, exportedAt: new Date().toISOString() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
+    a.href = URL.createURL(blob);
     a.download = `lifelog_backup_${targetDateStr}.json`;
     a.click();
   }
