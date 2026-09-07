@@ -159,7 +159,7 @@
     align-items: center; 
     margin-bottom: 6px; 
   }
-  .active-left { display: flex; align-items: center; gap: 8px; flex: 2; min-width: 0; }
+  .active-left { display: flex; align-items: center; gap: 8px; flex: 1.8; min-width: 0; }
   .active-icon { font-size: 1.3rem; flex-shrink: 0; }
   .active-title { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
   .active-badge { font-size: 0.8rem; font-weight: 700; color: var(--running); margin-top: 1px; }
@@ -169,7 +169,7 @@
     display: flex; 
     align-items: center; 
     justify-content: flex-end; 
-    width: 54px; 
+    width: 62px; 
     text-align: right; 
     font-variant-numeric: tabular-nums;
   }
@@ -585,7 +585,7 @@
   const DEFAULT_CATS = [
     { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
     { id: 'c2', name: 'Power Nap💤', icon: '🔋', color: 'rgba(99, 102, 241, 0.22)' },
-    { id: 'c3', name: 'ストレッチ (forearm / 前腕)', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
+    { id: 'c3', name: 'ストレッチ', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
     { id: 'c4', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.22)' },
     { id: 'c5', name: 'BM', icon: '🚽', color: 'rgba(148, 163, 184, 0.22)' },
     { id: 'c6', name: '風呂🛀', icon: '🛁', color: 'rgba(34, 211, 238, 0.22)' },
@@ -636,13 +636,12 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v29';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v30';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
-    // 既存のストレージ内カテゴリでストレッチの名称を「ストレッチ」に補正
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
       if (c.name.includes('ストレッチ')) {
-        c.name = 'ストレッチ (forearm / 前腕)';
+        c.name = 'ストレッチ';
       }
       return c;
     });
@@ -652,6 +651,12 @@
   }
 
   let cats = JSON.parse(localStorage.getItem('ll_cats') || JSON.stringify(DEFAULT_CATS));
+  // 既存データ内のログ名やカテゴリ名に古いストレッチ名が残っている場合の補正
+  cats = cats.map(c => {
+    if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
+    return c;
+  });
+
   let logs = [];
   let currentPhotos = [];
   let currentViewingDateYMD = getTodayStr();
@@ -688,6 +693,13 @@
           result = localLogs;
           saveLogsToDB(result);
         }
+        // 既存ログのストレッチ名も補正
+        result = result.map(l => {
+          if (l.name && l.name.includes('ストレッチ')) {
+            l.name = 'ストレッチ';
+          }
+          return l;
+        });
         resolve(result);
       };
       req.onerror = () => resolve([]);
@@ -886,7 +898,7 @@
       
       startDate = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate(), 0, 0, 0);
       endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
       titleStr = `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     } else if (mode === 'prevMonth') {
       const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
@@ -904,7 +916,7 @@
         startDate = endDate;
         endDate = temp;
       }
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
       titleStr = param1 === param2 ? `${formatDateWithDay(startDate)}（${diffDays}Day）` : `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     }
 
