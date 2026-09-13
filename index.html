@@ -636,7 +636,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v33';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v34';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -896,7 +896,7 @@
       
       startDate = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate(), 0, 0, 0);
       endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
       titleStr = `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     } else if (mode === 'prevMonth') {
       const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
@@ -914,7 +914,7 @@
         startDate = endDate;
         endDate = temp;
       }
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
       titleStr = param1 === param2 ? `${formatDateWithDay(startDate)}（${diffDays}Day）` : `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     }
 
@@ -1352,7 +1352,7 @@
 
   function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
-  // 保存ボタン：終了時刻が入っていても計測を終了させず、編集内容だけを単に保存する
+  // 保存ボタン：終了時刻が入っていても絶対に計測を終了させず、編集内容（時刻・メモ・写真）だけを保存する
   async function saveLogEdit() {
     const id = document.getElementById('editLogId').value;
     const l = logs.find(x => x.id === id);
@@ -1380,10 +1380,6 @@
         return;
       }
       l.endAt = newEnd.toISOString();
-    } else {
-      // 終了時刻欄が空欄の場合は、もともと終了していなければそのまま、
-      // 終了していたログを空欄にして保存した場合はどう扱うかの制御：
-      // もし元が終了済みで空欄ならendAtを消す、または維持する
     }
     
     l.startAt = newStart.toISOString();
