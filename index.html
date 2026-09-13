@@ -575,8 +575,8 @@
     <div class="modal-btns">
       <button class="btn-action btn-modal-danger" onclick="deleteCurrentLog()">削除</button>
       <button class="btn-action btn-cancel-white" onclick="closeEditModal()">閉じる</button>
-      <button class="btn-action btn-modal-stop" id="btnStopAndSave" style="display:none;" onclick="saveLogEdit(true)">終了</button>
-      <button class="btn-action btn-modal-save" onclick="saveLogEdit(false)">保存</button>
+      <button class="btn-action btn-modal-stop" id="btnStopAndSave" style="display:none;" onclick="stopLogEditFromModal()">終了</button>
+      <button class="btn-action btn-modal-save" onclick="saveLogEdit()">保存</button>
     </div>
   </div>
 </div>
@@ -636,7 +636,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v31';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v32';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -784,7 +784,7 @@
   }
 
   function closeExportDateModal() {
-    document.getElementById('exportDateModal').style.display = 'none';
+    document.getElementById('exportModalDate').style.display = 'none';
   }
 
   function submitExportDateModal() {
@@ -896,7 +896,7 @@
       
       startDate = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate(), 0, 0, 0);
       endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24) + 0.1);
       titleStr = `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     } else if (mode === 'prevMonth') {
       const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
@@ -914,7 +914,7 @@
         startDate = endDate;
         endDate = temp;
       }
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24) + 0.1);
       titleStr = param1 === param2 ? `${formatDateWithDay(startDate)}（${diffDays}Day）` : `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     }
 
