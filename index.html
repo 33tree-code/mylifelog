@@ -636,7 +636,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v34';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v39';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1352,7 +1352,7 @@
 
   function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
 
-  // 保存ボタン：終了時刻が入っていても絶対に計測を終了させず、編集内容（時刻・メモ・写真）だけを保存する
+  // 保存ボタン：絶対に計測状態や終了時刻（endAt）を勝手に新規作成・変更しない。編集された開始時刻・メモ・写真のみを保存する
   async function saveLogEdit() {
     const id = document.getElementById('editLogId').value;
     const l = logs.find(x => x.id === id);
@@ -1367,23 +1367,19 @@
       newStart.setHours(parseInt(sh, 10), parseInt(sm, 10), 0, 0);
     }
     
-    let newEnd = l.endAt ? new Date(l.endAt) : null;
-    if (e) {
+    // すでに終了しているログの「終了時刻」が入力されて変更された場合のみ反映し、
+    // まだ終了していない（計測中＝l.endAtがnullの）ログであれば、終了時刻欄に何が入っていようとendAtは絶対にいじらない（nullのまま＝計測中を維持する）
+    if (e && l.endAt) {
       const [eh, em] = e.split(':');
-      newEnd = new Date(newStart);
+      let newEnd = new Date(l.endAt);
       newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
       if (newEnd < newStart) {
         newEnd.setDate(newEnd.getDate() + 1);
-      }
-      if ((newEnd - newStart) >= 24 * 60 * 60 * 1000) {
-        alert('記録時間が24時間以上になっています。時間をご確認ください。');
-        return;
       }
       l.endAt = newEnd.toISOString();
     }
     
     l.startAt = newStart.toISOString();
-    
     l.memo = document.getElementById('editMemo').value;
     l.photos = currentPhotos;
     delete l.photo;
@@ -1392,7 +1388,7 @@
     await save();
   }
 
-  // 終了ボタン（編集モーダル内）：計測を強制終了して保存する
+  // 終了ボタン（編集モーダル内）：ここでのみ強制終了する
   async function stopLogEditFromModal() {
     const id = document.getElementById('editLogId').value;
     const l = logs.find(x => x.id === id);
