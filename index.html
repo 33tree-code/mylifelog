@@ -636,7 +636,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v31';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v32';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1285,7 +1285,8 @@
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
     } else {
       btnStopAndSave.style.display = 'block';
-      document.getElementById('editEndTime').value = '';
+      // 記録中でも、すでに一時入力されていた終了時刻（存在すれば）を保持して表示する
+      document.getElementById('editEndTime').value = timeInputFormat(l.tempEndAt);
     }
     
     document.getElementById('editMemo').value = l.memo || '';
@@ -1377,10 +1378,11 @@
         newEnd = new Date();
         if (newEnd < newStart) newEnd.setDate(newEnd.getDate() + 1);
       }
+      l.tempEndAt = null; // 終了確定時は一時保存をクリア
     } else {
-      // 「保存」ボタンのときは記録中の場合endAtは変更せずそのまま（null）維持する
-      // ただし、すでに終了している過去ログの編集であれば、入力された終了時刻で更新する
+      // 「保存」ボタンのときは計測状態（endAt）を変更せず維持する
       if (l.endAt) {
+        // すでに終了している過去ログの編集であれば、入力された終了時刻で更新
         if (e) {
           const [eh, em] = e.split(':');
           newEnd = new Date(newStart);
@@ -1392,6 +1394,17 @@
             alert('記録時間が24時間以上になっています。時間をご確認ください。');
             return;
           }
+        }
+      } else {
+        // 記録中のログの場合、入力された終了時刻を一時的にプロパティ（tempEndAt）として保持し、表示・次回編集時に残るようにする
+        if (e) {
+          const [eh, em] = e.split(':');
+          let tempEndDate = new Date(newStart);
+          tempEndDate.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
+          if (tempEndDate < newStart) tempEndDate.setDate(tempEndDate.getDate() + 1);
+          l.tempEndAt = tempEndDate.toISOString();
+        } else {
+          l.tempEndAt = null;
         }
       }
     }
