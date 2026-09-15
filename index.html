@@ -341,35 +341,46 @@
   }
   input[type="time"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
 
-  /* 時刻入力欄の右下に配置する「現在時刻」ボタンのコンテナ */
-  .time-action-row {
+  /* 時刻入力用のカスタムボタングループ */
+  .time-picker-custom-btns {
     display: flex;
-    justify-content: flex-end;
-    margin-top: 4px;
+    gap: 6px;
+    margin-top: 6px;
   }
-  /* 白っぽい石風のコンパクトな現在時刻ボタン */
-  .btn-time-now-small {
-    padding: 4px 10px;
-    border-radius: 6px;
+  .btn-time-action {
+    flex: 1;
+    padding: 7px 4px;
+    border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    font-size: 0.75rem;
-    background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 100%);
-    color: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.78rem;
+    text-align: center;
+    white-space: nowrap;
     box-shadow: var(--stone-shadow), var(--stone-highlight);
     position: relative;
     overflow: hidden;
   }
-  .btn-time-now-small::before {
+  .btn-time-action::before {
     content: '';
     position: absolute;
     inset: 0;
     background: var(--stone-texture);
     pointer-events: none;
   }
-  .btn-time-now-small:active {
-    transform: translateY(1px) scale(0.98);
+  .btn-time-reset {
+    background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
+    color: #cbd5e1;
+  }
+  .btn-time-now {
+    background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 100%);
+    color: #0f172a;
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  .btn-time-original {
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #38bdf8;
+    border-color: rgba(56, 189, 248, 0.3);
   }
 
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
@@ -592,16 +603,18 @@
     <div class="form-group">
       <label>開始時刻</label>
       <input type="time" id="editStartTime" class="modal-input">
-      <div class="time-action-row">
-        <button type="button" class="btn-time-now-small" onclick="setCurrentTimeInput('editStartTime')">現在時刻</button>
+      <div class="time-picker-custom-btns">
+        <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editStartTime')">現在時刻</button>
+        <button type="button" class="btn-time-action btn-time-original" onclick="setOriginalStartTime()">初期時刻</button>
       </div>
     </div>
     
     <div class="form-group">
       <label>終了時刻 <span style="font-size:0.7rem;color:var(--accent);">※未入力で終了保存すると現在時刻</span></label>
       <input type="time" id="editEndTime" class="modal-input">
-      <div class="time-action-row">
-        <button type="button" class="btn-time-now-small" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
+      <div class="time-picker-custom-btns">
+        <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
+        <button type="button" class="btn-time-action btn-time-reset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
     </div>
     
@@ -706,6 +719,7 @@
   let currentViewingDateYMD = getTodayStr();
   let currentReportData = null;
   let reportChartInstance = null;
+  let editingOriginalStartAt = null; // 編集中のログの元の開始時刻を保持
 
   const DB_NAME = 'LifelogDB';
   const STORE_NAME = 'logs';
@@ -927,12 +941,22 @@
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   }
 
-  /* 時刻入力に現在時刻をセットする関数 */
+  /* 時刻入力用の便利機能関数 */
+  function clearTimeInput(elementId) {
+    document.getElementById(elementId).value = '';
+  }
+
   function setCurrentTimeInput(elementId) {
     const now = new Date();
     const hh = String(now.getHours()).padStart(2, '0');
     const mm = String(now.getMinutes()).padStart(2, '0');
     document.getElementById(elementId).value = `${hh}:${mm}`;
+  }
+
+  function setOriginalStartTime() {
+    if (editingOriginalStartAt) {
+      document.getElementById('editStartTime').value = timeInputFormat(editingOriginalStartAt);
+    }
   }
 
   /* 集計レポート機能のロジック */
@@ -1329,6 +1353,8 @@
     if (!l) return;
     document.getElementById('editLogId').value = l.id;
     document.getElementById('editModalTitle').innerText = `${l.icon} ${l.name} の編集`;
+    
+    editingOriginalStartAt = l.startAt; // 初期時刻用に戻し先を保持
     document.getElementById('editStartTime').value = timeInputFormat(l.startAt);
     
     const btnStopAndSave = document.getElementById('btnStopAndSave');
