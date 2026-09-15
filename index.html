@@ -334,34 +334,18 @@
     -webkit-appearance: none !important;
     appearance: none !important;
   }
-  
-  /* iOSなどの標準時間ピッカー内にあるリセットボタンを「現在時刻」風に置き換える・スタイリングするためのカスタム */
-  input[type="time"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
-  input[type="time"]::-webkit-clear-button {
-    -webkit-appearance: none;
-    background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
-    color: #f8fafc;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    padding: 4px 8px;
-    font-size: 0.75rem;
-    font-weight: 700;
-    box-shadow: var(--stone-shadow), var(--stone-highlight);
-    cursor: pointer;
-    content: "現在時刻";
-  }
 
-  /* 自作の補助用「現在時刻」セットボタン行 */
+  /* 入力欄の下に配置する「現在時刻」セットボタン（白っぽい石風テクスチャー） */
   .time-action-row {
     display: flex;
     justify-content: flex-end;
-    margin-top: 4px;
+    margin-top: 5px;
   }
   .btn-now-time {
-    background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
-    color: #f8fafc;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 4px 10px;
+    background: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%);
+    color: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 5px 12px;
     border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 700;
@@ -690,7 +674,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v35';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v36';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
