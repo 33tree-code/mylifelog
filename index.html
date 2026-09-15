@@ -320,45 +320,6 @@
   .form-group { width: 100% !important; margin-bottom: 10px; display: flex; flex-direction: column; }
   .form-group label { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 5px; font-weight: 600; }
   
-  .time-input-row {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-    width: 100%;
-  }
-  .time-input-row input[type="time"] {
-    flex: 1;
-  }
-  .btn-now-time {
-    padding: 10px 12px;
-    border-radius: 8px;
-    font-size: 0.78rem;
-    font-weight: 700;
-    cursor: pointer;
-    white-space: nowrap;
-    background: linear-gradient(180deg, #e2e8f0 0%, #cbd5e1 100%);
-    color: #0f172a;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: var(--stone-shadow), var(--stone-highlight);
-    position: relative;
-    overflow: hidden;
-  }
-  .btn-now-time::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--stone-texture);
-    pointer-events: none;
-  }
-  .btn-now-time:active {
-    transform: translateY(2px) scale(0.98);
-  }
-
-  /* iOS等のネイティブ時間ピッカー内にある「リセット」ボタンを「現在時刻」に置換・カスタム表示するためのスタイル */
-  input[type="time"]::-webkit-datetime-edit-reset-button {
-    display: none; /* 標準のリセットを隠す（ブラウザ仕様により完全に文言変更ができない場合があるため、独自のボタンを横に配置） */
-  }
-
   .modal-input {
     width: 100% !important; 
     max-width: 100% !important; 
@@ -372,6 +333,52 @@
     font-size: 0.95rem !important; 
     -webkit-appearance: none !important;
     appearance: none !important;
+  }
+  
+  /* iOSなどの標準時間ピッカー内にあるリセットボタンを「現在時刻」風に置き換える・スタイリングするためのカスタム */
+  input[type="time"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+  input[type="time"]::-webkit-clear-button {
+    -webkit-appearance: none;
+    background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    cursor: pointer;
+    content: "現在時刻";
+  }
+
+  /* 自作の補助用「現在時刻」セットボタン行 */
+  .time-action-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+  .btn-now-time {
+    background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
+    color: #f8fafc;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-now-time::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
+  .btn-now-time:active {
+    transform: translateY(1px) scale(0.98);
   }
   
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
@@ -593,16 +600,16 @@
     
     <div class="form-group">
       <label>開始時刻</label>
-      <div class="time-input-row">
-        <input type="time" id="editStartTime" class="modal-input">
+      <input type="time" id="editStartTime" class="modal-input">
+      <div class="time-action-row">
         <button type="button" class="btn-now-time" onclick="setNowTime('editStartTime')">現在時刻</button>
       </div>
     </div>
     
     <div class="form-group">
       <label>終了時刻 <span style="font-size:0.7rem;color:var(--accent);">※未入力で終了保存すると現在時刻</span></label>
-      <div class="time-input-row">
-        <input type="time" id="editEndTime" class="modal-input">
+      <input type="time" id="editEndTime" class="modal-input">
+      <div class="time-action-row">
         <button type="button" class="btn-now-time" onclick="setNowTime('editEndTime')">現在時刻</button>
       </div>
     </div>
@@ -931,8 +938,9 @@
 
   function setNowTime(elementId) {
     const now = new Date();
-    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    document.getElementById(elementId).value = timeStr;
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById(elementId).value = `${hh}:${mm}`;
   }
 
   /* 集計レポート機能のロジック */
