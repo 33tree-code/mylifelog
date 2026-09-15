@@ -334,37 +334,25 @@
     -webkit-appearance: none !important;
     appearance: none !important;
   }
-
-  /* 入力欄の下に配置する「現在時刻」セットボタン（白っぽい石風テクスチャー） */
-  .time-action-row {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 5px;
-  }
-  .btn-now-time {
+  
+  /* 標準の時間ピッカー内にあるリセットボタンを「現在時刻」に書き換え、白っぽい石風テクスチャーを適用する */
+  input[type="time"]::-webkit-clear-button {
+    -webkit-appearance: none;
     background: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%);
     color: #0f172a;
     border: 1px solid rgba(255, 255, 255, 0.4);
-    padding: 5px 12px;
     border-radius: 6px;
+    padding: 4px 10px;
     font-size: 0.75rem;
     font-weight: 700;
-    cursor: pointer;
     box-shadow: var(--stone-shadow), var(--stone-highlight);
-    position: relative;
-    overflow: hidden;
+    cursor: pointer;
   }
-  .btn-now-time::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: var(--stone-texture);
-    pointer-events: none;
+  /* 標準のクリアボタンのテキストや役割を現在時刻に置き換えるための拡張 */
+  input[type="time"]::-webkit-clear-button::after {
+    content: "現在時刻";
   }
-  .btn-now-time:active {
-    transform: translateY(1px) scale(0.98);
-  }
-  
+
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
   .btn-action { 
     flex: 1; 
@@ -585,17 +573,11 @@
     <div class="form-group">
       <label>開始時刻</label>
       <input type="time" id="editStartTime" class="modal-input">
-      <div class="time-action-row">
-        <button type="button" class="btn-now-time" onclick="setNowTime('editStartTime')">現在時刻</button>
-      </div>
     </div>
     
     <div class="form-group">
       <label>終了時刻 <span style="font-size:0.7rem;color:var(--accent);">※未入力で終了保存すると現在時刻</span></label>
       <input type="time" id="editEndTime" class="modal-input">
-      <div class="time-action-row">
-        <button type="button" class="btn-now-time" onclick="setNowTime('editEndTime')">現在時刻</button>
-      </div>
     </div>
     
     <div class="form-group">
@@ -674,7 +656,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v36';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v37';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -918,13 +900,6 @@
     if (!s) return '';
     const d = new Date(s);
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  }
-
-  function setNowTime(elementId) {
-    const now = new Date();
-    const hh = String(now.getHours()).padStart(2, '0');
-    const mm = String(now.getMinutes()).padStart(2, '0');
-    document.getElementById(elementId).value = `${hh}:${mm}`;
   }
 
   /* 集計レポート機能のロジック */
