@@ -335,23 +335,31 @@
     appearance: none !important;
   }
   
-  /* 標準の時間ピッカー内にあるリセットボタンを「現在時刻」に書き換え、白っぽい石風テクスチャーを適用する */
+  /* =========================================================
+     iOS等標準ピッカー内の「リセット」および「確認(✓)」ボタンのカスタマイズ
+     ========================================================= */
+  /* 「リセット」ボタン（Webkitのクリアボタン）を「現在時刻」の白っぽい石風に変換 */
   input[type="time"]::-webkit-clear-button {
     -webkit-appearance: none;
-    background: linear-gradient(180deg, #f1f5f9 0%, #cbd5e1 100%);
-    color: #0f172a;
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 0.75rem;
+    background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 100%) !important;
+    color: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 0.8rem;
     font-weight: 700;
     box-shadow: var(--stone-shadow), var(--stone-highlight);
     cursor: pointer;
+    position: relative;
+    content: "現在時刻" !important;
   }
-  /* 標準のクリアボタンのテキストや役割を現在時刻に置き換えるための拡張 */
   input[type="time"]::-webkit-clear-button::after {
     content: "現在時刻";
+    display: inline-block;
   }
+
+  /* 「確定(✓)」ボタンも他のボタンと同様の石風テクスチャー＆デザインに統一 */
+  input[type="time"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
 
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
   .btn-action { 
@@ -656,7 +664,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v37';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v38';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
