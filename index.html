@@ -301,7 +301,7 @@
   
   .history-thumbs { display: flex; gap: 5px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
-  
+
   /* モーダル一般 */
   .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
   .modal-box { 
@@ -335,31 +335,54 @@
     appearance: none !important;
   }
   
-  /* =========================================================
-     iOS等標準ピッカー内の「リセット」および「確認(✓)」ボタンのカスタマイズ
-     ========================================================= */
-  /* 「リセット」ボタン（Webkitのクリアボタン）を「現在時刻」の白っぽい石風に変換 */
+  /* 標準ピッカーの標準クリアボタンを非表示化し独自の石風ボタンを使用 */
   input[type="time"]::-webkit-clear-button {
-    -webkit-appearance: none;
-    background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 100%) !important;
-    color: #0f172a !important;
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    border-radius: 8px;
-    padding: 6px 14px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    box-shadow: var(--stone-shadow), var(--stone-highlight);
-    cursor: pointer;
-    position: relative;
-    content: "現在時刻" !important;
+    display: none !important;
   }
-  input[type="time"]::-webkit-clear-button::after {
-    content: "現在時刻";
-    display: inline-block;
-  }
-
-  /* 「確定(✓)」ボタンも他のボタンと同様の石風テクスチャー＆デザインに統一 */
   input[type="time"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+
+  /* 時刻入力欄用のカスタムボタングループ（リセット・現在時刻・✓） */
+  .time-picker-custom-btns {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+  }
+  .btn-time-action {
+    flex: 1;
+    padding: 7px 4px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.78rem;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-time-action::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
+  .btn-time-reset {
+    background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
+    color: #cbd5e1;
+  }
+  .btn-time-now {
+    background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 100%);
+    color: #0f172a;
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+  .btn-time-check {
+    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+    color: #fff;
+    border-color: rgba(56, 189, 248, 0.4);
+    font-size: 0.9rem;
+  }
 
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
   .btn-action { 
@@ -581,11 +604,21 @@
     <div class="form-group">
       <label>開始時刻</label>
       <input type="time" id="editStartTime" class="modal-input">
+      <div class="time-picker-custom-btns">
+        <button type="button" class="btn-time-action btn-time-reset" onclick="clearTimeInput('editStartTime')">リセット</button>
+        <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editStartTime')">現在時刻</button>
+        <button type="button" class="btn-time-action btn-time-check" onclick="blurActiveInput()">✓</button>
+      </div>
     </div>
     
     <div class="form-group">
       <label>終了時刻 <span style="font-size:0.7rem;color:var(--accent);">※未入力で終了保存すると現在時刻</span></label>
       <input type="time" id="editEndTime" class="modal-input">
+      <div class="time-picker-custom-btns">
+        <button type="button" class="btn-time-action btn-time-reset" onclick="clearTimeInput('editEndTime')">リセット</button>
+        <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
+        <button type="button" class="btn-time-action btn-time-check" onclick="blurActiveInput()">✓</button>
+      </div>
     </div>
     
     <div class="form-group">
@@ -664,7 +697,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v38';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v39';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -908,6 +941,24 @@
     if (!s) return '';
     const d = new Date(s);
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+
+  /* 時刻入力用の便利機能関数 */
+  function clearTimeInput(elementId) {
+    document.getElementById(elementId).value = '';
+  }
+
+  function setCurrentTimeInput(elementId) {
+    const now = new Date();
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    document.getElementById(elementId).value = `${hh}:${mm}`;
+  }
+
+  function blurActiveInput() {
+    if (document.activeElement) {
+      document.activeElement.blur();
+    }
   }
 
   /* 集計レポート機能のロジック */
