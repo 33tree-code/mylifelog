@@ -353,12 +353,12 @@
   }
   .btn-time-action {
     flex: 1;
-    padding: 7px 2px;
+    padding: 7px 1px;
     border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 0.64rem;
+    font-size: 0.58rem;
     text-align: center;
     white-space: nowrap;
     box-shadow: var(--stone-shadow), var(--stone-highlight);
@@ -397,6 +397,7 @@
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #00A968;
     border-color: rgba(0, 169, 104, 0.3);
+    letter-spacing: -0.5px;
   }
   .time-hint-text {
     flex: 1;
@@ -721,7 +722,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v46';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v47';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
