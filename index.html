@@ -335,11 +335,14 @@
     appearance: none !important;
   }
   
-  /* 標準ピッカーの標準クリアボタンを非表示化 */
+  /* 標準ピッカーの標準クリアボタンを非表示化し、未入力でも高さを維持 */
   input[type="time"]::-webkit-clear-button {
     display: none !important;
   }
   input[type="time"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+  input[type="time"] {
+    min-height: 42px;
+  }
 
   /* 時刻入力用のカスタムボタングループ */
   .time-picker-custom-btns {
@@ -379,8 +382,8 @@
   }
   .btn-time-original {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
-    color: #94a3b8;
-    border-color: rgba(148, 163, 184, 0.3);
+    color: #cbd5e1;
+    border-color: rgba(255, 255, 255, 0.2);
   }
   .btn-time-hint-box {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
@@ -626,8 +629,8 @@
     <div class="form-group">
       <label>終了時刻</label>
       <input type="time" id="editEndTime" class="modal-input">
-      <div class="time-picker-custom-btns" id="endTimeCustomBtns">
-        <div class="btn-time-action btn-time-hint-box" id="endHintBox">※未入力で終了保存する<br>と現在時刻</div>
+      <div class="time-picker-custom-btns">
+        <div class="btn-time-action btn-time-hint-box" id="endHintBox">※ 未入力で終了保存する<br>  と現在時刻</div>
         <button type="button" class="btn-time-action btn-time-reset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
     </div>
@@ -708,7 +711,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v42';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v43';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
