@@ -397,26 +397,26 @@
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #7af578;
     border-color: rgba(122, 245, 120, 0.3);
-    font-size: 0.60rem;
+    font-size: 0.62rem;
     line-height: 1.25;
   }
   .btn-time-next-start {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #fdfe55;
-    border-color: rgba(253, 254, 85, 0.3);
-    font-size: 0.60rem;
+    border-color: rgba(253, 254, 85, 0.35);
+    font-size: 0.62rem;
     line-height: 1.25;
   }
   .btn-time-prev-saved {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
-    color: #2C6B6A;
-    border-color: rgba(44, 107, 106, 0.4);
+    color: #4cdbb0;
+    border-color: rgba(76, 219, 176, 0.4);
     font-size: 0.62rem;
     line-height: 1.25;
   }
   .time-hint-text-flex {
     flex: 1;
-    font-size: 0.52rem;
+    font-size: 0.58rem;
     font-weight: 700;
     color: rgba(0, 229, 255, 0.65);
     line-height: 1.35;
@@ -657,11 +657,11 @@
     <div class="form-group">
       <label>終了時刻</label>
       <input type="time" id="editEndTime" class="modal-input">
-      <!-- 終了時刻側の3等分グリッド（記録中：注意書き / 直後ログ開始時刻 / リセット） -->
+      <!-- 終了時刻側の3等分グリッド -->
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
         <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
         <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始時刻</button>
-        <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')" style="display:none;">現在時刻</button>
+        <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
         <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存時刻</button>
         <button type="button" class="btn-time-action btn-time-reset" id="btnEndTimeReset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
@@ -1098,7 +1098,6 @@
       const mm = String(d.getMinutes()).padStart(2, '0');
       document.getElementById('editEndTime').value = `${hh}:${mm}`;
     }
-    // 直後のログがまだない場合はなにも変化しない
   }
 
   /* 集計レポート機能のロジック */
@@ -1497,7 +1496,6 @@
     document.getElementById('editLogId').value = l.id;
     document.getElementById('editModalTitle').innerText = `${l.icon} ${l.name} の編集`;
     
-    // 当該ログ固有の初期開始時刻と前回保存終了時刻を保持
     editingOriginalStartAt = l.startAt;
     editingPreviousSavedEndAt = l.endAt || null;
 
@@ -1516,15 +1514,15 @@
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
       if (endHintText) endHintText.style.display = 'none';
       if (btnEndTimeNow) btnEndTimeNow.style.display = 'flex';
-      if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'flex'; // 終了したログ：「前回保存時刻」ボタンを表示
+      if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'flex';
       if (btnEndTimeReset) btnEndTimeReset.style.display = 'none';
     } else {
       btnStopAndSave.style.display = 'block';
       btnCancelStop.style.display = 'none';
       document.getElementById('editEndTime').value = timeInputFormat(l.tempEndAt);
-      if (endHintText) endHintText.style.display = 'flex';
+      if (endHintText) endHintText.style.display = 'block';
       if (btnEndTimeNow) btnEndTimeNow.style.display = 'none';
-      if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'none'; // 進行中のログ：非表示
+      if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'none';
       if (btnEndTimeReset) btnEndTimeReset.style.display = 'flex';
     }
     
