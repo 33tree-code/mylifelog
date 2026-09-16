@@ -335,7 +335,7 @@
     appearance: none !important;
   }
   
-  /* 標準ピッカーの標準クリアボタンを非表示化し、未入力でも高さを維持 */
+  /* 標準ピッカーの標準クリアボタンを非表示化し高さを統一 */
   input[type="time"]::-webkit-clear-button {
     display: none !important;
   }
@@ -349,6 +349,7 @@
     display: flex;
     gap: 6px;
     margin-top: 6px;
+    align-items: stretch;
   }
   .btn-time-action {
     flex: 1;
@@ -357,12 +358,16 @@
     font-weight: 700;
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 0.78rem;
+    font-size: 0.75rem;
     text-align: center;
     white-space: nowrap;
     box-shadow: var(--stone-shadow), var(--stone-highlight);
     position: relative;
     overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
   }
   .btn-time-action::before {
     content: '';
@@ -382,22 +387,25 @@
   }
   .btn-time-original {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
-    color: #cbd5e1;
-    border-color: rgba(255, 255, 255, 0.2);
+    color: #94a3b8;
+    border-color: rgba(148, 163, 184, 0.3);
   }
-  .btn-time-hint-box {
+  .btn-time-prev-end {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
-    color: rgba(0, 229, 255, 0.65);
-    border-color: rgba(0, 229, 255, 0.15);
+    color: #00A968;
+    border-color: rgba(0, 169, 104, 0.3);
+    font-size: 0.7rem;
+  }
+  .time-hint-text {
+    flex: 1;
     font-size: 0.72rem;
     font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.25;
-    text-align: center;
-    cursor: default;
-    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    color: #94a3b8;
+    line-height: 1.35;
+    padding-top: 2px;
+    padding-left: 2px;
+    text-indent: -1em;
+    padding-left: 1em;
   }
 
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
@@ -621,6 +629,7 @@
       <label>開始時刻</label>
       <input type="time" id="editStartTime" class="modal-input">
       <div class="time-picker-custom-btns">
+        <button type="button" class="btn-time-action btn-time-prev-end" onclick="setPrevLogEndTimePlusOne()">直近ログ終了時刻</button>
         <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editStartTime')">現在時刻</button>
         <button type="button" class="btn-time-action btn-time-original" onclick="setOriginalStartTime()">初期時刻</button>
       </div>
@@ -629,8 +638,8 @@
     <div class="form-group">
       <label>終了時刻</label>
       <input type="time" id="editEndTime" class="modal-input">
-      <div class="time-picker-custom-btns">
-        <div class="btn-time-action btn-time-hint-box" id="endHintBox">※ 未入力で終了保存する<br>  と現在時刻</div>
+      <div class="time-picker-custom-btns" id="endTimeCustomBtns">
+        <div class="time-hint-text" id="endHintText">※ 未入力で終了保存する<br>  と現在時刻</div>
         <button type="button" class="btn-time-action btn-time-reset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
     </div>
@@ -711,7 +720,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v43';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v44';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -737,6 +746,7 @@
   let currentReportData = null;
   let reportChartInstance = null;
   let editingOriginalStartAt = null;
+  let editingLogId = null;
 
   const DB_NAME = 'LifelogDB';
   const STORE_NAME = 'logs';
@@ -973,6 +983,52 @@
   function setOriginalStartTime() {
     if (editingOriginalStartAt) {
       document.getElementById('editStartTime').value = timeInputFormat(editingOriginalStartAt);
+    }
+  }
+
+  function setPrevLogEndTimePlusOne() {
+    // 直近1つ前に終了しているログの終了時刻の1分後を取得
+    const sorted = [...logs].sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    const currentIndex = sorted.findIndex(l => l.id === editingLogId);
+    
+    let prevEndAt = null;
+    if (currentIndex > 0) {
+      // タイムライン上で自分より前のログを探す
+      for (let i = currentIndex - 1; i >= 0; i--) {
+        if (sorted[i].endAt) {
+          prevEndAt = sorted[i].endAt;
+          break;
+        }
+      }
+    }
+    
+    if (!prevEndAt) {
+      // 前のログが見つからない場合、全ログの中で現在編集中の開始時刻より前に終了している最新のものを探す
+      const currentStart = new Date(editingOriginalStartAt || Date.now());
+      let latestEnd = null;
+      sorted.forEach(l => {
+        if (l.id !== editingLogId && l.endAt) {
+          const eTime = new Date(l.endAt);
+          if (eTime <= currentStart) {
+            if (!latestEnd || eTime > latestEnd) {
+              latestEnd = eTime;
+            }
+          }
+        }
+      });
+      if (latestEnd) {
+        prevEndAt = latestEnd.toISOString();
+      }
+    }
+
+    if (prevEndAt) {
+      const d = new Date(prevEndAt);
+      d.setMinutes(d.getMinutes() + 1);
+      const hh = String(d.getHours()).padStart(2, '0');
+      const mm = String(d.getMinutes()).padStart(2, '0');
+      document.getElementById('editStartTime').value = `${hh}:${mm}`;
+    } else {
+      alert('直近の終了しているログが見つかりませんでした。');
     }
   }
 
@@ -1368,6 +1424,7 @@
   function openEditModal(id) {
     const l = logs.find(x => x.id === id);
     if (!l) return;
+    editingLogId = l.id;
     document.getElementById('editLogId').value = l.id;
     document.getElementById('editModalTitle').innerText = `${l.icon} ${l.name} の編集`;
     
@@ -1376,18 +1433,18 @@
     
     const btnStopAndSave = document.getElementById('btnStopAndSave');
     const btnCancelStop = document.getElementById('btnCancelStop');
-    const endHintBox = document.getElementById('endHintBox');
+    const endHintText = document.getElementById('endHintText');
     
     if (l.endAt) {
       btnStopAndSave.style.display = 'none';
       btnCancelStop.style.display = 'block';
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
-      if (endHintBox) endHintBox.style.display = 'none';
+      if (endHintText) endHintText.style.display = 'none';
     } else {
       btnStopAndSave.style.display = 'block';
       btnCancelStop.style.display = 'none';
       document.getElementById('editEndTime').value = timeInputFormat(l.tempEndAt);
-      if (endHintBox) endHintBox.style.display = 'flex';
+      if (endHintText) endHintText.style.display = 'block';
     }
     
     document.getElementById('editMemo').value = l.memo || '';
