@@ -344,7 +344,7 @@
     min-height: 42px;
   }
 
-  /* 時刻入力用のカスタムボタングループ */
+  /* 時刻入力用のカスタムボタングループ（3分割で上段と完全同期） */
   .time-picker-custom-btns {
     display: flex;
     gap: 6px;
@@ -358,7 +358,7 @@
     font-weight: 700;
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 0.58rem;
+    font-size: 0.72rem;
     text-align: center;
     white-space: nowrap;
     box-shadow: var(--stone-shadow), var(--stone-highlight);
@@ -397,15 +397,18 @@
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #00A968;
     border-color: rgba(0, 169, 104, 0.3);
+    font-size: 0.65rem;
     letter-spacing: -0.5px;
   }
-  .time-hint-text {
-    flex: 1;
-    font-size: 0.72rem;
+  .time-hint-text-flex {
+    flex: 2;
+    font-size: 0.68rem;
     font-weight: 700;
     color: rgba(0, 229, 255, 0.65);
     line-height: 1.35;
-    padding-top: 2px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     padding-left: 1em;
     text-indent: -1em;
   }
@@ -641,7 +644,9 @@
       <label>終了時刻</label>
       <input type="time" id="editEndTime" class="modal-input">
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
-        <div class="time-hint-text" id="endHintText">※未入力で終了保存する<br>と現在時刻</div>
+        <div class="time-hint-text-flex" id="endHintText">※未入力で終了保存する<br>と現在時刻</div>
+        <!-- ダミーの空白要素を配置することで、右側のリセットボタンを上の「初期時刻」ボタンと同じ幅・サイズに完全同期 -->
+        <div style="flex:1;visibility:hidden;pointer-events:none;"></div>
         <button type="button" class="btn-time-action btn-time-reset" id="btnEndTimeReset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
     </div>
@@ -722,7 +727,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v47';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v48';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
