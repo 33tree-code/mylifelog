@@ -370,17 +370,17 @@
   }
   .btn-time-reset {
     background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
-    color: #cbd5e1;
+    color: #FFBF00;
   }
   .btn-time-now {
-    background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 100%);
-    color: #0f172a;
-    border-color: rgba(255, 255, 255, 0.5);
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #00E5FF;
+    border-color: rgba(0, 229, 255, 0.3);
   }
   .btn-time-original {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
-    color: #38bdf8;
-    border-color: rgba(56, 189, 248, 0.3);
+    color: #64748B;
+    border-color: rgba(100, 116, 139, 0.3);
   }
 
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
@@ -610,7 +610,10 @@
     </div>
     
     <div class="form-group">
-      <label>終了時刻 <span style="font-size:0.7rem;color:var(--accent);">※未入力で終了保存すると現在時刻</span></label>
+      <label style="display:flex;justify-content:space-between;align-items:flex-end;">
+        <span>終了時刻</span>
+        <span id="endHintLabel" style="font-size:0.75rem;font-weight:700;color:rgba(0,229,255,0.7);line-height:1.2;text-align:right;">※未入力で終了保存する<br>と現在時刻</span>
+      </label>
       <input type="time" id="editEndTime" class="modal-input">
       <div class="time-picker-custom-btns">
         <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
@@ -694,7 +697,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v40';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v41';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -719,7 +722,7 @@
   let currentViewingDateYMD = getTodayStr();
   let currentReportData = null;
   let reportChartInstance = null;
-  let editingOriginalStartAt = null; // 編集中のログの元の開始時刻を保持
+  let editingOriginalStartAt = null;
 
   const DB_NAME = 'LifelogDB';
   const STORE_NAME = 'logs';
@@ -1354,20 +1357,23 @@
     document.getElementById('editLogId').value = l.id;
     document.getElementById('editModalTitle').innerText = `${l.icon} ${l.name} の編集`;
     
-    editingOriginalStartAt = l.startAt; // 初期時刻用に戻し先を保持
+    editingOriginalStartAt = l.startAt;
     document.getElementById('editStartTime').value = timeInputFormat(l.startAt);
     
     const btnStopAndSave = document.getElementById('btnStopAndSave');
     const btnCancelStop = document.getElementById('btnCancelStop');
+    const endHintLabel = document.getElementById('endHintLabel');
     
     if (l.endAt) {
       btnStopAndSave.style.display = 'none';
       btnCancelStop.style.display = 'block';
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
+      if (endHintLabel) endHintLabel.style.display = 'none';
     } else {
       btnStopAndSave.style.display = 'block';
       btnCancelStop.style.display = 'none';
       document.getElementById('editEndTime').value = timeInputFormat(l.tempEndAt);
+      if (endHintLabel) endHintLabel.style.display = 'block';
     }
     
     document.getElementById('editMemo').value = l.memo || '';
