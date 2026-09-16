@@ -379,8 +379,22 @@
   }
   .btn-time-original {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
-    color: #64748B;
-    border-color: rgba(100, 116, 139, 0.3);
+    color: #94a3b8;
+    border-color: rgba(148, 163, 184, 0.3);
+  }
+  .btn-time-hint-box {
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: rgba(0, 229, 255, 0.65);
+    border-color: rgba(0, 229, 255, 0.15);
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.25;
+    text-align: center;
+    cursor: default;
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
   }
 
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
@@ -610,13 +624,10 @@
     </div>
     
     <div class="form-group">
-      <label style="display:flex;justify-content:space-between;align-items:flex-end;">
-        <span>終了時刻</span>
-        <span id="endHintLabel" style="font-size:0.75rem;font-weight:700;color:rgba(0,229,255,0.7);line-height:1.2;text-align:right;">※未入力で終了保存する<br>と現在時刻</span>
-      </label>
+      <label>終了時刻</label>
       <input type="time" id="editEndTime" class="modal-input">
-      <div class="time-picker-custom-btns">
-        <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
+      <div class="time-picker-custom-btns" id="endTimeCustomBtns">
+        <div class="btn-time-action btn-time-hint-box" id="endHintBox">※未入力で終了保存する<br>と現在時刻</div>
         <button type="button" class="btn-time-action btn-time-reset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
     </div>
@@ -697,7 +708,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v41';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v42';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1362,18 +1373,18 @@
     
     const btnStopAndSave = document.getElementById('btnStopAndSave');
     const btnCancelStop = document.getElementById('btnCancelStop');
-    const endHintLabel = document.getElementById('endHintLabel');
+    const endHintBox = document.getElementById('endHintBox');
     
     if (l.endAt) {
       btnStopAndSave.style.display = 'none';
       btnCancelStop.style.display = 'block';
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
-      if (endHintLabel) endHintLabel.style.display = 'none';
+      if (endHintBox) endHintBox.style.display = 'none';
     } else {
       btnStopAndSave.style.display = 'block';
       btnCancelStop.style.display = 'none';
       document.getElementById('editEndTime').value = timeInputFormat(l.tempEndAt);
-      if (endHintLabel) endHintLabel.style.display = 'block';
+      if (endHintBox) endHintBox.style.display = 'flex';
     }
     
     document.getElementById('editMemo').value = l.memo || '';
