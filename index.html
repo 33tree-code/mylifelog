@@ -353,12 +353,12 @@
   }
   .btn-time-action {
     flex: 1;
-    padding: 7px 2px;
+    padding: 7px 4px;
     border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 0.68rem;
+    font-size: 0.75rem;
     text-align: center;
     white-space: nowrap;
     box-shadow: var(--stone-shadow), var(--stone-highlight);
@@ -377,10 +377,8 @@
     pointer-events: none;
   }
   .btn-time-reset {
-    flex: 0.85; /* 開始時刻のボタンと同じようなサイズ感に調整 */
     background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
     color: #FFBF00;
-    font-size: 0.75rem;
   }
   .btn-time-now {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
@@ -396,14 +394,16 @@
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #00A968;
     border-color: rgba(0, 169, 104, 0.3);
+    font-size: 0.7rem;
   }
   .time-hint-text {
-    flex: 1.15;
+    flex: 1;
     font-size: 0.72rem;
     font-weight: 700;
-    color: #94a3b8;
+    color: rgba(0, 229, 255, 0.65);
     line-height: 1.35;
     padding-top: 2px;
+    padding-left: 2px;
     text-indent: -1em;
     padding-left: 1em;
   }
@@ -629,7 +629,7 @@
       <label>開始時刻</label>
       <input type="time" id="editStartTime" class="modal-input">
       <div class="time-picker-custom-btns">
-        <button type="button" class="btn-time-action btn-time-prev-end" onclick="setPrevLogEndTimePlusOne()">直前終了時刻</button>
+        <button type="button" class="btn-time-action btn-time-prev-end" onclick="setPrevLogEndTimePlusOne()">直近ログ終了時刻</button>
         <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editStartTime')">現在時刻</button>
         <button type="button" class="btn-time-action btn-time-original" onclick="setOriginalStartTime()">初期時刻</button>
       </div>
@@ -639,8 +639,8 @@
       <label>終了時刻</label>
       <input type="time" id="editEndTime" class="modal-input">
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
-        <div class="time-hint-text" id="endHintText">※未入力で終了保存する<br>と現在時刻</div>
-        <button type="button" class="btn-time-action btn-time-reset" onclick="clearTimeInput('editEndTime')">リセット</button>
+        <div class="time-hint-text" id="endHintText">※ 未入力で終了保存する<br>  と現在時刻</div>
+        <button type="button" class="btn-time-action btn-time-reset" id="btnEndTimeReset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
     </div>
     
@@ -1025,7 +1025,7 @@
       const mm = String(d.getMinutes()).padStart(2, '0');
       document.getElementById('editStartTime').value = `${hh}:${mm}`;
     } else {
-      alert('直前の終了しているログが見つかりませんでした。');
+      alert('直近の終了しているログが見つかりませんでした。');
     }
   }
 
@@ -1431,17 +1431,20 @@
     const btnStopAndSave = document.getElementById('btnStopAndSave');
     const btnCancelStop = document.getElementById('btnCancelStop');
     const endHintText = document.getElementById('endHintText');
+    const btnEndTimeReset = document.getElementById('btnEndTimeReset');
     
     if (l.endAt) {
       btnStopAndSave.style.display = 'none';
       btnCancelStop.style.display = 'block';
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
       if (endHintText) endHintText.style.display = 'none';
+      if (btnEndTimeReset) btnEndTimeReset.style.display = 'none'; // 終了したログにはリセットボタン非表示
     } else {
       btnStopAndSave.style.display = 'block';
       btnCancelStop.style.display = 'none';
       document.getElementById('editEndTime').value = timeInputFormat(l.tempEndAt);
       if (endHintText) endHintText.style.display = 'block';
+      if (btnEndTimeReset) btnEndTimeReset.style.display = 'flex'; // 進行中のログにはリセットボタン表示
     }
     
     document.getElementById('editMemo').value = l.memo || '';
