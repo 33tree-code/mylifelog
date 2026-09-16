@@ -358,7 +358,7 @@
     font-weight: 700;
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     text-align: center;
     white-space: nowrap;
     box-shadow: var(--stone-shadow), var(--stone-highlight);
@@ -379,16 +379,19 @@
   .btn-time-reset {
     background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
     color: #FFBF00;
+    font-size: 0.75rem;
   }
   .btn-time-now {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #00E5FF;
     border-color: rgba(0, 229, 255, 0.3);
+    font-size: 0.75rem;
   }
   .btn-time-original {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #94a3b8;
     border-color: rgba(148, 163, 184, 0.3);
+    font-size: 0.75rem;
   }
   .btn-time-prev-end {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
@@ -404,9 +407,16 @@
     font-size: 0.62rem;
     line-height: 1.25;
   }
+  .btn-time-prev-saved {
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #5c7865;
+    border-color: rgba(92, 120, 101, 0.4);
+    font-size: 0.62rem;
+    line-height: 1.25;
+  }
   .time-hint-text-flex {
     flex: 1;
-    font-size: 0.68rem;
+    font-size: 0.58rem;
     font-weight: 700;
     color: rgba(0, 229, 255, 0.65);
     line-height: 1.35;
@@ -647,12 +657,13 @@
     <div class="form-group">
       <label>終了時刻</label>
       <input type="time" id="editEndTime" class="modal-input">
-      <!-- 終了時刻側の3等分グリッド（左側：注意書き、中央：直後ログ開始時刻、右側：現在時刻 or リセット） -->
+      <!-- 終了時刻側の3等分グリッド -->
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
         <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
-        <button type="button" class="btn-time-action btn-time-next-start" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始時刻</button>
+        <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始時刻</button>
         <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
-        <button type="button" class="btn-time-action btn-time-reset" id="btnEndTimeReset" onclick="clearTimeInput('editEndTime')" style="display:none;">リセット</button>
+        <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存時刻</button>
+        <button type="button" class="btn-time-action btn-time-reset" id="btnEndTimeReset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
     </div>
     
@@ -732,7 +743,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v49';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v50';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -758,6 +769,7 @@
   let currentReportData = null;
   let reportChartInstance = null;
   let editingOriginalStartAt = null;
+  let editingPreviousSavedEndAt = null;
   let editingLogId = null;
 
   const DB_NAME = 'LifelogDB';
@@ -998,6 +1010,12 @@
     }
   }
 
+  function setPreviousSavedEndTime() {
+    if (editingPreviousSavedEndAt) {
+      document.getElementById('editEndTime').value = timeInputFormat(editingPreviousSavedEndAt);
+    }
+  }
+
   function setPrevLogEndTimePlusOne() {
     const sorted = [...logs].sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     const currentIndex = sorted.findIndex(l => l.id === editingLogId);
@@ -1042,7 +1060,6 @@
   }
 
   function setNextLogStartTimeMinusOne() {
-    // 直後に終了しているログがある場合に、直後のログの開始時刻の1分前の時刻になる
     const sorted = [...logs].sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     const currentIndex = sorted.findIndex(l => l.id === editingLogId);
     
@@ -1480,29 +1497,35 @@
     document.getElementById('editLogId').value = l.id;
     document.getElementById('editModalTitle').innerText = `${l.icon} ${l.name} の編集`;
     
+    // 当該ログ固有の初期開始時刻と前回保存終了時刻を保持
     editingOriginalStartAt = l.startAt;
+    editingPreviousSavedEndAt = l.endAt || null;
+
     document.getElementById('editStartTime').value = timeInputFormat(l.startAt);
     
     const btnStopAndSave = document.getElementById('btnStopAndSave');
     const btnCancelStop = document.getElementById('btnCancelStop');
     const endHintText = document.getElementById('endHintText');
-    const btnEndTimeReset = document.getElementById('btnEndTimeReset');
     const btnEndTimeNow = document.getElementById('btnEndTimeNow');
+    const btnEndTimePrevSaved = document.getElementById('btnEndTimePrevSaved');
+    const btnEndTimeReset = document.getElementById('btnEndTimeReset');
     
     if (l.endAt) {
       btnStopAndSave.style.display = 'none';
       btnCancelStop.style.display = 'block';
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
       if (endHintText) endHintText.style.display = 'none';
-      if (btnEndTimeNow) btnEndTimeNow.style.display = 'flex';     // 終了保存したログ側：「現在時刻」ボタンを表示
-      if (btnEndTimeReset) btnEndTimeReset.style.display = 'none'; // リセットボタンは非表示
+      if (btnEndTimeNow) btnEndTimeNow.style.display = 'flex';
+      if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'flex'; // 終了したログ：「前回保存時刻」ボタンを表示
+      if (btnEndTimeReset) btnEndTimeReset.style.display = 'none';
     } else {
       btnStopAndSave.style.display = 'block';
       btnCancelStop.style.display = 'none';
       document.getElementById('editEndTime').value = timeInputFormat(l.tempEndAt);
       if (endHintText) endHintText.style.display = 'block';
-      if (btnEndTimeNow) btnEndTimeNow.style.display = 'none';     // 記録中のログ側：「現在時刻」ボタンは非表示（注意書き）
-      if (btnEndTimeReset) btnEndTimeReset.style.display = 'flex'; // リセットボタンを表示
+      if (btnEndTimeNow) btnEndTimeNow.style.display = 'none';
+      if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'none'; // 進行中のログ：非表示
+      if (btnEndTimeReset) btnEndTimeReset.style.display = 'flex';
     }
     
     document.getElementById('editMemo').value = l.memo || '';
