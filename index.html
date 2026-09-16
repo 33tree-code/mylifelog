@@ -353,12 +353,12 @@
   }
   .btn-time-action {
     flex: 1;
-    padding: 7px 4px;
+    padding: 7px 2px;
     border-radius: 8px;
     font-weight: 700;
     cursor: pointer;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    font-size: 0.75rem;
+    font-size: 0.64rem;
     text-align: center;
     white-space: nowrap;
     box-shadow: var(--stone-shadow), var(--stone-highlight);
@@ -379,22 +379,24 @@
   .btn-time-reset {
     background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
     color: #FFBF00;
+    font-size: 0.75rem;
   }
   .btn-time-now {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #00E5FF;
     border-color: rgba(0, 229, 255, 0.3);
+    font-size: 0.75rem;
   }
   .btn-time-original {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #94a3b8;
     border-color: rgba(148, 163, 184, 0.3);
+    font-size: 0.75rem;
   }
   .btn-time-prev-end {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #00A968;
     border-color: rgba(0, 169, 104, 0.3);
-    font-size: 0.7rem;
   }
   .time-hint-text {
     flex: 1;
@@ -403,9 +405,8 @@
     color: rgba(0, 229, 255, 0.65);
     line-height: 1.35;
     padding-top: 2px;
-    padding-left: 2px;
-    text-indent: -1em;
     padding-left: 1em;
+    text-indent: -1em;
   }
 
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
@@ -639,7 +640,7 @@
       <label>終了時刻</label>
       <input type="time" id="editEndTime" class="modal-input">
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
-        <div class="time-hint-text" id="endHintText">※ 未入力で終了保存する<br>  と現在時刻</div>
+        <div class="time-hint-text" id="endHintText">※未入力で終了保存する<br>と現在時刻</div>
         <button type="button" class="btn-time-action btn-time-reset" id="btnEndTimeReset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
     </div>
@@ -720,7 +721,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v45';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v46';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1438,13 +1439,13 @@
       btnCancelStop.style.display = 'block';
       document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
       if (endHintText) endHintText.style.display = 'none';
-      if (btnEndTimeReset) btnEndTimeReset.style.display = 'none'; // 終了したログにはリセットボタン非表示
+      if (btnEndTimeReset) btnEndTimeReset.style.display = 'none';
     } else {
       btnStopAndSave.style.display = 'block';
       btnCancelStop.style.display = 'none';
       document.getElementById('editEndTime').value = timeInputFormat(l.tempEndAt);
       if (endHintText) endHintText.style.display = 'block';
-      if (btnEndTimeReset) btnEndTimeReset.style.display = 'flex'; // 進行中のログにはリセットボタン表示
+      if (btnEndTimeReset) btnEndTimeReset.style.display = 'flex';
     }
     
     document.getElementById('editMemo').value = l.memo || '';
