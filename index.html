@@ -397,26 +397,26 @@
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
     color: #7af578;
     border-color: rgba(122, 245, 120, 0.3);
-    font-size: 0.62rem;
+    font-size: 0.60rem;
     line-height: 1.25;
   }
   .btn-time-next-start {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
-    color: #51f5e6;
-    border-color: rgba(81, 245, 230, 0.3);
-    font-size: 0.62rem;
+    color: #fdfe55;
+    border-color: rgba(253, 254, 85, 0.3);
+    font-size: 0.60rem;
     line-height: 1.25;
   }
   .btn-time-prev-saved {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
-    color: #5c7865;
-    border-color: rgba(92, 120, 101, 0.4);
+    color: #2C6B6A;
+    border-color: rgba(44, 107, 106, 0.4);
     font-size: 0.62rem;
     line-height: 1.25;
   }
   .time-hint-text-flex {
     flex: 1;
-    font-size: 0.58rem;
+    font-size: 0.52rem;
     font-weight: 700;
     color: rgba(0, 229, 255, 0.65);
     line-height: 1.35;
@@ -657,11 +657,11 @@
     <div class="form-group">
       <label>終了時刻</label>
       <input type="time" id="editEndTime" class="modal-input">
-      <!-- 終了時刻側の3等分グリッド -->
+      <!-- 終了時刻側の3等分グリッド（記録中：注意書き / 直後ログ開始時刻 / リセット） -->
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
         <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
         <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始時刻</button>
-        <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
+        <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')" style="display:none;">現在時刻</button>
         <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存時刻</button>
         <button type="button" class="btn-time-action btn-time-reset" id="btnEndTimeReset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
@@ -743,7 +743,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v50';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v51';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1522,7 +1522,7 @@
       btnStopAndSave.style.display = 'block';
       btnCancelStop.style.display = 'none';
       document.getElementById('editEndTime').value = timeInputFormat(l.tempEndAt);
-      if (endHintText) endHintText.style.display = 'block';
+      if (endHintText) endHintText.style.display = 'flex';
       if (btnEndTimeNow) btnEndTimeNow.style.display = 'none';
       if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'none'; // 進行中のログ：非表示
       if (btnEndTimeReset) btnEndTimeReset.style.display = 'flex';
