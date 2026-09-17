@@ -302,20 +302,20 @@
   .history-thumbs { display: flex; gap: 5px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
   .history-img-thumb { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
 
-  /* モーダル一般 */
-  .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 16px; z-index: 100; }
+  /* モーダル一般（スマホで崩れないよう修正） */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 12px; z-index: 100; }
   .modal-box { 
     background: #151e2e; 
-    padding: 18px; 
+    padding: 16px; 
     border-radius: 14px; 
     width: 100%; 
     max-width: 380px; 
     border: 1px solid var(--border); 
     box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-    max-height: 85vh; 
+    max-height: 90vh; 
     display: flex; 
     flex-direction: column; 
-    overflow: hidden; 
+    overflow-y: auto; /* 修正：ボックス全体でスクロール可能にし、内部要素が隠れないように変更 */
   }
   .form-group { width: 100% !important; margin-bottom: 10px; display: flex; flex-direction: column; }
   .form-group label { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 5px; font-weight: 600; }
@@ -425,7 +425,7 @@
     text-indent: -1em;
   }
 
-  .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; }
+  .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; flex-shrink: 0; }
   .btn-action { 
     flex: 1; 
     padding: 10px 0; 
@@ -462,8 +462,8 @@
   .sort-name-input { flex: 1; margin: 0 !important; padding: 6px 8px !important; font-size: 0.85rem !important; }
   .btn-del-cat { background: #ef4444; border: none; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
   
-  .preview-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; max-height: 180px; overflow-y: auto; padding-right: 2px; }
-  .preview-img-wrap { position: relative; }
+  .preview-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; width: 100%; }
+  .preview-img-wrap { position: relative; width: 100%; }
   .preview-img-wrap img { width: 100%; border-radius: 6px; display: block; }
   .preview-img-wrap button { position: absolute; top: 6px; right: 6px; background: rgba(0, 0, 0, 0.75); color: #fff; border: none; border-radius: 6px; padding: 5px 10px; font-size: 0.75rem; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
   
@@ -638,7 +638,7 @@
 </div>
 
 <div class="modal" id="editModal">
-  <div class="modal-box" style="overflow-y:auto;max-height:90vh;">
+  <div class="modal-box">
     <h3 style="margin-bottom:12px;font-size:1.05rem;" id="editModalTitle">ログ編集</h3>
     <input type="hidden" id="editLogId">
     
@@ -674,6 +674,8 @@
       <label>写真追加</label>
       <input type="file" id="editPhoto" class="modal-input" accept="image/*" multiple onchange="handlePhotoUpload(event)">
     </div>
+    
+    <!-- プレビュー表示エリア -->
     <div id="imagePreviewContainer" class="preview-grid"></div>
 
     <div class="modal-btns">
@@ -1516,10 +1518,10 @@
     
     document.getElementById('editMemo').value = l.memo || '';
     
-    // 写真データを確実に対象配列へ代入
+    // 写真データの取得と反映
     currentPhotos = l.photos ? [...l.photos] : (l.photo ? [l.photo] : []);
     
-    // スマホの描画タイミングを考慮してモーダルを表示してからプレビュー描画を実行
+    // モーダルを表示した後に確実にプレビューを描画
     document.getElementById('editModal').style.display = 'flex';
     renderPreviewPhotos();
     
