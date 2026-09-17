@@ -335,7 +335,6 @@
     appearance: none !important;
   }
   
-  /* 標準ピッカーの標準クリアボタンを非表示化し高さを統一 */
   input[type="time"]::-webkit-clear-button {
     display: none !important;
   }
@@ -344,7 +343,6 @@
     min-height: 42px;
   }
 
-  /* 時刻入力用のカスタムボタングループ（完全3等分グリッドで上下位置を完全に一致させる） */
   .time-picker-custom-btns {
     display: flex;
     gap: 6px;
@@ -1518,17 +1516,25 @@
     
     document.getElementById('editMemo').value = l.memo || '';
     
-    // 【修正点】ログに保存されている写真データを取得してプレビューに反映
+    // 写真データを確実に対象配列へ代入
     currentPhotos = l.photos ? [...l.photos] : (l.photo ? [l.photo] : []);
+    
+    // スマホの描画タイミングを考慮してモーダルを表示してからプレビュー描画を実行
+    document.getElementById('editModal').style.display = 'flex';
     renderPreviewPhotos();
     
     document.getElementById('editPhoto').value = '';
-    document.getElementById('editModal').style.display = 'flex';
   }
 
   function renderPreviewPhotos() {
     const container = document.getElementById('imagePreviewContainer');
     if (!container) return;
+    
+    if (!currentPhotos || currentPhotos.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
     container.innerHTML = currentPhotos.map((p, i) => `
       <div class="preview-img-wrap">
         <img src="${p}">
@@ -1575,11 +1581,14 @@
 
   async function handlePhotoUpload(e) {
     const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    
     for (const f of files) {
       const compressed = await compressImage(f);
       currentPhotos.push(compressed);
     }
     renderPreviewPhotos();
+    e.target.value = '';
   }
 
   function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
