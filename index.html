@@ -416,7 +416,7 @@
   }
   .time-hint-text-flex {
     flex: 1;
-    font-size: 0.58rem;
+    font-size: 0.55rem;
     font-weight: 700;
     color: rgba(0, 229, 255, 0.65);
     line-height: 1.35;
@@ -659,6 +659,7 @@
       <input type="time" id="editEndTime" class="modal-input">
       <!-- 終了時刻側の3等分グリッド -->
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
+        <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
         <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始時刻</button>
         <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
         <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存時刻</button>
@@ -703,7 +704,7 @@
     { id: 'c12', name: 'Search', icon: '🔍', color: 'rgba(100, 116, 139, 0.25)' },
     { id: 'c13', name: 'Coffee', icon: '☕', color: 'rgba(120, 53, 15, 0.3)' },
     { id: 'c14', name: '抹茶', icon: '🍵', color: 'rgba(22, 101, 52, 0.3)' },
-    { id: 'c15', name: 'Work💼', icon: '🏢', color: 'rgba(15, 118, 110, 0.3)' },
+    { id: 'c15', name: 'Work✅', icon: '🏢', color: 'rgba(15, 118, 110, 0.3)' },
     { id: 'c16', name: '移動 →', icon: '🧭', color: 'rgba(71, 85, 105, 0.3)' },
     { id: 'c17', name: '食事🍴', icon: '🍽', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c18', name: '食事🍴 (家族)', icon: '👥', color: 'rgba(76, 29, 149, 0.25)' },
@@ -726,29 +727,31 @@
     { id: 'c35', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c36', name: 'Sweets🍪', icon: '🧁', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c37', name: 'Leisure', icon: '🎉', color: 'rgba(13, 148, 136, 0.3)' },
-    { id: 'c38', name: '旅行等🚃Plan', icon: '✈️', color: 'rgba(13, 148, 136, 0.3)' },
-    { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(71, 85, 105, 0.4)' },
-    { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(71, 85, 105, 0.4)' },
-    { id: 'c41', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
-    { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(194, 65, 12, 0.3)' },
-    { id: 'c43', name: 'Running👟', icon: '🏃', color: 'rgba(194, 65, 12, 0.3)' },
-    { id: 'c44', name: 'Walking', icon: '🚶', color: 'rgba(194, 65, 12, 0.3)' },
-    { id: 'c45', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(19, 78, 74, 0.35)' },
-    { id: 'c46', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
-    { id: 'c47', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
-    { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(30, 64, 175, 0.25)' },
-    { id: 'c49', name: '🍌', icon: '🍑', color: 'rgba(131, 24, 67, 0.3)' },
-    { id: 'c50', name: 'Waiting', icon: '⏳', color: 'rgba(30, 41, 59, 0.6)' },
-    { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
+    { id: 'c38', name: '旅行🚃Plan等', icon: '✈️', color: 'rgba(13, 148, 136, 0.3)' },
+    { id: 'c39', name: 'Research', icon: '🌐', color: 'rgba(2, 132, 199, 0.25)' },
+    { id: 'c40', name: 'Search', icon: '🔍', color: 'rgba(100, 116, 139, 0.25)' },
+    { id: 'c41', name: 'Screen Time', icon: '📱', color: 'rgba(71, 85, 105, 0.4)' },
+    { id: 'c42', name: '動画視聴', icon: '📺', color: 'rgba(71, 85, 105, 0.4)' },
+    { id: 'c43', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
+    { id: 'c44', name: '筋トレ💪', icon: '🏋️', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c45', name: 'Running👟', icon: '🏃', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c46', name: 'Walking', icon: '🚶', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c47', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c48', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
+    { id: 'c49', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
+    { id: 'c50', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c51', name: '🍌', icon: '🍑', color: 'rgba(131, 24, 67, 0.3)' },
+    { id: 'c52', name: 'Waiting', icon: '⏳', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c53', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v52';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v53';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
-      if (c.name.includes('ストレッチ')) {
-        c.name = 'ストレッチ';
-      }
+      if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
+      if (c.name.includes('Work💼')) c.name = 'Work✅';
+      if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
       return c;
     });
     if (savedCats.length === 0) savedCats = DEFAULT_CATS;
@@ -759,6 +762,8 @@
   let cats = JSON.parse(localStorage.getItem('ll_cats') || JSON.stringify(DEFAULT_CATS));
   cats = cats.map(c => {
     if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
+    if (c.name.includes('Work💼')) c.name = 'Work✅';
+    if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
     return c;
   });
 
@@ -1072,24 +1077,6 @@
       }
     }
     
-    if (!nextStartAt) {
-      const currentEnd = new Date(document.getElementById('editEndTime').value ? document.getElementById('editEndTime').value : Date.now());
-      let earliestStart = null;
-      sorted.forEach(l => {
-        if (l.id !== editingLogId && l.startAt) {
-          const sTime = new Date(l.startAt);
-          if (sTime >= currentEnd) {
-            if (!earliestStart || sTime < earliestStart) {
-              earliestStart = sTime;
-            }
-          }
-        }
-      });
-      if (earliestStart) {
-        nextStartAt = earliestStart.toISOString();
-      }
-    }
-
     if (nextStartAt) {
       const d = new Date(nextStartAt);
       d.setMinutes(d.getMinutes() - 1);
