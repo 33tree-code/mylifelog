@@ -1518,7 +1518,7 @@
     
     document.getElementById('editMemo').value = l.memo || '';
     
-    // 修正: 確実にphotos配列を取得しプレビューに反映させる
+    // 【修正点】ログに保存されている写真データを取得してプレビューに反映
     currentPhotos = l.photos ? [...l.photos] : (l.photo ? [l.photo] : []);
     renderPreviewPhotos();
     
@@ -1527,7 +1527,9 @@
   }
 
   function renderPreviewPhotos() {
-    document.getElementById('imagePreviewContainer').innerHTML = currentPhotos.map((p, i) => `
+    const container = document.getElementById('imagePreviewContainer');
+    if (!container) return;
+    container.innerHTML = currentPhotos.map((p, i) => `
       <div class="preview-img-wrap">
         <img src="${p}">
         <button type="button" onclick="removePhoto(${i})">削除</button>
