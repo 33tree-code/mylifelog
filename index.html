@@ -659,6 +659,7 @@
       <input type="time" id="editEndTime" class="modal-input">
       <!-- 終了時刻側の3等分グリッド -->
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
+        <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
         <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始時刻</button>
         <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
         <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存時刻</button>
@@ -742,7 +743,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v56';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v54';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1001,7 +1002,6 @@
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
   }
 
-  /* 時刻入力用の便利機能関数 */
   function clearTimeInput(elementId) {
     document.getElementById(elementId).value = '';
   }
@@ -1091,7 +1091,6 @@
     }
   }
 
-  /* 集計レポート機能のロジック */
   function openReportModal(mode, param1, param2) {
     let startDate, endDate, titleStr;
     const now = new Date();
@@ -1518,8 +1517,11 @@
     }
     
     document.getElementById('editMemo').value = l.memo || '';
+    
+    // 修正: 確実にphotos配列を取得しプレビューに反映させる
     currentPhotos = l.photos ? [...l.photos] : (l.photo ? [l.photo] : []);
     renderPreviewPhotos();
+    
     document.getElementById('editPhoto').value = '';
     document.getElementById('editModal').style.display = 'flex';
   }
@@ -1725,7 +1727,6 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* 日次Evernote出力処理 */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('/').map(Number);
