@@ -409,8 +409,8 @@
   }
   .btn-time-prev-saved {
     background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
-    color: #4cdbb0;
-    border-color: rgba(76, 219, 176, 0.4);
+    color: #6ba391;
+    border-color: rgba(107, 163, 145, 0.4);
     font-size: 0.62rem;
     line-height: 1.25;
   }
@@ -659,7 +659,6 @@
       <input type="time" id="editEndTime" class="modal-input">
       <!-- 終了時刻側の3等分グリッド -->
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
-        <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
         <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始時刻</button>
         <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
         <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存時刻</button>
@@ -743,7 +742,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v51';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v52';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
