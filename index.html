@@ -335,7 +335,6 @@
     appearance: none !important;
   }
   
-  /* 時刻・日付入力の調整 */
   input[type="time"]::-webkit-clear-button { display: none !important; }
   input[type="time"], input[type="date"] { min-height: 42px; }
 
@@ -1018,7 +1017,6 @@
     if (i >= 0) {
       logs[i].endAt = new Date().toISOString();
     } else {
-      // 現在閲覧中の履歴日付（currentViewingDateYMD）をベースに開始時刻を作成
       const [vy, vm, vd] = currentViewingDateYMD.split('/').map(Number);
       const baseDate = new Date(vy, vm - 1, vd);
       const now = new Date();
@@ -1106,7 +1104,6 @@
     const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     document.getElementById(elementId).value = timeStr;
     
-    // 日付も本日に同期
     if (elementId === 'editStartTime') {
       document.getElementById('editStartDate').value = dateInputFormat(now);
     } else if (elementId === 'editEndTime') {
@@ -1753,10 +1750,6 @@
             newEnd.setDate(newEnd.getDate() + 1);
           }
         }
-        if (newEnd && (newEnd - newStart) >= 24 * 60 * 60 * 1000) {
-          alert('記録時間が24時間以上になっています。時間をご確認ください。');
-          return;
-        }
       } else {
         if (eDateVal && eTimeVal) {
           l.tempEndAt = new Date(`${eDateVal}T${eTimeVal}:00`).toISOString();
@@ -1770,6 +1763,13 @@
           l.tempEndAt = null;
         }
       }
+    }
+
+    // 【ガード機能】開始日時と終了日時が逆転（終了が開始より前）になっていないかチェック
+    const checkEnd = newEnd || (l.tempEndAt ? new Date(l.tempEndAt) : null);
+    if (checkEnd && checkEnd <= newStart) {
+      alert('エラー: 終了時刻を開始時刻より後の時間に設定してください。');
+      return;
     }
     
     l.startAt = newStart.toISOString();
