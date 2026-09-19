@@ -343,7 +343,6 @@
     min-height: 42px;
   }
 
-  /* 改善されたカスタム写真追加ボタンのスタイル */
   .custom-file-upload-wrapper {
     position: relative;
     width: 100%;
@@ -703,7 +702,6 @@
     
     <div class="form-group">
       <label>写真追加</label>
-      <!-- 「ファイル未選択」を排除し、現在の追加枚数がわかるスマートなボタンに刷新 -->
       <div class="custom-file-upload-wrapper">
         <span class="custom-file-upload-text" id="uploadButtonText">📷 写真を追加する (追加済み: 0枚)</span>
         <input type="file" id="editPhoto" accept="image/*" multiple onchange="handlePhotoUpload(event)">
@@ -1553,7 +1551,6 @@
     
     document.getElementById('editMemo').value = l.memo || '';
     
-    // 写真データの取得と反映
     currentPhotos = l.photos ? [...l.photos] : (l.photo ? [l.photo] : []);
     
     document.getElementById('editModal').style.display = 'flex';
@@ -1566,7 +1563,6 @@
     const container = document.getElementById('imagePreviewContainer');
     if (!container) return;
     
-    // ボタンのテキストを現在の枚数に合わせて動的に更新
     const uploadText = document.getElementById('uploadButtonText');
     if (uploadText) {
       uploadText.innerText = `📷 写真を追加する (追加済み: ${currentPhotos.length}枚)`;
@@ -1780,6 +1776,7 @@
     return canvas.toDataURL('image/png');
   }
 
+  /* 日次Evernote出力処理（正確な年月日・時刻判定による睡眠ログの最初/最後配置対応） */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('/').map(Number);
@@ -1790,15 +1787,68 @@
     const w = days[targetDate.getDay()];
     const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})のログ`;
 
-    const targetDateStr = targetDate.toDateString();
-    
-    const tl = logs.filter(l => new Date(l.startAt).toDateString() === targetDateStr)
-                   .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
-    
-    if (tl.length === 0) {
+    const targetYear = targetDate.getFullYear();
+    const targetMonth = targetDate.getMonth();
+    const targetDay = targetDate.getDate();
+
+    const dayStart = new Date(targetYear, targetMonth, targetDay, 0, 0, 0);
+    const dayEnd = new Date(targetYear, targetMonth, targetDay, 23, 59, 59);
+
+    let matchedLogs = [];
+    logs.forEach(l => {
+      const start = new Date(l.startAt);
+      const end = l.endAt ? new Date(l.endAt) : new Date();
+      if (start <= dayEnd && end >= dayStart) {
+        matchedLogs.push(l);
+      }
+    });
+
+    if (matchedLogs.length === 0) {
       alert(`指定日（${dateTitle}）の記録はありません`);
       return;
     }
+
+    const uniqueLogs = Array.from(new Set(matchedLogs.map(l => l.id)))
+      .map(id => matchedLogs.find(l => l.id === id));
+
+    const isSleep = (l) => l.name && (l.name.includes('Sleep') || l.name.includes('Sleepless'));
+
+    let morningSleeps = []; // 前日から当日朝にかけて終わる睡眠（その日の最初）
+    let nightSleeps = [];   // 当日夜から翌日朝にかけて始まる睡眠（その日の最後）
+    let otherLogs = [];     // 日中の睡眠やその他の通常のログ
+
+    uniqueLogs.forEach(l => {
+      const start = new Date(l.startAt);
+      const end = l.endAt ? new Date(l.endAt) : new Date();
+
+      if (isSleep(l)) {
+        const startDateYMD = `${start.getFullYear()}/${start.getMonth() + 1}/${start.getDate()}`;
+        const endDateYMD = `${end.getFullYear()}/${end.getMonth() + 1}/${end.getDate()}`;
+        const targetYMD = `${targetYear}/${targetMonth + 1}/${targetDay}`;
+
+        // 判定：開始日が当日より前で、終了日が当日の場合 ＝ 朝方に終わる睡眠（その日の最初）
+        const isMorningEnding = (start < dayStart && endDateYMD === targetYMD && end.getHours() < 14);
+        // 判定：開始日が当日で、終了日が翌日以降の場合 ＝ 夜に始まる睡眠（その日の最後）
+        const isNightStarting = (startDateYMD === targetYMD && end > dayEnd && start.getHours() >= 17);
+
+        if (isMorningEnding) {
+          morningSleeps.push(l);
+        } else if (isNightStarting) {
+          nightSleeps.push(l);
+        } else {
+          otherLogs.push(l);
+        }
+      } else {
+        otherLogs.push(l);
+      }
+    });
+
+    otherLogs.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    morningSleeps.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    nightSleeps.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+
+    // 並び順： [朝の睡眠（最初）] + [その他のログ（時間順）] + [夜の睡眠（最後）]
+    const tl = [...morningSleeps, ...otherLogs, ...nightSleeps];
 
     const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
 
