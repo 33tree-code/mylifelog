@@ -335,11 +335,12 @@
     appearance: none !important;
   }
   
-  input[type="time"]::-webkit-clear-button {
-    display: none !important;
+  /* 日付・時刻ピッカー（datetime-local）のスタイル調整 */
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
   }
-  input[type="time"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
-  input[type="time"] {
+  input[type="datetime-local"] {
     min-height: 42px;
   }
 
@@ -673,24 +674,24 @@
     <input type="hidden" id="editLogId">
     
     <div class="form-group">
-      <label>開始時刻</label>
-      <input type="time" id="editStartTime" class="modal-input">
+      <label>開始日時</label>
+      <input type="datetime-local" id="editStartTime" class="modal-input">
       <div class="time-picker-custom-btns">
-        <button type="button" class="btn-time-action btn-time-prev-end" onclick="setPrevLogEndTimePlusOne()">直近ログ<br>終了時刻</button>
-        <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editStartTime')">現在時刻</button>
-        <button type="button" class="btn-time-action btn-time-original" onclick="setOriginalStartTime()">初期時刻</button>
+        <button type="button" class="btn-time-action btn-time-prev-end" onclick="setPrevLogEndTimePlusOne()">直近ログ<br>終了日時</button>
+        <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentDateTimeInput('editStartTime')">現在日時</button>
+        <button type="button" class="btn-time-action btn-time-original" onclick="setOriginalStartTime()">初期日時</button>
       </div>
     </div>
     
     <div class="form-group">
-      <label>終了時刻</label>
-      <input type="time" id="editEndTime" class="modal-input">
+      <label>終了日時</label>
+      <input type="datetime-local" id="editEndTime" class="modal-input">
       <!-- 終了時刻側の3等分グリッド -->
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
         <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
-        <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始時刻</button>
-        <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
-        <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存時刻</button>
+        <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始日時</button>
+        <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentDateTimeInput('editEndTime')">現在日時</button>
+        <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存日時</button>
         <button type="button" class="btn-time-action btn-time-reset" id="btnEndTimeReset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
     </div>
@@ -987,12 +988,18 @@
     if (i >= 0) {
       logs[i].endAt = new Date().toISOString();
     } else {
+      // 新規開始時は「現在選択している表示日付（currentViewingDateYMD）」をベースにする
+      const [vy, vm, vd] = currentViewingDateYMD.split('/').map(Number);
+      const baseDate = new Date(vy, vm - 1, vd);
+      const now = new Date();
+      baseDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+
       logs.push({
         id: Date.now().toString(),
         catId: c.id,
         name: c.name,
         icon: c.icon,
-        startAt: new Date().toISOString(),
+        startAt: baseDate.toISOString(),
         endAt: null,
         memo: '',
         photos: []
@@ -1029,32 +1036,36 @@
     return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
   }
 
-  function timeInputFormat(s) {
+  // datetime-local 用のフォーマット (YYYY-MM-DDTHH:mm)
+  function datetimeLocalFormat(s) {
     if (!s) return '';
     const d = new Date(s);
-    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mm = String(d.getMinutes()).padStart(2, '0');
+    return `${y}-${m}-${day}T${hh}:${mm}`;
   }
 
   function clearTimeInput(elementId) {
     document.getElementById(elementId).value = '';
   }
 
-  function setCurrentTimeInput(elementId) {
+  function setCurrentDateTimeInput(elementId) {
     const now = new Date();
-    const hh = String(now.getHours()).padStart(2, '0');
-    const mm = String(now.getMinutes()).padStart(2, '0');
-    document.getElementById(elementId).value = `${hh}:${mm}`;
+    document.getElementById(elementId).value = datetimeLocalFormat(now);
   }
 
   function setOriginalStartTime() {
     if (editingOriginalStartAt) {
-      document.getElementById('editStartTime').value = timeInputFormat(editingOriginalStartAt);
+      document.getElementById('editStartTime').value = datetimeLocalFormat(editingOriginalStartAt);
     }
   }
 
   function setPreviousSavedEndTime() {
     if (editingPreviousSavedEndAt) {
-      document.getElementById('editEndTime').value = timeInputFormat(editingPreviousSavedEndAt);
+      document.getElementById('editEndTime').value = datetimeLocalFormat(editingPreviousSavedEndAt);
     }
   }
 
@@ -1093,9 +1104,7 @@
     if (prevEndAt) {
       const d = new Date(prevEndAt);
       d.setMinutes(d.getMinutes() + 1);
-      const hh = String(d.getHours()).padStart(2, '0');
-      const mm = String(d.getMinutes()).padStart(2, '0');
-      document.getElementById('editStartTime').value = `${hh}:${mm}`;
+      document.getElementById('editStartTime').value = datetimeLocalFormat(d);
     } else {
       alert('直近の終了しているログが見つかりませんでした。');
     }
@@ -1118,9 +1127,7 @@
     if (nextStartAt) {
       const d = new Date(nextStartAt);
       d.setMinutes(d.getMinutes() - 1);
-      const hh = String(d.getHours()).padStart(2, '0');
-      const mm = String(d.getMinutes()).padStart(2, '0');
-      document.getElementById('editEndTime').value = `${hh}:${mm}`;
+      document.getElementById('editEndTime').value = datetimeLocalFormat(d);
     }
   }
 
@@ -1522,7 +1529,7 @@
     editingOriginalStartAt = l.startAt;
     editingPreviousSavedEndAt = l.endAt || null;
 
-    document.getElementById('editStartTime').value = timeInputFormat(l.startAt);
+    document.getElementById('editStartTime').value = datetimeLocalFormat(l.startAt);
     
     const btnStopAndSave = document.getElementById('btnStopAndSave');
     const btnCancelStop = document.getElementById('btnCancelStop');
@@ -1534,7 +1541,7 @@
     if (l.endAt) {
       btnStopAndSave.style.display = 'none';
       btnCancelStop.style.display = 'block';
-      document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
+      document.getElementById('editEndTime').value = datetimeLocalFormat(l.endAt);
       if (endHintText) endHintText.style.display = 'none';
       if (btnEndTimeNow) btnEndTimeNow.style.display = 'flex';
       if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'flex';
@@ -1542,7 +1549,7 @@
     } else {
       btnStopAndSave.style.display = 'block';
       btnCancelStop.style.display = 'none';
-      document.getElementById('editEndTime').value = timeInputFormat(l.tempEndAt);
+      document.getElementById('editEndTime').value = l.tempEndAt ? datetimeLocalFormat(l.tempEndAt) : '';
       if (endHintText) endHintText.style.display = 'block';
       if (btnEndTimeNow) btnEndTimeNow.style.display = 'none';
       if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'none';
@@ -1636,56 +1643,43 @@
     const l = logs.find(x => x.id === id);
     if (!l) return;
     
-    const s = document.getElementById('editStartTime').value;
-    const e = document.getElementById('editEndTime').value;
+    const sVal = document.getElementById('editStartTime').value;
+    const eVal = document.getElementById('editEndTime').value;
     
-    let newStart = new Date(l.startAt);
-    if (s) {
-      const [sh, sm] = s.split(':');
-      newStart.setHours(parseInt(sh, 10), parseInt(sm, 10), 0, 0);
+    if (sVal) {
+      l.startAt = new Date(sVal).toISOString();
     }
     
     let newEnd = l.endAt ? new Date(l.endAt) : null;
     
     if (isStopBtn) {
-      if (e) {
-        const [eh, em] = e.split(':');
-        newEnd = new Date(newStart);
-        newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
-        if (newEnd < newStart) newEnd.setDate(newEnd.getDate() + 1);
+      if (eVal) {
+        newEnd = new Date(eVal);
       } else {
         newEnd = new Date();
-        if (newEnd < newStart) newEnd.setDate(newEnd.getDate() + 1);
       }
       l.tempEndAt = null;
     } else {
       if (l.endAt) {
-        if (e) {
-          const [eh, em] = e.split(':');
-          newEnd = new Date(newStart);
-          newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
-          if (newEnd < newStart) {
+        if (eVal) {
+          newEnd = new Date(eVal);
+          if (newEnd < new Date(l.startAt)) {
             newEnd.setDate(newEnd.getDate() + 1);
           }
-          if ((newEnd - newStart) >= 24 * 60 * 60 * 1000) {
+          if ((newEnd - new Date(l.startAt)) >= 24 * 60 * 60 * 1000) {
             alert('記録時間が24時間以上になっています。時間をご確認ください。');
             return;
           }
         }
       } else {
-        if (e) {
-          const [eh, em] = e.split(':');
-          let tempEndDate = new Date(newStart);
-          tempEndDate.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
-          if (tempEndDate < newStart) tempEndDate.setDate(tempEndDate.getDate() + 1);
-          l.tempEndAt = tempEndDate.toISOString();
+        if (eVal) {
+          l.tempEndAt = new Date(eVal).toISOString();
         } else {
           l.tempEndAt = null;
         }
       }
     }
     
-    l.startAt = newStart.toISOString();
     if (newEnd) {
       l.endAt = newEnd.toISOString();
     }
@@ -1706,12 +1700,9 @@
     l.endAt = null;
     l.tempEndAt = null;
     
-    const s = document.getElementById('editStartTime').value;
-    if (s) {
-      const [sh, sm] = s.split(':');
-      let newStart = new Date(l.startAt);
-      newStart.setHours(parseInt(sh, 10), parseInt(sm, 10), 0, 0);
-      l.startAt = newStart.toISOString();
+    const sVal = document.getElementById('editStartTime').value;
+    if (sVal) {
+      l.startAt = new Date(sVal).toISOString();
     }
     
     l.memo = document.getElementById('editMemo').value;
@@ -1776,7 +1767,6 @@
     return canvas.toDataURL('image/png');
   }
 
-  /* 日次Evernote出力処理（正確な年月日・時刻判定による睡眠ログの最初/最後配置対応） */
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('/').map(Number);
@@ -1813,9 +1803,9 @@
 
     const isSleep = (l) => l.name && (l.name.includes('Sleep') || l.name.includes('Sleepless'));
 
-    let morningSleeps = []; // 前日から当日朝にかけて終わる睡眠（その日の最初）
-    let nightSleeps = [];   // 当日夜から翌日朝にかけて始まる睡眠（その日の最後）
-    let otherLogs = [];     // 日中の睡眠やその他の通常のログ
+    let morningSleeps = [];
+    let nightSleeps = [];
+    let otherLogs = [];
 
     uniqueLogs.forEach(l => {
       const start = new Date(l.startAt);
@@ -1826,9 +1816,7 @@
         const endDateYMD = `${end.getFullYear()}/${end.getMonth() + 1}/${end.getDate()}`;
         const targetYMD = `${targetYear}/${targetMonth + 1}/${targetDay}`;
 
-        // 判定：開始日が当日より前で、終了日が当日の場合 ＝ 朝方に終わる睡眠（その日の最初）
         const isMorningEnding = (start < dayStart && endDateYMD === targetYMD && end.getHours() < 14);
-        // 判定：開始日が当日で、終了日が翌日以降の場合 ＝ 夜に始まる睡眠（その日の最後）
         const isNightStarting = (startDateYMD === targetYMD && end > dayEnd && start.getHours() >= 17);
 
         if (isMorningEnding) {
@@ -1847,7 +1835,6 @@
     morningSleeps.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     nightSleeps.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
 
-    // 並び順： [朝の睡眠（最初）] + [その他のログ（時間順）] + [夜の睡眠（最後）]
     const tl = [...morningSleeps, ...otherLogs, ...nightSleeps];
 
     const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
