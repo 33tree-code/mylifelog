@@ -318,7 +318,7 @@
     overflow-y: auto;
   }
   .form-group { width: 100% !important; margin-bottom: 10px; display: flex; flex-direction: column; }
-  .form-group label { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 5px; font-weight: 600; }
+  .form-group label { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 5px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
   
   .modal-input {
     width: 100% !important; 
@@ -335,13 +335,32 @@
     appearance: none !important;
   }
   
-  /* 日付・時刻ピッカー（datetime-local）のスタイル調整 */
-  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    cursor: pointer;
+  /* 時刻・日付入力の調整 */
+  input[type="time"]::-webkit-clear-button { display: none !important; }
+  input[type="time"], input[type="date"] { min-height: 42px; }
+
+  .date-time-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
   }
-  input[type="datetime-local"] {
-    min-height: 42px;
+  .date-select-input {
+    flex: 1.2;
+    padding: 10px 8px !important;
+    font-size: 0.82rem !important;
+    background: #090e17 !important;
+    border: 1px solid var(--border) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+  }
+  .time-select-input {
+    flex: 1;
+    padding: 10px 8px !important;
+    font-size: 0.95rem !important;
+    background: #090e17 !important;
+    border: 1px solid var(--border) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
   }
 
   .custom-file-upload-wrapper {
@@ -674,24 +693,35 @@
     <input type="hidden" id="editLogId">
     
     <div class="form-group">
-      <label>開始日時</label>
-      <input type="datetime-local" id="editStartTime" class="modal-input">
+      <label>
+        <span>開始時刻</span>
+        <span id="startDayLabel" style="font-size:0.75rem;color:var(--accent);font-weight:bold;"></span>
+      </label>
+      <div class="date-time-row">
+        <input type="date" id="editStartDate" class="date-select-input" onchange="updateDayLabels()">
+        <input type="time" id="editStartTime" class="time-select-input">
+      </div>
       <div class="time-picker-custom-btns">
-        <button type="button" class="btn-time-action btn-time-prev-end" onclick="setPrevLogEndTimePlusOne()">直近ログ<br>終了日時</button>
-        <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentDateTimeInput('editStartTime')">現在日時</button>
-        <button type="button" class="btn-time-action btn-time-original" onclick="setOriginalStartTime()">初期日時</button>
+        <button type="button" class="btn-time-action btn-time-prev-end" onclick="setPrevLogEndTimePlusOne()">直近ログ<br>終了時刻</button>
+        <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editStartTime')">現在時刻</button>
+        <button type="button" class="btn-time-action btn-time-original" onclick="setOriginalStartTime()">初期時刻</button>
       </div>
     </div>
     
     <div class="form-group">
-      <label>終了日時</label>
-      <input type="datetime-local" id="editEndTime" class="modal-input">
-      <!-- 終了時刻側の3等分グリッド -->
+      <label>
+        <span>終了時刻</span>
+        <span id="endDayLabel" style="font-size:0.75rem;color:var(--accent);font-weight:bold;"></span>
+      </label>
+      <div class="date-time-row">
+        <input type="date" id="editEndDate" class="date-select-input" onchange="updateDayLabels()">
+        <input type="time" id="editEndTime" class="time-select-input">
+      </div>
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
         <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
-        <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始日時</button>
-        <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentDateTimeInput('editEndTime')">現在日時</button>
-        <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存日時</button>
+        <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後ログ<br>開始時刻</button>
+        <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
+        <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存時刻</button>
         <button type="button" class="btn-time-action btn-time-reset" id="btnEndTimeReset" onclick="clearTimeInput('editEndTime')">リセット</button>
       </div>
     </div>
@@ -988,7 +1018,7 @@
     if (i >= 0) {
       logs[i].endAt = new Date().toISOString();
     } else {
-      // 新規開始時は「現在選択している表示日付（currentViewingDateYMD）」をベースにする
+      // 現在閲覧中の履歴日付（currentViewingDateYMD）をベースに開始時刻を作成
       const [vy, vm, vd] = currentViewingDateYMD.split('/').map(Number);
       const baseDate = new Date(vy, vm - 1, vd);
       const now = new Date();
@@ -1036,36 +1066,68 @@
     return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
   }
 
-  // datetime-local 用のフォーマット (YYYY-MM-DDTHH:mm)
-  function datetimeLocalFormat(s) {
+  function timeInputFormat(s) {
+    if (!s) return '';
+    const d = new Date(s);
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+
+  function dateInputFormat(s) {
     if (!s) return '';
     const d = new Date(s);
     const y = d.getFullYear();
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
-    const hh = String(d.getHours()).padStart(2, '0');
-    const mm = String(d.getMinutes()).padStart(2, '0');
-    return `${y}-${m}-${day}T${hh}:${mm}`;
+    return `${y}-${m}-${day}`;
+  }
+
+  function getFormattedDayOfWeek(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return '';
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    return `(${days[d.getDay()]})`;
+  }
+
+  function updateDayLabels() {
+    const sDate = document.getElementById('editStartDate').value;
+    const eDate = document.getElementById('editEndDate').value;
+    
+    document.getElementById('startDayLabel').innerText = getFormattedDayOfWeek(sDate);
+    document.getElementById('endDayLabel').innerText = getFormattedDayOfWeek(eDate);
   }
 
   function clearTimeInput(elementId) {
     document.getElementById(elementId).value = '';
   }
 
-  function setCurrentDateTimeInput(elementId) {
+  function setCurrentTimeInput(elementId) {
     const now = new Date();
-    document.getElementById(elementId).value = datetimeLocalFormat(now);
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    document.getElementById(elementId).value = timeStr;
+    
+    // 日付も本日に同期
+    if (elementId === 'editStartTime') {
+      document.getElementById('editStartDate').value = dateInputFormat(now);
+    } else if (elementId === 'editEndTime') {
+      document.getElementById('editEndDate').value = dateInputFormat(now);
+    }
+    updateDayLabels();
   }
 
   function setOriginalStartTime() {
     if (editingOriginalStartAt) {
-      document.getElementById('editStartTime').value = datetimeLocalFormat(editingOriginalStartAt);
+      document.getElementById('editStartTime').value = timeInputFormat(editingOriginalStartAt);
+      document.getElementById('editStartDate').value = dateInputFormat(editingOriginalStartAt);
+      updateDayLabels();
     }
   }
 
   function setPreviousSavedEndTime() {
     if (editingPreviousSavedEndAt) {
-      document.getElementById('editEndTime').value = datetimeLocalFormat(editingPreviousSavedEndAt);
+      document.getElementById('editEndTime').value = timeInputFormat(editingPreviousSavedEndAt);
+      document.getElementById('editEndDate').value = dateInputFormat(editingPreviousSavedEndAt);
+      updateDayLabels();
     }
   }
 
@@ -1104,7 +1166,9 @@
     if (prevEndAt) {
       const d = new Date(prevEndAt);
       d.setMinutes(d.getMinutes() + 1);
-      document.getElementById('editStartTime').value = datetimeLocalFormat(d);
+      document.getElementById('editStartTime').value = timeInputFormat(d);
+      document.getElementById('editStartDate').value = dateInputFormat(d);
+      updateDayLabels();
     } else {
       alert('直近の終了しているログが見つかりませんでした。');
     }
@@ -1127,7 +1191,9 @@
     if (nextStartAt) {
       const d = new Date(nextStartAt);
       d.setMinutes(d.getMinutes() - 1);
-      document.getElementById('editEndTime').value = datetimeLocalFormat(d);
+      document.getElementById('editEndTime').value = timeInputFormat(d);
+      document.getElementById('editEndDate').value = dateInputFormat(d);
+      updateDayLabels();
     }
   }
 
@@ -1529,7 +1595,8 @@
     editingOriginalStartAt = l.startAt;
     editingPreviousSavedEndAt = l.endAt || null;
 
-    document.getElementById('editStartTime').value = datetimeLocalFormat(l.startAt);
+    document.getElementById('editStartTime').value = timeInputFormat(l.startAt);
+    document.getElementById('editStartDate').value = dateInputFormat(l.startAt);
     
     const btnStopAndSave = document.getElementById('btnStopAndSave');
     const btnCancelStop = document.getElementById('btnCancelStop');
@@ -1541,7 +1608,8 @@
     if (l.endAt) {
       btnStopAndSave.style.display = 'none';
       btnCancelStop.style.display = 'block';
-      document.getElementById('editEndTime').value = datetimeLocalFormat(l.endAt);
+      document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
+      document.getElementById('editEndDate').value = dateInputFormat(l.endAt);
       if (endHintText) endHintText.style.display = 'none';
       if (btnEndTimeNow) btnEndTimeNow.style.display = 'flex';
       if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'flex';
@@ -1549,12 +1617,15 @@
     } else {
       btnStopAndSave.style.display = 'block';
       btnCancelStop.style.display = 'none';
-      document.getElementById('editEndTime').value = l.tempEndAt ? datetimeLocalFormat(l.tempEndAt) : '';
+      document.getElementById('editEndTime').value = l.tempEndAt ? timeInputFormat(l.tempEndAt) : '';
+      document.getElementById('editEndDate').value = l.tempEndAt ? dateInputFormat(l.tempEndAt) : dateInputFormat(l.startAt);
       if (endHintText) endHintText.style.display = 'block';
       if (btnEndTimeNow) btnEndTimeNow.style.display = 'none';
       if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'none';
       if (btnEndTimeReset) btnEndTimeReset.style.display = 'flex';
     }
+    
+    updateDayLabels();
     
     document.getElementById('editMemo').value = l.memo || '';
     
@@ -1643,43 +1714,65 @@
     const l = logs.find(x => x.id === id);
     if (!l) return;
     
-    const sVal = document.getElementById('editStartTime').value;
-    const eVal = document.getElementById('editEndTime').value;
+    const sDateVal = document.getElementById('editStartDate').value;
+    const sTimeVal = document.getElementById('editStartTime').value;
+    const eDateVal = document.getElementById('editEndDate').value;
+    const eTimeVal = document.getElementById('editEndTime').value;
     
-    if (sVal) {
-      l.startAt = new Date(sVal).toISOString();
+    let newStart = new Date(l.startAt);
+    if (sDateVal && sTimeVal) {
+      newStart = new Date(`${sDateVal}T${sTimeVal}:00`);
+    } else if (sTimeVal) {
+      const [sh, sm] = sTimeVal.split(':');
+      newStart.setHours(parseInt(sh, 10), parseInt(sm, 10), 0, 0);
     }
     
     let newEnd = l.endAt ? new Date(l.endAt) : null;
     
     if (isStopBtn) {
-      if (eVal) {
-        newEnd = new Date(eVal);
+      if (eDateVal && eTimeVal) {
+        newEnd = new Date(`${eDateVal}T${eTimeVal}:00`);
+      } else if (eTimeVal) {
+        const [eh, em] = eTimeVal.split(':');
+        newEnd = new Date(newStart);
+        newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
+        if (newEnd < newStart) newEnd.setDate(newEnd.getDate() + 1);
       } else {
         newEnd = new Date();
       }
       l.tempEndAt = null;
     } else {
       if (l.endAt) {
-        if (eVal) {
-          newEnd = new Date(eVal);
-          if (newEnd < new Date(l.startAt)) {
+        if (eDateVal && eTimeVal) {
+          newEnd = new Date(`${eDateVal}T${eTimeVal}:00`);
+        } else if (eTimeVal) {
+          const [eh, em] = eTimeVal.split(':');
+          newEnd = new Date(newStart);
+          newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
+          if (newEnd < newStart) {
             newEnd.setDate(newEnd.getDate() + 1);
           }
-          if ((newEnd - new Date(l.startAt)) >= 24 * 60 * 60 * 1000) {
-            alert('記録時間が24時間以上になっています。時間をご確認ください。');
-            return;
-          }
+        }
+        if (newEnd && (newEnd - newStart) >= 24 * 60 * 60 * 1000) {
+          alert('記録時間が24時間以上になっています。時間をご確認ください。');
+          return;
         }
       } else {
-        if (eVal) {
-          l.tempEndAt = new Date(eVal).toISOString();
+        if (eDateVal && eTimeVal) {
+          l.tempEndAt = new Date(`${eDateVal}T${eTimeVal}:00`).toISOString();
+        } else if (eTimeVal) {
+          const [eh, em] = eTimeVal.split(':');
+          let tempEndDate = new Date(newStart);
+          tempEndDate.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
+          if (tempEndDate < newStart) tempEndDate.setDate(tempEndDate.getDate() + 1);
+          l.tempEndAt = tempEndDate.toISOString();
         } else {
           l.tempEndAt = null;
         }
       }
     }
     
+    l.startAt = newStart.toISOString();
     if (newEnd) {
       l.endAt = newEnd.toISOString();
     }
@@ -1700,9 +1793,15 @@
     l.endAt = null;
     l.tempEndAt = null;
     
-    const sVal = document.getElementById('editStartTime').value;
-    if (sVal) {
-      l.startAt = new Date(sVal).toISOString();
+    const sDateVal = document.getElementById('editStartDate').value;
+    const sTimeVal = document.getElementById('editStartTime').value;
+    if (sDateVal && sTimeVal) {
+      l.startAt = new Date(`${sDateVal}T${sTimeVal}:00`).toISOString();
+    } else if (sTimeVal) {
+      const [sh, sm] = sTimeVal.split(':');
+      let newStart = new Date(l.startAt);
+      newStart.setHours(parseInt(sh, 10), parseInt(sm, 10), 0, 0);
+      l.startAt = newStart.toISOString();
     }
     
     l.memo = document.getElementById('editMemo').value;
