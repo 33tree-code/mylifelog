@@ -1101,7 +1101,6 @@
     updateModalDuration();
   }
 
-  // 編集モーダル内で現在の設定時間から経過時間をリアルタイム計算して表示
   function updateModalDuration() {
     const sDateVal = document.getElementById('editStartDate').value;
     const sTimeVal = document.getElementById('editStartTime').value;
@@ -1209,13 +1208,14 @@
     }
   }
 
+  // 「直後ログ開始時刻」ボタン：進行中・終了済みに関わらず、直後のログ（または最も近い未来のログ）の開始1分前をセット
   function setNextLogStartTimeMinusOne() {
     const sorted = [...logs].sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     const currentIndex = sorted.findIndex(l => l.id === editingLogId);
     
     let nextStartAt = null;
     
-    // 1. まず、現在編集中のログよりも後に始まる「他のログの開始時刻」を探す
+    // 1. タイムライン上で現在編集中のログより後にあるログを探す
     if (currentIndex >= 0 && currentIndex < sorted.length - 1) {
       for (let i = currentIndex + 1; i < sorted.length; i++) {
         if (sorted[i].startAt) {
@@ -1225,10 +1225,13 @@
       }
     }
     
-    // 2. もし直後のログが見つからない場合、タイムライン全体から「現在編集中の開始時刻よりも後にある最も早い開始時刻」を探す
+    // 2. 見つからない場合、全ログの中から現在編集中の開始時刻より後にある最も早い開始時刻を探す
     if (!nextStartAt) {
-      const currentStart = new Date(document.getElementById('editStartDate').value + 'T' + document.getElementById('editStartTime').value + ':00');
+      const sDateVal = document.getElementById('editStartDate').value;
+      const sTimeVal = document.getElementById('editStartTime').value;
+      const currentStart = new Date(`${sDateVal}T${sTimeVal}:00`);
       let earliestNext = null;
+      
       sorted.forEach(l => {
         if (l.id !== editingLogId && l.startAt) {
           const sTime = new Date(l.startAt);
