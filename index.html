@@ -474,6 +474,22 @@
     text-indent: -1em;
   }
 
+  /* コピーライトルール適用ボタン */
+  .btn-copywriting {
+    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+    color: #fff;
+    border: 1px solid rgba(56, 189, 248, 0.4);
+    font-size: 0.75rem;
+    padding: 5px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+  }
+
   .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; flex-shrink: 0; }
   .btn-action { 
     flex: 1; 
@@ -725,8 +741,11 @@
     </div>
     
     <div class="form-group">
-      <label>メモ</label>
-      <textarea id="editMemo" class="modal-input" rows="4" placeholder="メモを入力..."></textarea>
+      <label>
+        <span>メモ</span>
+        <button type="button" class="btn-copywriting" onclick="applyCopywritingRules()">✨ 文章校正ルール適用</button>
+      </label>
+      <textarea id="editMemo" class="modal-input" rows="4" placeholder="メモを入力...（「でして、」→「で、」「いまして、」→「いて、」等に自動整形）"></textarea>
     </div>
     
     <div class="form-group">
@@ -779,7 +798,7 @@
     { id: 'c25', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c26', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c27', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
-    { id: 'c_edit', name: '🛠️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c28', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c29', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
@@ -806,16 +825,22 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v54';
+  const CURRENT_VER = '2026_09_exact_cats_and_stone_v55';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
       if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
       if (c.name.includes('Work💼')) c.name = 'Work✅';
       if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
-      if (c.name.includes('風呂🛀')) c.name = '風呂🛁';
+      if (c.name.includes('風呂')) { c.name = '風呂🛁'; c.icon = '🛀'; }
       return c;
     });
+    // Ensure Shooting next has 🖼️・🎬Editing (🛠️)
+    const shootingIdx = savedCats.findIndex(c => c.name === 'Shooting');
+    if (shootingIdx >= 0) {
+      savedCats = savedCats.filter(c => c.name !== '🖼️・🎬Editing' && c.name !== '🛠️・🎬Editing');
+      savedCats.splice(shootingIdx + 1, 0, { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' });
+    }
     if (savedCats.length === 0) savedCats = DEFAULT_CATS;
     localStorage.setItem('ll_cats', JSON.stringify(savedCats));
     localStorage.setItem('ll_cats_ver', CURRENT_VER);
@@ -826,16 +851,15 @@
     if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
     if (c.name.includes('Work💼')) c.name = 'Work✅';
     if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
-    if (c.name.includes('風呂🛀')) c.name = '風呂🛁';
+    if (c.name.includes('風呂')) { c.name = '風呂🛁'; c.icon = '🛀'; }
     return c;
   });
 
-  const planIdx = cats.findIndex(c => c.name.includes('旅行🚃Plan等'));
-  if (planIdx >= 0) {
-    cats = cats.filter(c => c.name !== 'Research' && c.name !== 'Search');
-    const researchObj = { id: 'c_res', name: 'Research', icon: '🌐', color: 'rgba(2, 132, 199, 0.25)' };
-    const searchObj = { id: 'c_sea', name: 'Search', icon: '🔍', color: 'rgba(100, 116, 139, 0.25)' };
-    cats.splice(planIdx + 1, 0, researchObj, searchObj);
+  // Ensure Shooting next has 🖼️・🎬Editing (🛠️) in active cats array
+  const sIdx = cats.findIndex(c => c.name === 'Shooting');
+  if (sIdx >= 0) {
+    cats = cats.filter(c => c.name !== '🖼️・🎬Editing' && c.name !== '🛠️・🎬Editing');
+    cats.splice(sIdx + 1, 0, { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' });
   }
 
   let logs = [];
@@ -881,8 +905,9 @@
           if (l.name && l.name.includes('ストレッチ')) {
             l.name = 'ストレッチ';
           }
-          if (l.name && l.name.includes('風呂🛀')) {
+          if (l.name && l.name.includes('風呂')) {
             l.name = '風呂🛁';
+            l.icon = '🛀';
           }
           return l;
         });
@@ -1208,14 +1233,13 @@
     }
   }
 
-  // 「直後ログ開始時刻」ボタン：進行中・終了済みに関わらず、直後のログ（または最も近い未来のログ）の開始1分前をセット
+  // 「直後ログ開始時刻」ボタン：直後のログの開始時刻の1分前をセットするよう確実に設定
   function setNextLogStartTimeMinusOne() {
     const sorted = [...logs].sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
     const currentIndex = sorted.findIndex(l => l.id === editingLogId);
     
     let nextStartAt = null;
     
-    // 1. タイムライン上で現在編集中のログより後にあるログを探す
     if (currentIndex >= 0 && currentIndex < sorted.length - 1) {
       for (let i = currentIndex + 1; i < sorted.length; i++) {
         if (sorted[i].startAt) {
@@ -1225,7 +1249,6 @@
       }
     }
     
-    // 2. 見つからない場合、全ログの中から現在編集中の開始時刻より後にある最も早い開始時刻を探す
     if (!nextStartAt) {
       const sDateVal = document.getElementById('editStartDate').value;
       const sTimeVal = document.getElementById('editStartTime').value;
@@ -1258,7 +1281,23 @@
     }
   }
 
-  // 重複時間（オーバーラップ）を計算して秒数を差し引くヘルパー関数
+  // 専門家レベルの文章校正ルール適用関数
+  function applyCopywritingRules() {
+    const textarea = document.getElementById('editMemo');
+    if (!textarea) return;
+    let text = textarea.value;
+
+    text = text.replace(/でして、/g, 'で、');
+    text = text.replace(/いまして、/g, 'いて、');
+    text = text.replace(/りまして、/g, 'り、');
+    text = text.replace(/それこそ、/g, '');
+    text = text.replace(/それこそ/g, '');
+    text = text.replace(/それであれば、?/g, 'なので');
+
+    textarea.value = text;
+    updateModalDuration();
+  }
+
   function calculateNetSeconds(log, startDate, endDate) {
     const start = new Date(log.startAt);
     const end = log.endAt ? new Date(log.endAt) : new Date();
@@ -1446,41 +1485,6 @@
         }
       }
     });
-  }
-
-  async function exportReportToEvernote() {
-    if (!currentReportData) return;
-    const { titleStr, totalSecAll, totalPeriodHours, sortedStats } = currentReportData;
-
-    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
-    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr}</p>`;
-    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 4px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
-    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間）</p>`;
-
-    if (reportChartInstance) {
-      const chartBase64 = reportChartInstance.toBase64Image();
-      html += `<p style="margin:0 0 16px 0;"><img src="${chartBase64}" width="320" style="max-width:320px;width:100%;height:auto;display:block;" /></p>`;
-    }
-
-    html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【カテゴリ別内訳】</p>`;
-    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
-
-    sortedStats.forEach(item => {
-      const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
-      const lineStr = `${item.icon} ${item.name} ―― ${formatSecToJP(item.sec)}（${ratio}%）`;
-      html += `<p style="font-size:15px;margin:0 0 4px 0;">${lineStr}</p>`;
-      plain += `${lineStr}\n`;
-    });
-
-    html += `</div>`;
-
-    const ok = await copyToClipboard(html, plain);
-    if (ok) {
-      alert(`【${titleStr}】の集計レポートをコピーしました！\nEvernoteに貼り付けてください。`);
-      closeReportModal();
-    } else {
-      alert('クリップボードへのコピーに失敗しました。');
-    }
   }
 
   function render() {
