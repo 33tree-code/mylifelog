@@ -693,12 +693,11 @@
     
     <div class="form-group">
       <label>
-        <span>開始時刻</span>
-        <span id="startDayLabel" style="font-size:0.75rem;color:var(--accent);font-weight:bold;"></span>
+        <span>開始時刻 <span id="startDayLabel" style="color:var(--accent);font-weight:bold;"></span></span>
       </label>
       <div class="date-time-row">
-        <input type="date" id="editStartDate" class="date-select-input" onchange="updateDayLabels()">
-        <input type="time" id="editStartTime" class="time-select-input">
+        <input type="date" id="editStartDate" class="date-select-input" onchange="updateDayLabels(); updateModalDuration();">
+        <input type="time" id="editStartTime" class="time-select-input" onchange="updateModalDuration()">
       </div>
       <div class="time-picker-custom-btns">
         <button type="button" class="btn-time-action btn-time-prev-end" onclick="setPrevLogEndTimePlusOne()">直近ログ<br>終了時刻</button>
@@ -709,12 +708,12 @@
     
     <div class="form-group">
       <label>
-        <span>終了時刻</span>
-        <span id="endDayLabel" style="font-size:0.75rem;color:var(--accent);font-weight:bold;"></span>
+        <span>終了時刻 <span id="endDayLabel" style="color:var(--accent);font-weight:bold;"></span></span>
+        <span id="modalDurationLabel" style="font-size:0.8rem;color:var(--running);font-weight:bold;"></span>
       </label>
       <div class="date-time-row">
-        <input type="date" id="editEndDate" class="date-select-input" onchange="updateDayLabels()">
-        <input type="time" id="editEndTime" class="time-select-input">
+        <input type="date" id="editEndDate" class="date-select-input" onchange="updateDayLabels(); updateModalDuration();">
+        <input type="time" id="editEndTime" class="time-select-input" onchange="updateModalDuration()">
       </div>
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
         <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
@@ -792,6 +791,7 @@
     { id: 'c37', name: 'Research', icon: '🌐', color: 'rgba(2, 132, 199, 0.25)' },
     { id: 'c38', name: 'Search', icon: '🔍', color: 'rgba(100, 116, 139, 0.25)' },
     { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(71, 85, 105, 0.4)' },
+    { id: 'c_vid', name: '動画・画像編集', icon: '🎬', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c41', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
     { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(194, 65, 12, 0.3)' },
@@ -813,6 +813,7 @@
       if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
       if (c.name.includes('Work💼')) c.name = 'Work✅';
       if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
+      if (c.name.includes('画像、動画編集')) c.name = '動画・画像編集';
       return c;
     });
     if (savedCats.length === 0) savedCats = DEFAULT_CATS;
@@ -825,6 +826,7 @@
     if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
     if (c.name.includes('Work💼')) c.name = 'Work✅';
     if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
+    if (c.name.includes('画像、動画編集')) c.name = '動画・画像編集';
     return c;
   });
 
@@ -878,6 +880,9 @@
         result = result.map(l => {
           if (l.name && l.name.includes('ストレッチ')) {
             l.name = 'ストレッチ';
+          }
+          if (l.name && l.name.includes('画像、動画編集')) {
+            l.name = '動画・画像編集';
           }
           return l;
         });
@@ -1093,10 +1098,43 @@
     
     document.getElementById('startDayLabel').innerText = getFormattedDayOfWeek(sDate);
     document.getElementById('endDayLabel').innerText = getFormattedDayOfWeek(eDate);
+    updateModalDuration();
+  }
+
+  // 編集モーダル内で現在の設定時間から経過時間をリアルタイム計算して表示
+  function updateModalDuration() {
+    const sDateVal = document.getElementById('editStartDate').value;
+    const sTimeVal = document.getElementById('editStartTime').value;
+    const eDateVal = document.getElementById('editEndDate').value;
+    const eTimeVal = document.getElementById('editEndTime').value;
+
+    const durLabel = document.getElementById('modalDurationLabel');
+    if (!durLabel) return;
+
+    if (!sDateVal || !sTimeVal || !eDateVal || !eTimeVal) {
+      durLabel.innerText = '';
+      return;
+    }
+
+    const start = new Date(`${sDateVal}T${sTimeVal}:00`);
+    const end = new Date(`${eDateVal}T${eTimeVal}:00`);
+
+    if (isNaN(start) || isNaN(end) || end <= start) {
+      durLabel.innerText = '';
+      return;
+    }
+
+    const { h, m } = getDurationParts(start, end);
+    if (h === 0) {
+      durLabel.innerText = `⏱ ${m}分`;
+    } else {
+      durLabel.innerText = `⏱ ${h}時間 ${m}分`;
+    }
   }
 
   function clearTimeInput(elementId) {
     document.getElementById(elementId).value = '';
+    updateModalDuration();
   }
 
   function setCurrentTimeInput(elementId) {
@@ -1176,6 +1214,8 @@
     const currentIndex = sorted.findIndex(l => l.id === editingLogId);
     
     let nextStartAt = null;
+    
+    // 1. まず、現在編集中のログよりも後に始まる「他のログの開始時刻」を探す
     if (currentIndex >= 0 && currentIndex < sorted.length - 1) {
       for (let i = currentIndex + 1; i < sorted.length; i++) {
         if (sorted[i].startAt) {
@@ -1185,13 +1225,65 @@
       }
     }
     
+    // 2. もし直後のログが見つからない場合、タイムライン全体から「現在編集中の開始時刻よりも後にある最も早い開始時刻」を探す
+    if (!nextStartAt) {
+      const currentStart = new Date(document.getElementById('editStartDate').value + 'T' + document.getElementById('editStartTime').value + ':00');
+      let earliestNext = null;
+      sorted.forEach(l => {
+        if (l.id !== editingLogId && l.startAt) {
+          const sTime = new Date(l.startAt);
+          if (sTime > currentStart) {
+            if (!earliestNext || sTime < earliestNext) {
+              earliestNext = sTime;
+            }
+          }
+        }
+      });
+      if (earliestNext) {
+        nextStartAt = earliestNext.toISOString();
+      }
+    }
+
     if (nextStartAt) {
       const d = new Date(nextStartAt);
       d.setMinutes(d.getMinutes() - 1);
       document.getElementById('editEndTime').value = timeInputFormat(d);
       document.getElementById('editEndDate').value = dateInputFormat(d);
       updateDayLabels();
+    } else {
+      alert('直後のログが見つかりませんでした。');
     }
+  }
+
+  // 重複時間（オーバーラップ）を計算して秒数を差し引くヘルパー関数
+  function calculateNetSeconds(log, startDate, endDate) {
+    const start = new Date(log.startAt);
+    const end = log.endAt ? new Date(log.endAt) : new Date();
+    
+    const effStart = start < startDate ? startDate : start;
+    const effEnd = end > endDate ? endDate : end;
+    let sec = Math.max(0, Math.floor((effEnd - effStart) / 1000));
+    if (sec <= 0) return 0;
+
+    if (log.name && log.name.includes('移動 →')) {
+      logs.forEach(other => {
+        if (other.id === log.id || !other.endAt) return;
+        if (other.name && other.name.includes('移動 →')) return;
+
+        const oStart = new Date(other.startAt);
+        const oEnd = new Date(other.endAt);
+
+        const overlapStart = new Date(Math.max(effStart, oStart));
+        const overlapEnd = new Date(Math.min(effEnd, oEnd));
+        const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
+
+        if (overlapSec > 0) {
+          sec -= overlapSec;
+        }
+      });
+    }
+
+    return Math.max(0, sec);
   }
 
   function openReportModal(mode, param1, param2) {
@@ -1240,9 +1332,7 @@
       const end = new Date(l.endAt);
       
       if (end >= startDate && start <= endDate) {
-        const effStart = start < startDate ? startDate : start;
-        const effEnd = end > endDate ? endDate : end;
-        const sec = Math.max(0, Math.floor((effEnd - effStart) / 1000));
+        const sec = calculateNetSeconds(l, startDate, endDate);
         if (sec > 0) {
           if (!statsMap[l.catId]) {
             statsMap[l.catId] = { name: l.name, icon: l.icon, sec: 0, count: 0 };
@@ -1765,14 +1855,12 @@
       }
     }
 
-    // 【ガード機能1】開始日時と終了日時が逆転（終了が開始より前、または同じ）になっていないかチェック
     const checkEnd = newEnd || (l.tempEndAt ? new Date(l.tempEndAt) : null);
     if (checkEnd && checkEnd <= newStart) {
       alert('エラー: 終了時刻を開始時刻より後の時間に設定してください。');
       return;
     }
 
-    // 【ガード機能2】10時間以上（36000000ミリ秒）の長時間の場合の確認メッセージ（ご指定の文言）
     if (checkEnd) {
       const durationMs = checkEnd - newStart;
       if (durationMs >= 10 * 60 * 60 * 1000) {
@@ -1782,7 +1870,7 @@
         const timeStr = `${hours}時間${mins > 0 ? mins + '分' : ''}`;
         const confirmMsg = `⚠️ 記録時間が長時間（${timeStr}）になっています。このまま保存しますか？`;
         if (!confirm(confirmMsg)) {
-          return; // 「いいえ」の場合は保存を中止
+          return;
         }
       }
     }
@@ -1881,6 +1969,41 @@
     return canvas.toDataURL('image/png');
   }
 
+  async function exportReportToEvernote() {
+    if (!currentReportData) return;
+    const { titleStr, totalSecAll, totalPeriodHours, sortedStats } = currentReportData;
+
+    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr}</p>`;
+    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 4px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
+    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間）</p>`;
+
+    if (reportChartInstance) {
+      const chartBase64 = reportChartInstance.toBase64Image();
+      html += `<p style="margin:0 0 16px 0;"><img src="${chartBase64}" width="320" style="max-width:320px;width:100%;height:auto;display:block;" /></p>`;
+    }
+
+    html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【カテゴリ別内訳】</p>`;
+    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
+
+    sortedStats.forEach(item => {
+      const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
+      const lineStr = `${item.icon} ${item.name} ―― ${formatSecToJP(item.sec)}（${ratio}%）`;
+      html += `<p style="font-size:15px;margin:0 0 4px 0;">${lineStr}</p>`;
+      plain += `${lineStr}\n`;
+    });
+
+    html += `</div>`;
+
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
+      alert(`【${titleStr}】の集計レポートをコピーしました！\nEvernoteに貼り付けてください。`);
+      closeReportModal();
+    } else {
+      alert('クリップボードへのコピーに失敗しました。');
+    }
+  }
+
   async function exportEvernoteByDate(dateStringYMD) {
     if (!dateStringYMD) return;
     const [y, m, d] = dateStringYMD.split('/').map(Number);
@@ -1960,7 +2083,8 @@
     for (let index = 0; index < tl.length; index++) {
       const l = tl[index];
       const end = l.endAt || new Date().toISOString();
-      const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(end)} (${formatDurationJP(l.startAt, end)})`;
+      const netSec = calculateNetSeconds(l, dayStart, dayEnd);
+      const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(end)} (${formatSecToJP(netSec)})`;
       const p = l.photos || (l.photo ? [l.photo] : []);
       const iconPng = emojiToPngDataUrl(l.icon);
       
