@@ -757,7 +757,7 @@
     { id: 'c3', name: 'ストレッチ', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
     { id: 'c4', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.22)' },
     { id: 'c5', name: 'BM', icon: '🚽', color: 'rgba(148, 163, 184, 0.22)' },
-    { id: 'c6', name: '風呂🛀', icon: '🛁', color: 'rgba(34, 211, 238, 0.22)' },
+    { id: 'c6', name: '風呂🛁', icon: '🛀', color: 'rgba(34, 211, 238, 0.22)' },
     { id: 'c7', name: '読書📖', icon: '📚', color: 'rgba(180, 83, 9, 0.25)' },
     { id: 'c8', name: '自己啓発', icon: '🌱', color: 'rgba(132, 204, 22, 0.22)' },
     { id: 'c9', name: 'Tech Work', icon: '🖥', color: 'rgba(30, 41, 59, 0.7)' },
@@ -779,6 +779,7 @@
     { id: 'c25', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c26', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c27', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c_edit', name: '🛠️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c28', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c29', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
@@ -791,7 +792,6 @@
     { id: 'c37', name: 'Research', icon: '🌐', color: 'rgba(2, 132, 199, 0.25)' },
     { id: 'c38', name: 'Search', icon: '🔍', color: 'rgba(100, 116, 139, 0.25)' },
     { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(71, 85, 105, 0.4)' },
-    { id: 'c_vid', name: '動画・画像編集', icon: '🎬', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c41', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
     { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(194, 65, 12, 0.3)' },
@@ -813,7 +813,7 @@
       if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
       if (c.name.includes('Work💼')) c.name = 'Work✅';
       if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
-      if (c.name.includes('画像、動画編集')) c.name = '動画・画像編集';
+      if (c.name.includes('風呂🛀')) c.name = '風呂🛁';
       return c;
     });
     if (savedCats.length === 0) savedCats = DEFAULT_CATS;
@@ -826,7 +826,7 @@
     if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
     if (c.name.includes('Work💼')) c.name = 'Work✅';
     if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
-    if (c.name.includes('画像、動画編集')) c.name = '動画・画像編集';
+    if (c.name.includes('風呂🛀')) c.name = '風呂🛁';
     return c;
   });
 
@@ -881,8 +881,8 @@
           if (l.name && l.name.includes('ストレッチ')) {
             l.name = 'ストレッチ';
           }
-          if (l.name && l.name.includes('画像、動画編集')) {
-            l.name = '動画・画像編集';
+          if (l.name && l.name.includes('風呂🛀')) {
+            l.name = '風呂🛁';
           }
           return l;
         });
