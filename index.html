@@ -709,7 +709,7 @@
     <div class="form-group">
       <label>
         <span>終了時刻 <span id="endDayLabel" style="color:var(--accent);font-weight:bold;"></span></span>
-        <span id="modalDurationLabel" style="font-size:0.8rem;color:var(--running);font-weight:bold;"></span>
+        <span id="modalDurationLabel" style="font-size:0.8rem;color:var(--running);font-weight:bold;">⏱ 0分</span>
       </label>
       <div class="date-time-row">
         <input type="date" id="editEndDate" class="date-select-input" onchange="updateDayLabels(); updateModalDuration();">
@@ -806,7 +806,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v56';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v57';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1099,7 +1099,7 @@
     if (!durLabel) return;
 
     if (!sDateVal || !sTimeVal || !eDateVal || !eTimeVal) {
-      durLabel.innerText = '';
+      durLabel.innerText = '⏱ 0分';
       return;
     }
 
@@ -1107,7 +1107,7 @@
     const end = new Date(`${eDateVal}T${eTimeVal}:00`);
 
     if (isNaN(start) || isNaN(end) || end <= start) {
-      durLabel.innerText = '';
+      durLabel.innerText = '⏱ 0分';
       return;
     }
 
@@ -2035,7 +2035,6 @@
     for (let index = 0; index < tl.length; index++) {
       const l = tl[index];
       const end = l.endAt || new Date().toISOString();
-      // 修正：クリップされた秒数ではなく、ログ自体の本来の開始〜終了時刻から経過時間を計算
       const totalSec = Math.max(0, Math.floor((new Date(end) - new Date(l.startAt)) / 1000));
       const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(end)} (${formatSecToJP(totalSec)})`;
       const p = l.photos || (l.photo ? [l.photo] : []);
