@@ -715,6 +715,8 @@
         <input type="date" id="editEndDate" class="date-select-input" onchange="updateDayLabels(); updateModalDuration();">
         <input type="time" id="editEndTime" class="time-select-input" onchange="updateModalDuration()">
       </div>
+      <!-- 身支度・移動ログの重複控除インフォメーション表示用エリア -->
+      <div id="modalOverlapInfo" style="font-size:0.75rem;color:#facc15;margin-top:4px;display:none;"></div>
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
         <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
         <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後のログ<br>開始時刻</button>
@@ -806,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v60';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v61';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1096,16 +1098,16 @@
     const eTimeVal = document.getElementById('editEndTime').value;
 
     const durLabel = document.getElementById('modalDurationLabel');
+    const overlapInfoEl = document.getElementById('modalOverlapInfo');
     if (!durLabel) return;
 
     if (!sDateVal || !sTimeVal) {
       durLabel.innerText = '';
+      if (overlapInfoEl) overlapInfoEl.style.display = 'none';
       return;
     }
 
     const start = new Date(`${sDateVal}T${sTimeVal}:00`);
-    
-    // 修正：終了時刻（日付・時刻）が両方入力されている場合はその終了時刻を使用し、未入力の場合は現在時刻を使用する
     let end;
     if (eDateVal && eTimeVal) {
       end = new Date(`${eDateVal}T${eTimeVal}:00`);
@@ -1115,14 +1117,57 @@
 
     if (isNaN(start) || isNaN(end) || end <= start) {
       durLabel.innerText = '⏱ 0分';
+      if (overlapInfoEl) overlapInfoEl.style.display = 'none';
       return;
     }
 
-    const { h, m } = getDurationParts(start, end);
+    // 現在編集中のログを特定
+    const l = logs.find(x => x.id === editingLogId);
+    const isMovableOrPrep = l && l.name && (l.name.includes('移動 →') || l.name.includes('身支度等'));
+
+    let netSec = Math.max(0, Math.floor((end - start) / 1000));
+    let deductionDetails = [];
+
+    if (isMovableOrPrep) {
+      logs.forEach(other => {
+        if (other.id === editingLogId || !other.endAt) return;
+        if (other.name && (other.name.includes('移動 →') || other.name.includes('身支度等'))) return;
+
+        const oStart = new Date(other.startAt);
+        const oEnd = new Date(other.endAt);
+
+        const overlapStart = new Date(Math.max(start, oStart));
+        const overlapEnd = new Date(Math.min(end, oEnd));
+        const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
+
+        if (overlapSec > 0) {
+          netSec -= overlapSec;
+          const overlapMin = Math.round(overlapSec / 60);
+          if (overlapMin > 0) {
+            deductionDetails.push(`${other.name} ${overlapMin}分`);
+          }
+        }
+      });
+    }
+
+    netSec = Math.max(0, netSec);
+    const totalMin = Math.floor(netSec / 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+
     if (h === 0) {
       durLabel.innerText = `⏱ ${m}分`;
     } else {
       durLabel.innerText = `⏱ ${h}時間 ${m}分`;
+    }
+
+    if (overlapInfoEl) {
+      if (deductionDetails.length > 0) {
+        overlapInfoEl.style.display = 'block';
+        overlapInfoEl.innerText = `※集計控除: ${deductionDetails.join(', ')}含まれます`;
+      } else {
+        overlapInfoEl.style.display = 'none';
+      }
     }
   }
 
@@ -1250,6 +1295,7 @@
     }
   }
 
+  // 集計用：移動ログまたは身支度ログの場合、他のログと重複する時間を控除する関数
   function calculateNetSeconds(log, startDate, endDate) {
     const start = new Date(log.startAt);
     const end = log.endAt ? new Date(log.endAt) : new Date();
@@ -1259,10 +1305,10 @@
     let sec = Math.max(0, Math.floor((effEnd - effStart) / 1000));
     if (sec <= 0) return 0;
 
-    if (log.name && log.name.includes('移動 →')) {
+    if (log.name && (log.name.includes('移動 →') || log.name.includes('身支度等'))) {
       logs.forEach(other => {
         if (other.id === log.id || !other.endAt) return;
-        if (other.name && other.name.includes('移動 →')) return;
+        if (other.name && (other.name.includes('移動 →') || other.name.includes('身支度等'))) return;
 
         const oStart = new Date(other.startAt);
         const oEnd = new Date(other.endAt);
@@ -1278,6 +1324,42 @@
     }
 
     return Math.max(0, sec);
+  }
+
+  // 集計時に対象ログの控除内訳テキストを生成するヘルパー
+  function getDeductionNoteForLog(targetLog, startDate, endDate) {
+    if (!targetLog.name || (!targetLog.name.includes('移動 →') && !targetLog.name.includes('身支度等'))) {
+      return '';
+    }
+    const start = new Date(targetLog.startAt);
+    const end = targetLog.endAt ? new Date(targetLog.endAt) : new Date();
+    const effStart = start < startDate ? startDate : start;
+    const effEnd = end > endDate ? endDate : end;
+
+    let details = [];
+    logs.forEach(other => {
+      if (other.id === targetLog.id || !other.endAt) return;
+      if (other.name && (other.name.includes('移動 →') || other.name.includes('身支度等'))) return;
+
+      const oStart = new Date(other.startAt);
+      const oEnd = new Date(other.endAt);
+
+      const overlapStart = new Date(Math.max(effStart, oStart));
+      const overlapEnd = new Date(Math.min(effEnd, oEnd));
+      const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
+
+      if (overlapSec > 0) {
+        const min = Math.round(overlapSec / 60);
+        if (min > 0) {
+          details.push(`${other.name} ${min}分`);
+        }
+      }
+    });
+
+    if (details.length > 0) {
+      return `※重複時間（${details.join(', ')}）控除`;
+    }
+    return '';
   }
 
   function openReportModal(mode, param1, param2) {
@@ -1350,11 +1432,35 @@
     } else {
       rankContainer.innerHTML = sortedStats.map((item, idx) => {
         const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
+        
+        // 当該カテゴリのログに対して個別控除メモがないか確認
+        let subNoteHtml = '';
+        if (item.name.includes('移動 →') || item.name.includes('身支度等')) {
+          // 該当期間内の該当ログを集めて控除ノートを作成
+          let notesSet = new Set();
+          logs.forEach(l => {
+            if (l.catId && statsMap[l.catId] && l.name === item.name && l.endAt) {
+              const start = new Date(l.startAt);
+              const end = new Date(l.endAt);
+              if (end >= startDate && start <= endDate) {
+                const note = getDeductionNoteForLog(l, startDate, endDate);
+                if (note) notesSet.add(note);
+              }
+            }
+          });
+          if (notesSet.size > 0) {
+            subNoteHtml = `<div style="font-size:0.7rem;color:#facc15;margin-top:2px;">${Array.from(notesSet).join(' / ')}</div>`;
+          }
+        }
+
         return `
           <div style="background:#0b1120;padding:8px 10px;border-radius:8px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;">
             <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
               <span>${item.icon}</span>
-              <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</span>
+              <div style="min-width:0;flex:1;">
+                <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">${item.name}</span>
+                ${subNoteHtml}
+              </div>
             </div>
             <div style="text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums;">
               <span style="font-weight:700;color:var(--accent);">${formatSecToJP(item.sec)}</span>
