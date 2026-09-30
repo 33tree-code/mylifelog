@@ -787,7 +787,7 @@
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
     { id: 'c31', name: '仕事関連', icon: '👥', color: 'rgba(6, 78, 59, 0.35)' },
     { id: 'c32', name: 'Social👥', icon: '🤝', color: 'rgba(30, 58, 138, 0.3)' },
-    { id: 'c33', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c33', name: 'Cooking👨‍‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c34', name: 'Sweets🍪', icon: '🧁', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c35', name: 'Leisure', icon: '🎉', color: 'rgba(13, 148, 136, 0.3)' },
     { id: 'c36', name: '旅行🚃Plan等', icon: '✈️', color: 'rgba(13, 148, 136, 0.3)' },
@@ -808,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v66';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v68';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -2015,6 +2015,32 @@
       }
     }
     
+    // 追加：他のログと30分（1800秒）以上の重複・控除が発生している場合の警告チェック
+    if (checkEnd && (l.name.includes('移動 →') || l.name.includes('身支度等'))) {
+      let maxOverlapSec = 0;
+      logs.forEach(other => {
+        if (other.id === l.id || !other.endAt) return;
+        if (other.name && (other.name.includes('移動 →') || other.name.includes('身支度等'))) return;
+
+        const oStart = new Date(other.startAt);
+        const oEnd = new Date(other.endAt);
+        const overlapStart = new Date(Math.max(newStart, oStart));
+        const overlapEnd = new Date(Math.min(checkEnd, oEnd));
+        const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
+        if (overlapSec > maxOverlapSec) {
+          maxOverlapSec = overlapSec;
+        }
+      });
+
+      if (maxOverlapSec >= 1800) {
+        const overlapMin = Math.round(maxOverlapSec / 60);
+        const confirmOverlapMsg = `⚠️ 他のログと ${overlapMin}分間 の長時間の重複（控除対象）があります。このまま保存しますか？`;
+        if (!confirm(confirmOverlapMsg)) {
+          return;
+        }
+      }
+    }
+    
     l.startAt = newStart.toISOString();
     if (newEnd) {
       l.endAt = newEnd.toISOString();
@@ -2030,7 +2056,8 @@
 
   async function cancelLogStop() {
     const id = document.getElementById('editLogId').value;
-    const l = logs.find(x => x.id === id);
+    const l = logs.log(x => x.id === id); // 修正箇所
+    // 省略なしの正常処理
     if (!l) return;
     
     l.endAt = null;
