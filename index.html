@@ -781,7 +781,7 @@
     { id: 'c25', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c26', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c27', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
-    { id: 'c_edit', name: '🖼️️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c28', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c29', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
@@ -808,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v63';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v64';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1139,7 +1139,6 @@
         const overlapEnd = new Date(Math.min(end, oEnd));
         const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
-        // 2分未満（120秒未満）の重複は控除しない
         if (overlapSec >= 120) {
           const overlapMin = Math.round(overlapSec / 60);
           if (overlapMin > 0) {
@@ -1293,7 +1292,6 @@
     }
   }
 
-  // 集計用：移動ログまたは身支度ログの場合、2分未満（120秒未満）の重複は除外して時間を控除する
   function calculateNetSeconds(log, startDate, endDate) {
     const start = new Date(log.startAt);
     const end = log.endAt ? new Date(log.endAt) : new Date();
@@ -1315,7 +1313,6 @@
         const overlapEnd = new Date(Math.min(effEnd, oEnd));
         const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
-        // 2分未満（120秒未満）の重複は控除しない
         if (overlapSec >= 120) {
           sec -= overlapSec;
         }
@@ -1373,7 +1370,7 @@
       
       startDate = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate(), 0, 0, 0);
       endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
       titleStr = `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     } else if (mode === 'prevMonth') {
       const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
@@ -1391,12 +1388,12 @@
         startDate = endDate;
         endDate = temp;
       }
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
       titleStr = param1 === param2 ? `${formatDateWithDay(startDate)}（${diffDays}Day）` : `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     }
 
     const totalPeriodHours = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60)));
-    const totalDaysCount = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1);
+    const totalDaysCount = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)));
 
     const statsMap = {};
     let totalSecAll = 0;
