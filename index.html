@@ -781,7 +781,7 @@
     { id: 'c25', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c26', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c27', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
-    { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c28', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c29', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
@@ -808,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v65';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v66';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1417,7 +1417,7 @@
     });
 
     const sortedStats = Object.values(statsMap).sort((a, b) => b.sec - a.sec);
-    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, sortedStats };
+    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, sortedStats, totalDaysCount };
 
     document.getElementById('reportTitle').innerText = titleStr;
     document.getElementById('reportRangeInfo').innerHTML = `総記録時間: ${formatSecToJP(totalSecAll)}<br><span style="font-size:0.78rem;color:var(--text-sub);font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間）</span>`;
@@ -1551,6 +1551,73 @@
         }
       }
     });
+  }
+
+  async function exportReportToEvernote() {
+    if (!currentReportData) return;
+    const { titleStr, totalSecAll, totalPeriodHours, sortedStats, totalDaysCount } = currentReportData;
+
+    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr}</p>`;
+    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 4px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
+    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間）</p>`;
+
+    if (reportChartInstance) {
+      const chartBase64 = reportChartInstance.toBase64Image();
+      html += `<p style="margin:0 0 16px 0;"><img src="${chartBase64}" width="320" style="max-width:320px;width:100%;height:auto;display:block;" /></p>`;
+    }
+
+    html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【カテゴリ別内訳】</p>`;
+    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
+
+    const avgTimeTargets = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
+    const countTargets = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', '飲み会🍻仕事関連', '飲み会🍻priv…', '🍌'];
+
+    sortedStats.forEach(item => {
+      const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
+      
+      let extraInfoPlain = '';
+      if (avgTimeTargets.some(t => item.name.includes(t))) {
+        const avgSec = Math.round(item.sec / totalDaysCount);
+        extraInfoPlain = ` (1日平均: ${formatSecToJP(avgSec)})`;
+      } else if (countTargets.some(t => item.name.includes(t))) {
+        extraInfoPlain = ` (回数: ${item.count}回)`;
+      }
+
+      let subNotePlain = '';
+      if (item.name.includes('移動 →') || item.name.includes('身支度等')) {
+        let notesSet = new Set();
+        let startDate = currentReportData.startDate;
+        let endDate = currentReportData.endDate;
+        logs.forEach(l => {
+          if (l.catId && l.name === item.name && l.endAt) {
+            const start = new Date(l.startAt);
+            const end = new Date(l.endAt);
+            if (end >= startDate && start <= endDate) {
+              const note = getDeductionNoteForLog(l, startDate, endDate);
+              if (note) notesSet.add(note);
+            }
+          }
+        });
+        if (notesSet.size > 0) {
+          subNotePlain = ` [${Array.from(notesSet).join(' / ')}]`;
+        }
+      }
+
+      const lineStr = `${item.icon} ${item.name}${extraInfoPlain} ―― ${formatSecToJP(item.sec)}（${ratio}%）${subNotePlain}`;
+      html += `<p style="font-size:15px;margin:0 0 4px 0;">${lineStr}</p>`;
+      plain += `${lineStr}\n`;
+    });
+
+    html += `</div>`;
+
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
+      alert(`【${titleStr}】の集計レポートをコピーしました！\nEvernoteに貼り付けてください。`);
+      closeReportModal();
+    } else {
+      alert('クリップボードへのコピーに失敗しました。');
+    }
   }
 
   function render() {
@@ -1992,255 +2059,6 @@
     logs = logs.filter(l => l.id !== document.getElementById('editLogId').value);
     closeEditModal();
     await save();
-  }
-
-  function copyToClipboard(html, plain) {
-    return new Promise(resolve => {
-      const handler = e => {
-        e.clipboardData.setData('text/html', html);
-        e.clipboardData.setData('text/plain', plain);
-        e.preventDefault();
-      };
-      document.addEventListener('copy', handler);
-      const success = document.execCommand('copy');
-      document.removeEventListener('copy', handler);
-
-      if (success) {
-        resolve(true);
-        return;
-      }
-
-      if (navigator.clipboard && window.ClipboardItem) {
-        const bh = new Blob([html], { type: 'text/html' });
-        const bp = new Blob([plain], { type: 'text/plain' });
-        navigator.clipboard.write([new ClipboardItem({ 'text/html': bh, 'text/plain': bp })])
-          .then(() => resolve(true))
-          .catch(() => {
-            navigator.clipboard.writeText(plain)
-              .then(() => resolve(true))
-              .catch(() => resolve(false));
-          });
-      } else if (navigator.clipboard) {
-        navigator.clipboard.writeText(plain)
-          .then(() => resolve(true))
-          .catch(() => resolve(false));
-      } else {
-        resolve(false);
-      }
-    });
-  }
-
-  function emojiToPngDataUrl(emoji) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 96;
-    canvas.height = 96;
-    const ctx = canvas.getContext('2d');
-    ctx.font = '72px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(emoji, 48, 54);
-    return canvas.toDataURL('image/png');
-  }
-
-  async function exportReportToEvernote() {
-    if (!currentReportData) return;
-    const { titleStr, totalSecAll, totalPeriodHours, sortedStats } = currentReportData;
-
-    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
-    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr}</p>`;
-    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 4px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
-    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間）</p>`;
-
-    if (reportChartInstance) {
-      const chartBase64 = reportChartInstance.toBase64Image();
-      html += `<p style="margin:0 0 16px 0;"><img src="${chartBase64}" width="320" style="max-width:320px;width:100%;height:auto;display:block;" /></p>`;
-    }
-
-    html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【カテゴリ別内訳】</p>`;
-    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
-
-    sortedStats.forEach(item => {
-      const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
-      const lineStr = `${item.icon} ${item.name} ―― ${formatSecToJP(item.sec)}（${ratio}%）`;
-      html += `<p style="font-size:15px;margin:0 0 4px 0;">${lineStr}</p>`;
-      plain += `${lineStr}\n`;
-    });
-
-    html += `</div>`;
-
-    const ok = await copyToClipboard(html, plain);
-    if (ok) {
-      alert(`【${titleStr}】の集計レポートをコピーしました！\nEvernoteに貼り付けてください。`);
-      closeReportModal();
-    } else {
-      alert('クリップボードへのコピーに失敗しました。');
-    }
-  }
-
-  async function exportEvernoteByDate(dateStringYMD) {
-    if (!dateStringYMD) return;
-    const [y, m, d] = dateStringYMD.split('/').map(Number);
-    if (!y || !m || !d) return;
-    const targetDate = new Date(y, m - 1, d);
-
-    const days = ['日', '月', '火', '水', '木', '金', '土'];
-    const w = days[targetDate.getDay()];
-    const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})のログ`;
-
-    const targetYear = targetDate.getFullYear();
-    const targetMonth = targetDate.getMonth();
-    const targetDay = targetDate.getDate();
-
-    const dayStart = new Date(targetYear, targetMonth, targetDay, 0, 0, 0);
-    const dayEnd = new Date(targetYear, targetMonth, targetDay, 23, 59, 59);
-
-    let matchedLogs = [];
-    logs.forEach(l => {
-      const start = new Date(l.startAt);
-      const end = l.endAt ? new Date(l.endAt) : new Date();
-      if (start <= dayEnd && end >= dayStart) {
-        matchedLogs.push(l);
-      }
-    });
-
-    if (matchedLogs.length === 0) {
-      alert(`指定日（${dateTitle}）の記録はありません`);
-      return;
-    }
-
-    const uniqueLogs = Array.from(new Set(matchedLogs.map(l => l.id)))
-      .map(id => matchedLogs.find(l => l.id === id));
-
-    const isSleep = (l) => l.name && (l.name.includes('Sleep') || l.name.includes('Sleepless'));
-
-    let morningSleeps = [];
-    let nightSleeps = [];
-    let otherLogs = [];
-
-    uniqueLogs.forEach(l => {
-      const start = new Date(l.startAt);
-      const end = l.endAt ? new Date(l.endAt) : new Date();
-
-      if (isSleep(l)) {
-        const startDateYMD = `${start.getFullYear()}/${start.getMonth() + 1}/${start.getDate()}`;
-        const endDateYMD = `${end.getFullYear()}/${end.getMonth() + 1}/${end.getDate()}`;
-        const targetYMD = `${targetYear}/${targetMonth + 1}/${targetDay}`;
-
-        const isMorningEnding = (start < dayStart && endDateYMD === targetYMD && end.getHours() < 14);
-        const isNightStarting = (startDateYMD === targetYMD && end > dayEnd && start.getHours() >= 17);
-
-        if (isMorningEnding) {
-          morningSleeps.push(l);
-        } else if (isNightStarting) {
-          nightSleeps.push(l);
-        } else {
-          otherLogs.push(l);
-        }
-      } else {
-        otherLogs.push(l);
-      }
-    });
-
-    otherLogs.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
-    morningSleeps.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
-    nightSleeps.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
-
-    const tl = [...morningSleeps, ...otherLogs, ...nightSleeps];
-
-    const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
-
-    let html = `<div style="${FONT_STYLE}">`;
-    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 16px 0;${FONT_STYLE}">${dateTitle}</p>`;
-    let plain = `${dateTitle}\n\n`;
-
-    for (let index = 0; index < tl.length; index++) {
-      const l = tl[index];
-      const end = l.endAt || new Date().toISOString();
-      const totalSec = Math.max(0, Math.floor((new Date(end) - new Date(l.startAt)) / 1000));
-      const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(end)} (${formatSecToJP(totalSec)})`;
-      const p = l.photos || (l.photo ? [l.photo] : []);
-      const iconPng = emojiToPngDataUrl(l.icon);
-      
-      let logHtml = `
-        <div style="margin:0;padding:0;${FONT_STYLE}">
-          <p style="line-height:1;margin:0 0 4px 0;">
-            <img src="${iconPng}" width="44" height="44" style="width:44px;height:44px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
-          </p>
-          <p style="font-size:20px;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${l.name}</p>
-          <p style="font-size:15px;color:#00b4d8;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${tr}</p>
-      `;
-      plain += `${l.icon}\n${l.name}\n${tr}\n`;
-
-      if (l.memo && l.memo.trim() !== '') {
-        logHtml += `<p style="margin:0;padding:0;"><br></p>`;
-        const memoLines = l.memo.split('\n');
-        memoLines.forEach(line => {
-          const sanitizedLine = line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-          logHtml += `<p style="font-size:15px;line-height:1.45;margin:0;padding:0;${FONT_STYLE}">${sanitizedLine === '' ? '<br>' : sanitizedLine}</p>`;
-        });
-        plain += `\n${l.memo}\n`;
-      }
-      
-      if (p.length > 0) {
-        p.forEach(photoSrc => {
-          logHtml += `<p style="margin:8px 0 0 0;padding:0;">
-            <img src="${photoSrc}" style="max-width:100%;height:auto;display:block;" />
-          </p>`;
-        });
-      }
-      
-      logHtml += '</div>';
-      html += logHtml;
-
-      if (index < tl.length - 1) {
-        html += '<p style="margin:0;padding:0;"><br></p>';
-        plain += '\n';
-      }
-    }
-    
-    html += '</div>';
-
-    const ok = await copyToClipboard(html, plain);
-    if (ok) {
-      alert(`【${dateTitle}】をコピーしました！\nEvernoteに貼り付けてください。`);
-    } else {
-      alert('クリップボードへのコピーに失敗しました。');
-    }
-  }
-
-  function exportBackupDataAll() {
-    const nowStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const data = { cats, logs, exportedAt: new Date().toISOString() };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `lifelog_backup_all_${nowStr}.json`;
-    a.click();
-  }
-
-  function importBackupDataAll(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = async evt => {
-      try {
-        const data = JSON.parse(evt.target.result);
-        if (data.cats && data.logs) {
-          if (confirm('現在のすべての記録・カテゴリを上書きしてバックアップから復元しますか？')) {
-            cats = data.cats;
-            logs = data.logs;
-            await save();
-            alert('データを復元しました！');
-            closeSettingModal();
-          }
-        } else {
-          alert('正しいバックアップファイルではありません。');
-        }
-      } catch (err) {
-        alert('ファイルの読み込みに失敗しました。');
-      }
-    };
-    reader.readAsText(file);
   }
 
   loadLogsFromDB().then(loaded => {
