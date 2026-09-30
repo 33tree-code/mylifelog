@@ -715,7 +715,7 @@
         <input type="date" id="editEndDate" class="date-select-input" onchange="updateDayLabels(); updateModalDuration();">
         <input type="time" id="editEndTime" class="time-select-input" onchange="updateModalDuration()">
       </div>
-      <!-- 移動・身支度ログの重複控除インフォメーション -->
+      <!-- 重複控除インフォメーション -->
       <div id="modalOverlapInfo" style="font-size:0.75rem;color:#facc15;margin-top:4px;display:none;"></div>
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
         <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
@@ -781,7 +781,7 @@
     { id: 'c25', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c26', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c27', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
-    { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c_edit', name: '🖼️️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c28', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c29', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
@@ -799,7 +799,7 @@
     { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(194, 65, 12, 0.3)' },
     { id: 'c43', name: 'Running👟', icon: '🏃', color: 'rgba(194, 65, 12, 0.3)' },
     { id: 'c44', name: 'Walking', icon: '🚶', color: 'rgba(194, 65, 12, 0.3)' },
-    { id: 'c45', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c45', name: 'ゴルフ練習', icon: '🏌️️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c46', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
     { id: 'c47', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
     { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(30, 64, 175, 0.25)' },
@@ -808,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v68';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v69';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1139,6 +1139,7 @@
         const overlapEnd = new Date(Math.min(end, oEnd));
         const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
+        // 2分未満（120秒未満）の重複は控除しない
         if (overlapSec >= 120) {
           const overlapMin = Math.round(overlapSec / 60);
           if (overlapMin > 0) {
@@ -1313,6 +1314,7 @@
         const overlapEnd = new Date(Math.min(effEnd, oEnd));
         const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
+        // 2分未満（120秒未満）の重複は控除しない
         if (overlapSec >= 120) {
           sec -= overlapSec;
         }
@@ -1370,7 +1372,7 @@
       
       startDate = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate(), 0, 0, 0);
       endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)));
       titleStr = `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     } else if (mode === 'prevMonth') {
       const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
@@ -1388,12 +1390,12 @@
         startDate = endDate;
         endDate = temp;
       }
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)));
       titleStr = param1 === param2 ? `${formatDateWithDay(startDate)}（${diffDays}Day）` : `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     }
 
     const totalPeriodHours = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60)));
-    const totalDaysCount = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1);
+    const totalDaysCount = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)));
 
     const statsMap = {};
     let totalSecAll = 0;
@@ -1551,6 +1553,70 @@
         }
       }
     });
+  }
+
+  // Evernote出力処理（日付指定・前日・当日用）
+  async function exportEvernoteByDate(dateStr) {
+    const [y, m, d] = dateStr.split('/').map(Number);
+    const targetDate = new Date(y, m - 1, d);
+    const targetDateStr = targetDate.toDateString();
+
+    const targetLogs = logs.filter(l => l.endAt && (new Date(l.startAt).toDateString() === targetDateStr || new Date(l.endAt).toDateString() === targetDateStr))
+                           .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+
+    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
+    html += `<p style="font-size:22px;font-weight:bold;margin:0 0 12px 0;">${dateStr} ライフログ</p>`;
+    let plain = `${dateStr} ライフログ\n\n`;
+
+    if (targetLogs.length === 0) {
+      html += `<p>この日の記録はありません。</p>`;
+      plain += `この日の記録はありません。\n`;
+    } else {
+      let totalSecDay = 0;
+      targetLogs.forEach(l => {
+        const start = new Date(l.startAt);
+        const end = new Date(l.endAt);
+        const sec = Math.max(0, Math.floor((end - start) / 1000));
+        totalSecDay += sec;
+
+        const durStr = formatDurationJP(l.startAt, l.endAt);
+        const timeRange = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)}`;
+        const line = `${l.icon} ${l.name} (${timeRange}) ―― ${durStr}`;
+        html += `<p style="font-size:15px;margin:0 0 4px 0;">${line}</p>`;
+        plain += `${line}\n`;
+        if (l.memo) {
+          html += `<p style="font-size:13px;color:#64748b;margin:0 0 8px 16px;">メモ: ${l.memo}</p>`;
+          plain += `  メモ: ${l.memo}\n`;
+        }
+      });
+      html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin-top:12px;">総記録時間: ${formatSecToJP(totalSecDay)}</p>`;
+      plain += `\n総記録時間: ${formatSecToJP(totalSecDay)}\n`;
+    }
+    html += `</div>`;
+
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
+      alert(`【${dateStr}】のログをコピーしました！\nCopy！ 貼付可能です`);
+    } else {
+      alert('クリップボードへのコピーに失敗しました。');
+    }
+  }
+
+  async function copyToClipboard(html, plain) {
+    try {
+      if (navigator.clipboard && window.ClipboardItem) {
+        const type = "text/html";
+        const blob = new Blob([html], { type });
+        const data = [new ClipboardItem({ [type]: blob, "text/plain": new Blob([plain], { type: "text/plain" }) })];
+        await navigator.clipboard.write(data);
+        return true;
+      } else {
+        await navigator.clipboard.writeText(plain);
+        return true;
+      }
+    } catch (e) {
+      return false;
+    }
   }
 
   async function exportReportToEvernote() {
@@ -2015,11 +2081,11 @@
       }
     }
     
-    if (checkEnd && (l.name.includes('移動 →') || l.name.includes('身支度等'))) {
+    // 【修正】他のログとの重複時間が30分（1800秒）以上ある場合の警告チェック（全ログ対象）
+    if (checkEnd) {
       let maxOverlapSec = 0;
       logs.forEach(other => {
         if (other.id === l.id || !other.endAt) return;
-        if (other.name && (other.name.includes('移動 →') || other.name.includes('身支度等'))) return;
 
         const oStart = new Date(other.startAt);
         const oEnd = new Date(other.endAt);
@@ -2033,7 +2099,7 @@
 
       if (maxOverlapSec >= 1800) {
         const overlapMin = Math.round(maxOverlapSec / 60);
-        const confirmOverlapMsg = `⚠️ 他のログと ${overlapMin}分間 の長時間の重複（控除対象）があります。このまま保存しますか？`;
+        const confirmOverlapMsg = `⚠️ 他のログと ${overlapMin}分間 の長時間の重複があります。このまま保存しますか？`;
         if (!confirm(confirmOverlapMsg)) {
           return;
         }
