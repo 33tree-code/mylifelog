@@ -781,7 +781,7 @@
     { id: 'c25', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c26', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c27', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
-    { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c_edit', name: '🖼️️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c28', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c29', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
@@ -796,10 +796,10 @@
     { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c41', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
-    { id: 'c42', name: '筋トレ💪', icon: '🏋️️', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(194, 65, 12, 0.3)' },
     { id: 'c43', name: 'Running👟', icon: '🏃', color: 'rgba(194, 65, 12, 0.3)' },
     { id: 'c44', name: 'Walking', icon: '🚶', color: 'rgba(194, 65, 12, 0.3)' },
-    { id: 'c45', name: 'ゴルフ練習', icon: '🏌', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c45', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c46', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
     { id: 'c47', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
     { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(30, 64, 175, 0.25)' },
@@ -808,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v71';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v72';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1352,7 +1352,6 @@
     });
 
     if (details.length > 0) {
-      // 最初だけ「※重複時間」とし、以降を並べる形式に変更
       return `※重複時間 (${details.join(') / (')})`;
     }
     return '';
@@ -1552,6 +1551,7 @@
     });
   }
 
+  // Evernote出力処理：元のリッチテキスト（アイコン画像、時間、メモ、写真）構造に戻しました
   async function exportEvernoteByDate(dateStr) {
     const [y, m, d] = dateStr.split('/').map(Number);
     const targetDate = new Date(y, m - 1, d);
@@ -1560,45 +1560,53 @@
     const targetLogs = logs.filter(l => l.endAt && (new Date(l.startAt).toDateString() === targetDateStr || new Date(l.endAt).toDateString() === targetDateStr))
                            .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
 
-    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
-    html += `<p style="font-size:22px;font-weight:bold;margin:0 0 12px 0;">${dateStr} ライフログ</p>`;
-    let plain = `${dateStr} ライフログ\n\n`;
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const w = days[targetDate.getDay()];
+    const titleDateStr = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})`;
+
+    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important; color: #f1f5f9; background: #070b14; padding: 16px;">`;
+    html += `<p style="font-size:20px;font-weight:bold;margin:0 0 16px 0;">${titleDateStr}のログ</p>`;
+    let plain = `${titleDateStr}のログ\n\n`;
 
     if (targetLogs.length === 0) {
       html += `<p>この日の記録はありません。</p>`;
       plain += `この日の記録はありません。\n`;
     } else {
-      let totalSecDay = 0;
       targetLogs.forEach(l => {
-        const start = new Date(l.startAt);
-        const end = new Date(l.endAt);
-        const sec = Math.max(0, Math.floor((end - start) / 1000));
-        totalSecDay += sec;
-
         const durStr = formatDurationJP(l.startAt, l.endAt);
-        const timeRange = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)}`;
-        const line = `${l.icon} ${l.name} (${timeRange}) ―― ${durStr}`;
-        html += `<p style="font-size:15px;margin:0 0 4px 0;">${line}</p>`;
-        plain += `${line}\n`;
+        const timeRange = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${durStr})`;
+        
+        // アイコンと名前
+        html += `<p style="font-size:24px;margin:16px 0 4px 0;">${l.icon}</p>`;
+        html += `<p style="font-size:15px;font-weight:bold;margin:0 0 2px 0;">${l.name}</p>`;
+        html += `<p style="font-size:13px;color:#38bdf8;font-weight:bold;margin:0 0 8px 0;">${timeRange}</p>`;
+        
+        plain += `${l.icon} ${l.name}\n${timeRange}\n`;
+
         if (l.memo) {
-          html += `<p style="font-size:13px;color:#64748b;margin:0 0 8px 16px;">メモ: ${l.memo}</p>`;
-          plain += `  メモ: ${l.memo}\n`;
+          html += `<p style="font-size:13px;color:#cbd5e1;margin:0 0 8px 0;line-height:1.4;">${l.memo}</p>`;
+          plain += `メモ: ${l.memo}\n`;
         }
+
+        const photos = l.photos || (l.photo ? [l.photo] : []);
+        if (photos.length > 0) {
+          photos.forEach(p => {
+            html += `<p style="margin:0 0 12px 0;"><img src="${p}" width="320" style="max-width:320px;width:100%;height:auto;border-radius:8px;display:block;" /></p>`;
+          });
+        }
+        plain += `\n`;
       });
-      html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin-top:12px;">総記録時間: ${formatSecToJP(totalSecDay)}</p>`;
-      plain += `\n総記録時間: ${formatSecToJP(totalSecDay)}\n`;
     }
     html += `</div>`;
 
     const ok = await copyToClipboard(html, plain);
     if (ok) {
-      alert(`【${dateStr}】のログをコピーしました！\nCopy！ 貼付可能です`);
+      alert(`【${titleDateStr}】のログをコピーしました！\nCopy！ 貼付可能です`);
     } else {
       alert('クリップボードへのコピーに失敗しました。');
     }
   }
 
-  // iPhone（iOS Safari等）でのHTMLリッチテキスト書込制限を確実に対策するコピー関数
   async function copyToClipboard(html, plain) {
     try {
       if (navigator.clipboard && window.ClipboardItem) {
@@ -1609,7 +1617,6 @@
           await navigator.clipboard.write(data);
           return true;
         } catch (err) {
-          // iOS Safari等でClipboardItemのHTML書き込みが拒否される場合のフォールバック（一時要素の選択コピー）
           return fallbackCopyHTML(html, plain);
         }
       } else {
