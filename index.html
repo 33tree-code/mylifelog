@@ -1575,10 +1575,10 @@
         const durStr = formatDurationJP(l.startAt, l.endAt);
         const timeRange = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)} (${durStr})`;
         
-        // 次のログとの間は必ず1行空ける（最初のログ以外は上のマージンを設定）
+        // ログブロック同士の間に必ず1行（約36px〜40px）の余白を空ける
         const itemMargin = index === 0 ? "margin:0;" : "margin:36px 0 0 0;";
 
-        // アイコンは文字の約4倍の大きさ（56px）
+        // アイコンサイズを文字サイズの3〜5倍程度に大きく設定（56px）
         html += `<div style="${itemMargin}">`;
         html += `<div style="font-size:56px;line-height:1;margin:0;padding:0;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;">${l.icon}</div>`;
         html += `<div style="font-size:16px;font-weight:bold;margin:0;padding:0;line-height:1.2;">${l.name}</div>`;
@@ -1597,7 +1597,7 @@
         }
 
         if (l.memo) {
-          // 写真の有無に関わらず、メモがある場合は時間表示との間に1つ空ける（margin-top: 14px）
+          // メモのみの場合は時間表示との間を1行空け、入力された通りの改行構造（pre-wrap）を完全に保持
           const memoMarginTop = hasPhoto ? "margin:6px 0 0 0;" : "margin:14px 0 0 0;";
           html += `<div style="font-size:14px;color:#cbd5e1;${memoMarginTop}padding:0;line-height:1.4;white-space:pre-wrap;">${l.memo}</div>`;
           plain += `メモ: ${l.memo}\n`;
