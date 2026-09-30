@@ -796,10 +796,10 @@
     { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c41', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
-    { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c42', name: '筋トレ💪', icon: '🏋️️', color: 'rgba(194, 65, 12, 0.3)' },
     { id: 'c43', name: 'Running👟', icon: '🏃', color: 'rgba(194, 65, 12, 0.3)' },
     { id: 'c44', name: 'Walking', icon: '🚶', color: 'rgba(194, 65, 12, 0.3)' },
-    { id: 'c45', name: 'ゴルフ練習', icon: '🏌️️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c45', name: 'ゴルフ練習', icon: '🏌', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c46', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
     { id: 'c47', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
     { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(30, 64, 175, 0.25)' },
@@ -808,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v70';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v71';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1436,7 +1436,6 @@
         let extraInfoHtml = '';
         if (avgTimeTargets.some(t => item.name.includes(t))) {
           const avgSec = Math.round(item.sec / totalDaysCount);
-          // （1日平均：〇時間〇分）の色を Spring Green に設定
           extraInfoHtml = `<div style="font-size:0.75rem;color:#00FF7F;margin-top:2px;">(1日平均: ${formatSecToJP(avgSec)})</div>`;
         } else if (countTargets.some(t => item.name.includes(t))) {
           extraInfoHtml = `<div style="font-size:0.75rem;color:#00FF7F;margin-top:2px;">(回数: ${item.count}回)</div>`;
@@ -1460,7 +1459,6 @@
           }
         }
 
-        // 見やすさ向上のための上下配置レイアウト
         return `
           <div style="background:#0b1120;padding:10px 12px;border-radius:8px;border:1px solid var(--border);display:flex;flex-direction:column;gap:4px;font-size:0.82rem;">
             <div style="display:flex;justify-content:space-between;align-items:center;">
@@ -1600,25 +1598,54 @@
     }
   }
 
+  // iPhone（iOS Safari等）でのHTMLリッチテキスト書込制限を確実に対策するコピー関数
   async function copyToClipboard(html, plain) {
     try {
       if (navigator.clipboard && window.ClipboardItem) {
         try {
-          const type = "text/html";
-          const blob = new Blob([html], { type });
-          const data = [new ClipboardItem({ [type]: blob, "text/plain": new Blob([plain], { type: "text/plain" }) })];
+          const blobHtml = new Blob([html], { type: "text/html" });
+          const blobPlain = new Blob([plain], { type: "text/plain" });
+          const data = [new ClipboardItem({ "text/html": blobHtml, "text/plain": blobPlain })];
           await navigator.clipboard.write(data);
           return true;
-        } catch (errHtml) {
-          // iOS等でHTMLクリップボード書き込みが拒否・失敗した場合はテキストのみでフォールバック
-          await navigator.clipboard.writeText(plain);
-          return true;
+        } catch (err) {
+          // iOS Safari等でClipboardItemのHTML書き込みが拒否される場合のフォールバック（一時要素の選択コピー）
+          return fallbackCopyHTML(html, plain);
         }
       } else {
-        await navigator.clipboard.writeText(plain);
-        return true;
+        return fallbackCopyHTML(html, plain);
       }
     } catch (e) {
+      return false;
+    }
+  }
+
+  function fallbackCopyHTML(html, plain) {
+    try {
+      const container = document.createElement('div');
+      container.innerHTML = html;
+      container.style.position = 'fixed';
+      container.style.pointerEvents = 'none';
+      container.style.opacity = '0';
+      document.body.appendChild(container);
+      
+      const range = document.createRange();
+      range.selectNodeContents(container);
+      const selection = window.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      
+      const successful = document.execCommand('copy');
+      selection.removeAllRanges();
+      document.body.removeChild(container);
+      
+      if (successful) {
+        return true;
+      } else {
+        navigator.clipboard.writeText(plain);
+        return true;
+      }
+    } catch (err) {
       return false;
     }
   }
@@ -1780,7 +1807,6 @@
     }
   }
 
-  // 終了ボタン押下時（画像①）にも重複30分以上の警告チェックとメッセージ（「長時間の」を削除）を反映
   async function stopRunningLog(id) {
     const i = logs.findIndex(l => l.id === id && !l.endAt);
     if (i >= 0) {
@@ -2110,7 +2136,6 @@
       }
     }
     
-    // 他のログとの重複時間が30分（1800秒）以上ある場合の警告チェック（「長時間の」を削除）
     if (checkEnd) {
       let maxOverlapSec = 0;
       logs.forEach(other => {
