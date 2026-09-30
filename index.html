@@ -808,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v69';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v70';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -2034,7 +2034,7 @@
 
       if (maxOverlapSec >= 1800) {
         const overlapMin = Math.round(maxOverlapSec / 60);
-        const confirmOverlapMsg = `⚠️ 他のログと ${overlapMin}分間 の長時間の重複（控除対象）があります。このまま保存しますか？`;
+        const confirmOverlapMsg = `⚠️️ 他のログと ${overlapMin}分間 の長時間の重複（控除対象）があります。このまま保存しますか？`;
         if (!confirm(confirmOverlapMsg)) {
           return;
         }
