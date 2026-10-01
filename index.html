@@ -808,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v62';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v63';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1136,7 +1136,7 @@
         const overlapEnd = new Date(Math.min(end, oEnd));
         const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
-        if (overlapSec >= 120) { // 2分（120秒）未満は控除しない
+        if (overlapSec >= 120) { // 2分未満は控除しない
           netSec -= overlapSec;
           const overlapMin = Math.round(overlapSec / 60);
           if (overlapMin > 0) {
@@ -1313,7 +1313,7 @@
         const overlapEnd = new Date(Math.min(effEnd, oEnd));
         const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
-        if (overlapSec >= 120) { // 2分（120秒）未満の重複は控除しない
+        if (overlapSec >= 120) { // 2分未満の重複は控除しない
           sec -= overlapSec;
         }
       });
@@ -1344,7 +1344,7 @@
       const overlapEnd = new Date(Math.min(effEnd, oEnd));
       const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
-      if (overlapSec >= 120) { // 2分未満の控除は記載しない
+      if (overlapSec >= 120) {
         const min = Math.round(overlapSec / 60);
         if (min > 0) {
           details.push(`${other.name} ${min}分`);
@@ -1371,14 +1371,14 @@
       
       startDate = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate(), 0, 0, 0);
       endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
       titleStr = `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     } else if (mode === 'prevMonth') {
       const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
       const prevMonthNum = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
       startDate = new Date(prevYear, prevMonthNum, 1, 0, 0, 0);
       endDate = new Date(prevYear, prevMonthNum + 1, 0, 23, 59, 59);
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
       titleStr = `${prevYear}/${String(prevMonthNum + 1).padStart(2, '0')}（Month・${diffDays}Day）`;
     } else if (mode === 'custom' && param1 && param2) {
       const sDate = new Date(param1);
@@ -1390,12 +1390,12 @@
         startDate = endDate;
         endDate = temp;
       }
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-      titleStr = param1 === param2 ? `${formatDateWithDay(startDate)}（${diffDays}Day）` : `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+      titleStr = param1 === param2 ? `${formatDateWithDay(startDate)}（1Day）` : `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     }
 
     const totalPeriodHours = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60)));
-    const totalDaysCount = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1);
+    const totalDaysCount = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)));
 
     const statsMap = {};
     let totalSecAll = 0;
@@ -1419,7 +1419,7 @@
     });
 
     const sortedStats = Object.values(statsMap).sort((a, b) => b.sec - a.sec);
-    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, sortedStats };
+    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, totalDaysCount, sortedStats };
 
     document.getElementById('reportTitle').innerText = titleStr;
     document.getElementById('reportRangeInfo').innerHTML = `総記録時間: ${formatSecToJP(totalSecAll)}<br><span style="font-size:0.78rem;color:var(--text-sub);font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）</span>`;
@@ -1452,13 +1452,11 @@
           }
         }
 
-        // 1日平均時間の追加判定
         let extraInfoHtml = '';
         if (avgTimeTargetNames.some(target => item.name.includes(target))) {
           const avgSec = item.sec / totalDaysCount;
           extraInfoHtml += `<span style="font-size:0.75rem;color:var(--accent);margin-left:6px;">(1日平均: ${formatSecToJP(avgSec)})</span>`;
         }
-        // 回数の追加判定
         if (countTargetNames.some(target => item.name.includes(target))) {
           extraInfoHtml += `<span style="font-size:0.75rem;color:#f472b6;margin-left:6px;">(${item.count}回)</span>`;
         }
@@ -2047,12 +2045,12 @@
 
   async function exportReportToEvernote() {
     if (!currentReportData) return;
-    const { titleStr, totalSecAll, totalPeriodHours, sortedStats } = currentReportData;
+    const { titleStr, totalSecAll, totalPeriodHours, totalDaysCount, sortedStats } = currentReportData;
 
     let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
     html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr}</p>`;
     html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 4px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
-    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間）</p>`;
+    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）</p>`;
 
     if (reportChartInstance) {
       const chartBase64 = reportChartInstance.toBase64Image();
@@ -2060,11 +2058,23 @@
     }
 
     html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【カテゴリ別内訳】</p>`;
-    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
+    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）\n\n【カテゴリ別内訳】\n`;
+
+    const avgTimeTargetNames = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
+    const countTargetNames = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', 'ゴルフ練習', '飲み会🍻仕事関連', '飲み会🍻Private', '🍌'];
 
     sortedStats.forEach(item => {
       const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
-      const lineStr = `${item.icon} ${item.name} ―― ${formatSecToJP(item.sec)}（${ratio}%）`;
+      let extraText = '';
+      if (avgTimeTargetNames.some(target => item.name.includes(target))) {
+        const avgSec = item.sec / totalDaysCount;
+        extraText += ` (1日平均: ${formatSecToJP(avgSec)})`;
+      }
+      if (countTargetNames.some(target => item.name.includes(target))) {
+        extraText += ` (${item.count}回)`;
+      }
+
+      const lineStr = `${item.icon} ${item.name} ―― ${formatSecToJP(item.sec)}（${ratio}%）${extraText}`;
       html += `<p style="font-size:15px;margin:0 0 4px 0;">${lineStr}</p>`;
       plain += `${lineStr}\n`;
     });
