@@ -808,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v63';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v64';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1013,7 +1013,8 @@
   async function toggleLog(c) {
     const i = logs.findIndex(l => l.catId === c.id && !l.endAt);
     if (i >= 0) {
-      logs[i].endAt = new Date().toISOString();
+      // メイン画面の「終了」ボタン経由の終了処理（共通関数へ集約）
+      await stopRunningLog(logs[i].id);
     } else {
       const [vy, vm, vd] = currentViewingDateYMD.split('/').map(Number);
       const baseDate = new Date(vy, vm - 1, vd);
@@ -1030,8 +1031,8 @@
         memo: '',
         photos: []
       });
+      await save();
     }
-    await save();
   }
 
   function getDurationParts(s, e) {
@@ -1077,6 +1078,24 @@
     if (isNaN(d)) return '';
     const days = ['日', '月', '火', '水', '木', '金', '土'];
     return `(${days[d.getDay()]})`;
+  }
+
+  // 重複チェック用ヘルパー（他の確定済みログと30分（1800秒）以上の重複があるかチェック）
+  function checkOverlapWarning(targetId, start, end) {
+    let hasOverlap = false;
+    logs.forEach(other => {
+      if (other.id === targetId || !other.endAt) return;
+      // 移動・身支度ログ同士の重複判定は除外する場合はここで調整可能ですが基本仕様通り全ログ対象
+      const oStart = new Date(other.startAt);
+      const oEnd = new Date(other.endAt);
+      const overlapStart = new Date(Math.max(start, oStart));
+      const overlapEnd = new Date(Math.min(end, oEnd));
+      const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
+      if (overlapSec >= 1800) { // 30分（1800秒）以上
+        hasOverlap = true;
+      }
+    });
+    return hasOverlap;
   }
 
   function updateDayLabels() {
@@ -1646,10 +1665,33 @@
 
   async function stopRunningLog(id) {
     const i = logs.findIndex(l => l.id === id && !l.endAt);
-    if (i >= 0) {
-      logs[i].endAt = new Date().toISOString();
-      await save();
+    if (i < 0) return;
+    
+    const l = logs[i];
+    const start = new Date(l.startAt);
+    const end = new Date();
+
+    // 1. 長時間（10時間以上）の警告チェック
+    const durationMs = end - start;
+    if (durationMs >= 10 * 60 * 60 * 1000) {
+      const totalMin = Math.floor(durationMs / (1000 * 60));
+      const hours = Math.floor(totalMin / 60);
+      const mins = totalMin % 60;
+      const timeStr = `${hours}時間${mins > 0 ? mins + '分' : ''}`;
+      if (!confirm(`⚠️ 記録時間が長時間（${timeStr}）になっています。このまま終了しますか？`)) {
+        return;
+      }
     }
+
+    // 2. 30分以上の重複警告チェック
+    if (checkOverlapWarning(l.id, start, end)) {
+      if (!confirm(`⚠️ 他のログと30分以上の時間重複があります。このまま終了してもよろしいですか？`)) {
+        return;
+      }
+    }
+
+    l.endAt = end.toISOString();
+    await save();
   }
 
   function openCatModal() { document.getElementById('catModal').style.display = 'flex'; }
@@ -1942,8 +1984,13 @@
         const hours = Math.floor(totalMin / 60);
         const mins = totalMin % 60;
         const timeStr = `${hours}時間${mins > 0 ? mins + '分' : ''}`;
-        const confirmMsg = `⚠️ 記録時間が長時間（${timeStr}）になっています。このまま保存しますか？`;
-        if (!confirm(confirmMsg)) {
+        if (!confirm(`⚠️ 記録時間が長時間（${timeStr}）になっています。このまま保存しますか？`)) {
+          return;
+        }
+      }
+
+      if (checkOverlapWarning(l.id, newStart, checkEnd)) {
+        if (!confirm(`⚠️ 他のログと30分以上の時間重複があります。このまま保存してもよろしいですか？`)) {
           return;
         }
       }
