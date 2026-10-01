@@ -715,6 +715,7 @@
         <input type="date" id="editEndDate" class="date-select-input" onchange="updateDayLabels(); updateModalDuration();">
         <input type="time" id="editEndTime" class="time-select-input" onchange="updateModalDuration()">
       </div>
+      <!-- 身支度・移動ログの重複控除インフォメーション表示用エリア -->
       <div id="modalOverlapInfo" style="font-size:0.75rem;color:#facc15;margin-top:4px;display:none;"></div>
       <div class="time-picker-custom-btns" id="endTimeCustomBtns">
         <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
@@ -738,6 +739,7 @@
       </div>
     </div>
     
+    <!-- プレビュー表示エリア -->
     <div id="imagePreviewContainer" class="preview-grid"></div>
 
     <div class="modal-btns">
@@ -779,13 +781,13 @@
     { id: 'c25', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c26', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c27', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
-    { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c28', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c29', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
     { id: 'c31', name: '仕事関連', icon: '👥', color: 'rgba(6, 78, 59, 0.35)' },
     { id: 'c32', name: 'Social👥', icon: '🤝', color: 'rgba(30, 58, 138, 0.3)' },
-    { id: 'c33', name: 'Cooking👨‍‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c33', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c34', name: 'Sweets🍪', icon: '🧁', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c35', name: 'Leisure', icon: '🎉', color: 'rgba(13, 148, 136, 0.3)' },
     { id: 'c36', name: '旅行🚃Plan等', icon: '✈️', color: 'rgba(13, 148, 136, 0.3)' },
@@ -800,13 +802,13 @@
     { id: 'c45', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c46', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
     { id: 'c47', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
-    { id: 'c48', name: '飲み会🍻priv…', icon: '🍺', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c48', name: '飲み会🍻Private', icon: '🍺', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c49', name: '🍌', icon: '🍑', color: 'rgba(131, 24, 67, 0.3)' },
     { id: 'c50', name: 'Waiting', icon: '⏳', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v68';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v62';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -814,6 +816,7 @@
       if (c.name.includes('Work💼')) c.name = 'Work✅';
       if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
       if (c.name.includes('風呂')) { c.name = '風呂🛁'; c.icon = '🛀'; }
+      if (c.name.includes('飲み会🍻priv')) c.name = '飲み会🍻Private';
       return c;
     });
     if (savedCats.length === 0) savedCats = DEFAULT_CATS;
@@ -827,6 +830,7 @@
     if (c.name.includes('Work💼')) c.name = 'Work✅';
     if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
     if (c.name.includes('風呂')) { c.name = '風呂🛁'; c.icon = '🛀'; }
+    if (c.name.includes('飲み会🍻priv')) c.name = '飲み会🍻Private';
     return c;
   });
 
@@ -872,6 +876,7 @@
         result = result.map(l => {
           if (l.name && l.name.includes('ストレッチ')) l.name = 'ストレッチ';
           if (l.name && l.name.includes('風呂')) { l.name = '風呂🛁'; l.icon = '🛀'; }
+          if (l.name && l.name.includes('飲み会🍻priv')) l.name = '飲み会🍻Private';
           return l;
         });
         resolve(result);
@@ -1045,12 +1050,6 @@
     return `${h}h ${String(m).padStart(2, '0')}m`;
   }
 
-  function formatDurationJP(s, e) {
-    const { h, m } = getDurationParts(s, e);
-    if (h === 0) return `${m}分`;
-    return `${h}時間 ${m}分`;
-  }
-
   function formatTimeSingleDigit(s) {
     if (!s) return '';
     const d = new Date(s);
@@ -1137,7 +1136,8 @@
         const overlapEnd = new Date(Math.min(end, oEnd));
         const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
-        if (overlapSec >= 120) {
+        if (overlapSec >= 120) { // 2分（120秒）未満は控除しない
+          netSec -= overlapSec;
           const overlapMin = Math.round(overlapSec / 60);
           if (overlapMin > 0) {
             deductionDetails.push(`${other.name} ${overlapMin}分`);
@@ -1146,6 +1146,7 @@
       });
     }
 
+    netSec = Math.max(0, netSec);
     const totalMin = Math.floor(netSec / 60);
     const h = Math.floor(totalMin / 60);
     const m = totalMin % 60;
@@ -1290,6 +1291,7 @@
     }
   }
 
+  // 集計用：移動ログまたは身支度ログの場合、他のログと重複する時間を控除する関数（2分未満は控除しない）
   function calculateNetSeconds(log, startDate, endDate) {
     const start = new Date(log.startAt);
     const end = log.endAt ? new Date(log.endAt) : new Date();
@@ -1311,7 +1313,7 @@
         const overlapEnd = new Date(Math.min(effEnd, oEnd));
         const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
-        if (overlapSec >= 120) {
+        if (overlapSec >= 120) { // 2分（120秒）未満の重複は控除しない
           sec -= overlapSec;
         }
       });
@@ -1320,6 +1322,7 @@
     return Math.max(0, sec);
   }
 
+  // 集計時に対象ログの控除内訳テキストを生成するヘルパー（2分未満の重複は表示しない）
   function getDeductionNoteForLog(targetLog, startDate, endDate) {
     if (!targetLog.name || (!targetLog.name.includes('移動 →') && !targetLog.name.includes('身支度等'))) {
       return '';
@@ -1341,7 +1344,7 @@
       const overlapEnd = new Date(Math.min(effEnd, oEnd));
       const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
-      if (overlapSec >= 120) {
+      if (overlapSec >= 120) { // 2分未満の控除は記載しない
         const min = Math.round(overlapSec / 60);
         if (min > 0) {
           details.push(`${other.name} ${min}分`);
@@ -1353,107 +1356,6 @@
       return `※重複時間（${details.join(', ')}）控除`;
     }
     return '';
-  }
-
-  // --- 追加・修正：クリップボードコピー用関数 ---
-  async function copyToClipboard(htmlContent, plainContent) {
-    try {
-      if (navigator.clipboard && window.ClipboardItem) {
-        const blobHtml = new Blob([htmlContent], { type: 'text/html' });
-        const blobPlain = new Blob([plainContent], { type: 'text/plain' });
-        await navigator.clipboard.write([
-          new ClipboardItem({
-            'text/html': blobHtml,
-            'text/plain': blobPlain
-          })
-        ]);
-        return true;
-      } else {
-        await navigator.clipboard.writeText(plainContent);
-        return true;
-      }
-    } catch (e) {
-      console.error(e);
-      // フォールバック
-      const textarea = document.createElement('textarea');
-      textarea.value = plainContent;
-      textarea.style.position = 'fixed';
-      document.body.appendChild(textarea);
-      textarea.focus();
-      textarea.select();
-      try {
-        const success = document.execCommand('copy');
-        document.body.removeChild(textarea);
-        return success;
-      } catch (err) {
-        document.body.removeChild(textarea);
-        return false;
-      }
-    }
-  }
-
-  // 日付指定・前日・当日用のEvernote一括出力関数
-  async function exportEvernoteByDate(ymdStr) {
-    const [y, m, d] = ymdStr.split('/').map(Number);
-    const targetDate = new Date(y, m - 1, d);
-    const startDate = new Date(y, m - 1, d, 0, 0, 0);
-    const endDate = new Date(y, m - 1, d, 23, 59, 59);
-
-    const titleStr = formatDateWithDay(targetDate);
-    
-    // 対象日のログを抽出
-    const targetLogs = logs.filter(l => {
-      if (!l.endAt) return false;
-      const lStart = new Date(l.startAt);
-      const lEnd = new Date(l.endAt);
-      return lEnd >= startDate && lStart <= endDate;
-    }).sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
-
-    let totalSecAll = 0;
-    targetLogs.forEach(l => {
-      totalSecAll += calculateNetSeconds(l, startDate, endDate);
-    });
-
-    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
-    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr} ライフログ</p>`;
-    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 14px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
-    html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【タイムライン】</p>`;
-
-    let plain = `${titleStr} ライフログ\n総記録時間: ${formatSecToJP(totalSecAll)}\n\n【タイムライン】\n`;
-
-    if (targetLogs.length === 0) {
-      html += `<p style="font-size:14px;color:#64748b;">この日の記録はありません</p>`;
-      plain += `この日の記録はありません\n`;
-    } else {
-      targetLogs.forEach(l => {
-        const startStr = formatTimeSingleDigit(l.startAt);
-        const endStr = formatTimeSingleDigit(l.endAt);
-        const durStr = formatDurationJP(l.startAt, l.endAt);
-        const noteText = getDeductionNoteForLog(l, startDate, endDate);
-        const memoStr = l.memo ? ` (${l.memo})` : '';
-        
-        const lineStr = `${l.icon} ${l.name}：${startStr} - ${endStr}（${durStr}）${memoStr} ${noteText}`;
-        html += `<p style="font-size:15px;margin:0 0 6px 0;">${lineStr}</p>`;
-        plain += `${lineStr}\n`;
-
-        // 写真がある場合の処理
-        const photos = l.photos || (l.photo ? [l.photo] : []);
-        if (photos.length > 0) {
-          photos.forEach(p => {
-            html += `<p style="margin:4px 0 8px 0;"><img src="${p}" width="280" style="max-width:280px;width:100%;height:auto;display:block;border-radius:6px;" /></p>`;
-          });
-        }
-      });
-    }
-
-    html += `</div>`;
-
-    const ok = await copyToClipboard(html, plain);
-    if (ok) {
-      alert(`【${titleStr}】のログをEvernote形式でコピーしました！\nEvernoteに貼り付けてください。`);
-    } else {
-      alert('クリップボードへのコピーに失敗しました。');
-    }
   }
 
   function openReportModal(mode, param1, param2) {
@@ -1469,14 +1371,15 @@
       
       startDate = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate(), 0, 0, 0);
       endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
       titleStr = `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     } else if (mode === 'prevMonth') {
       const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
       const prevMonthNum = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
       startDate = new Date(prevYear, prevMonthNum, 1, 0, 0, 0);
       endDate = new Date(prevYear, prevMonthNum + 1, 0, 23, 59, 59);
-      titleStr = `${prevYear}/${String(prevMonthNum + 1).padStart(2, '0')}（Month）`;
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+      titleStr = `${prevYear}/${String(prevMonthNum + 1).padStart(2, '0')}（Month・${diffDays}Day）`;
     } else if (mode === 'custom' && param1 && param2) {
       const sDate = new Date(param1);
       const eDate = new Date(param2);
@@ -1487,12 +1390,12 @@
         startDate = endDate;
         endDate = temp;
       }
-      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
       titleStr = param1 === param2 ? `${formatDateWithDay(startDate)}（${diffDays}Day）` : `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
     }
 
     const totalPeriodHours = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60)));
-    const totalDaysCount = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)));
+    const totalDaysCount = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)) + 1);
 
     const statsMap = {};
     let totalSecAll = 0;
@@ -1516,29 +1419,21 @@
     });
 
     const sortedStats = Object.values(statsMap).sort((a, b) => b.sec - a.sec);
-    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, sortedStats, totalDaysCount };
+    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, sortedStats };
 
     document.getElementById('reportTitle').innerText = titleStr;
-    document.getElementById('reportRangeInfo').innerHTML = `総記録時間: ${formatSecToJP(totalSecAll)}<br><span style="font-size:0.78rem;color:var(--text-sub);font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間）</span>`;
+    document.getElementById('reportRangeInfo').innerHTML = `総記録時間: ${formatSecToJP(totalSecAll)}<br><span style="font-size:0.78rem;color:var(--text-sub);font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）</span>`;
 
     const rankContainer = document.getElementById('reportRankingList');
     if (sortedStats.length === 0) {
       rankContainer.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:12px;">この期間の記録はありません</div>`;
     } else {
-      const avgTimeTargets = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
-      const countTargets = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', '飲み会🍻仕事関連', '飲み会🍻priv…', '🍌'];
+      const avgTimeTargetNames = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
+      const countTargetNames = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', 'ゴルフ練習', '飲み会🍻仕事関連', '飲み会🍻Private', '🍌'];
 
-      rankContainer.innerHTML = sortedStats.map((item) => {
+      rankContainer.innerHTML = sortedStats.map((item, idx) => {
         const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
         
-        let extraInfoHtml = '';
-        if (avgTimeTargets.some(t => item.name.includes(t))) {
-          const avgSec = Math.round(item.sec / totalDaysCount);
-          extraInfoHtml = `<span style="font-size:0.75rem;color:var(--accent);margin-left:6px;">(1日平均: ${formatSecToJP(avgSec)})</span>`;
-        } else if (countTargets.some(t => item.name.includes(t))) {
-          extraInfoHtml = `<span style="font-size:0.75rem;color:#facc15;margin-left:6px;">(回数: ${item.count}回)</span>`;
-        }
-
         let subNoteHtml = '';
         if (item.name.includes('移動 →') || item.name.includes('身支度等')) {
           let notesSet = new Set();
@@ -1557,21 +1452,30 @@
           }
         }
 
+        // 1日平均時間の追加判定
+        let extraInfoHtml = '';
+        if (avgTimeTargetNames.some(target => item.name.includes(target))) {
+          const avgSec = item.sec / totalDaysCount;
+          extraInfoHtml += `<span style="font-size:0.75rem;color:var(--accent);margin-left:6px;">(1日平均: ${formatSecToJP(avgSec)})</span>`;
+        }
+        // 回数の追加判定
+        if (countTargetNames.some(target => item.name.includes(target))) {
+          extraInfoHtml += `<span style="font-size:0.75rem;color:#f472b6;margin-left:6px;">(${item.count}回)</span>`;
+        }
+
         return `
           <div style="background:#0b1120;padding:8px 10px;border-radius:8px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;">
             <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
               <span>${item.icon}</span>
               <div style="min-width:0;flex:1;">
-                <div style="display:flex;align-items:center;flex-wrap:wrap;">
-                  <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</span>
-                  ${extraInfoHtml}
-                </div>
+                <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">${item.name}</span>
                 ${subNoteHtml}
               </div>
             </div>
             <div style="text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums;">
               <span style="font-weight:700;color:var(--accent);">${formatSecToJP(item.sec)}</span>
               <span style="font-size:0.75rem;color:var(--text-sub);margin-left:4px;">(${ratio}%)</span>
+              ${extraInfoHtml}
             </div>
           </div>
         `;
@@ -1650,71 +1554,6 @@
         }
       }
     });
-  }
-
-  async function exportReportToEvernote() {
-    if (!currentReportData) return;
-    const { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, sortedStats, totalDaysCount } = currentReportData;
-
-    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
-    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr}</p>`;
-    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 4px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
-    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間）</p>`;
-
-    if (reportChartInstance) {
-      const chartBase64 = reportChartInstance.toBase64Image();
-      html += `<p style="margin:0 0 16px 0;"><img src="${chartBase64}" width="320" style="max-width:320px;width:100%;height:auto;display:block;" /></p>`;
-    }
-
-    html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【カテゴリ別内訳】</p>`;
-    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
-
-    const avgTimeTargets = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
-    const countTargets = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', '飲み会🍻仕事関連', '飲み会🍻priv…', '🍌'];
-
-    sortedStats.forEach(item => {
-      const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
-      
-      let extraInfoPlain = '';
-      if (avgTimeTargets.some(t => item.name.includes(t))) {
-        const avgSec = Math.round(item.sec / totalDaysCount);
-        extraInfoPlain = ` (1日平均: ${formatSecToJP(avgSec)})`;
-      } else if (countTargets.some(t => item.name.includes(t))) {
-        extraInfoPlain = ` (回数: ${item.count}回)`;
-      }
-
-      let subNotePlain = '';
-      if (item.name.includes('移動 →') || item.name.includes('身支度等')) {
-        let notesSet = new Set();
-        logs.forEach(l => {
-          if (l.catId && l.name === item.name && l.endAt) {
-            const start = new Date(l.startAt);
-            const end = new Date(l.endAt);
-            if (end >= startDate && start <= endDate) {
-              const note = getDeductionNoteForLog(l, startDate, endDate);
-              if (note) notesSet.add(note);
-            }
-          }
-        });
-        if (notesSet.size > 0) {
-          subNotePlain = ` [${Array.from(notesSet).join(' / ')}]`;
-        }
-      }
-
-      const lineStr = `${item.icon} ${item.name}${extraInfoPlain} ―― ${formatSecToJP(item.sec)}（${ratio}%）${subNotePlain}`;
-      html += `<p style="font-size:15px;margin:0 0 4px 0;">${lineStr}</p>`;
-      plain += `${lineStr}\n`;
-    });
-
-    html += `</div>`;
-
-    const ok = await copyToClipboard(html, plain);
-    if (ok) {
-      alert(`【${titleStr}】の集計レポートをコピーしました！\nEvernoteに貼り付けてください。`);
-      closeReportModal();
-    } else {
-      alert('クリップボードへのコピーに失敗しました。');
-    }
   }
 
   function render() {
@@ -2112,31 +1951,6 @@
       }
     }
     
-    if (checkEnd && (l.name.includes('移動 →') || l.name.includes('身支度等'))) {
-      let maxOverlapSec = 0;
-      logs.forEach(other => {
-        if (other.id === l.id || !other.endAt) return;
-        if (other.name && (other.name.includes('移動 →') || other.name.includes('身支度等'))) return;
-
-        const oStart = new Date(other.startAt);
-        const oEnd = new Date(other.endAt);
-        const overlapStart = new Date(Math.max(newStart, oStart));
-        const overlapEnd = new Date(Math.min(checkEnd, oEnd));
-        const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
-        if (overlapSec > maxOverlapSec) {
-          maxOverlapSec = overlapSec;
-        }
-      });
-
-      if (maxOverlapSec >= 1800) {
-        const overlapMin = Math.round(maxOverlapSec / 60);
-        const confirmOverlapMsg = `⚠️ 他のログと ${overlapMin}分間 の長時間の重複（控除対象）があります。このまま保存しますか？`;
-        if (!confirm(confirmOverlapMsg)) {
-          return;
-        }
-      }
-    }
-    
     l.startAt = newStart.toISOString();
     if (newEnd) {
       l.endAt = newEnd.toISOString();
@@ -2181,6 +1995,255 @@
     logs = logs.filter(l => l.id !== document.getElementById('editLogId').value);
     closeEditModal();
     await save();
+  }
+
+  function copyToClipboard(html, plain) {
+    return new Promise(resolve => {
+      const handler = e => {
+        e.clipboardData.setData('text/html', html);
+        e.clipboardData.setData('text/plain', plain);
+        e.preventDefault();
+      };
+      document.addEventListener('copy', handler);
+      const success = document.execCommand('copy');
+      document.removeEventListener('copy', handler);
+
+      if (success) {
+        resolve(true);
+        return;
+      }
+
+      if (navigator.clipboard && window.ClipboardItem) {
+        const bh = new Blob([html], { type: 'text/html' });
+        const bp = new Blob([plain], { type: 'text/plain' });
+        navigator.clipboard.write([new ClipboardItem({ 'text/html': bh, 'text/plain': bp })])
+          .then(() => resolve(true))
+          .catch(() => {
+            navigator.clipboard.writeText(plain)
+              .then(() => resolve(true))
+              .catch(() => resolve(false));
+          });
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(plain)
+          .then(() => resolve(true))
+          .catch(() => resolve(false));
+      } else {
+        resolve(false);
+      }
+    });
+  }
+
+  function emojiToPngDataUrl(emoji) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 96;
+    canvas.height = 96;
+    const ctx = canvas.getContext('2d');
+    ctx.font = '72px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, 48, 54);
+    return canvas.toDataURL('image/png');
+  }
+
+  async function exportReportToEvernote() {
+    if (!currentReportData) return;
+    const { titleStr, totalSecAll, totalPeriodHours, sortedStats } = currentReportData;
+
+    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important;">`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0;">${titleStr}</p>`;
+    html += `<p style="font-size:16px;font-weight:bold;color:#00b4d8;margin:0 0 4px 0;">総記録時間: ${formatSecToJP(totalSecAll)}</p>`;
+    html += `<p style="font-size:13px;color:#64748b;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間）</p>`;
+
+    if (reportChartInstance) {
+      const chartBase64 = reportChartInstance.toBase64Image();
+      html += `<p style="margin:0 0 16px 0;"><img src="${chartBase64}" width="320" style="max-width:320px;width:100%;height:auto;display:block;" /></p>`;
+    }
+
+    html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0;">【カテゴリ別内訳】</p>`;
+    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間）\n\n【カテゴリ別内訳】\n`;
+
+    sortedStats.forEach(item => {
+      const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
+      const lineStr = `${item.icon} ${item.name} ―― ${formatSecToJP(item.sec)}（${ratio}%）`;
+      html += `<p style="font-size:15px;margin:0 0 4px 0;">${lineStr}</p>`;
+      plain += `${lineStr}\n`;
+    });
+
+    html += `</div>`;
+
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
+      alert(`【${titleStr}】の集計レポートをコピーしました！\nEvernoteに貼り付けてください。`);
+      closeReportModal();
+    } else {
+      alert('クリップボードへのコピーに失敗しました。');
+    }
+  }
+
+  async function exportEvernoteByDate(dateStringYMD) {
+    if (!dateStringYMD) return;
+    const [y, m, d] = dateStringYMD.split('/').map(Number);
+    if (!y || !m || !d) return;
+    const targetDate = new Date(y, m - 1, d);
+
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const w = days[targetDate.getDay()];
+    const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})のログ`;
+
+    const targetYear = targetDate.getFullYear();
+    const targetMonth = targetDate.getMonth();
+    const targetDay = targetDate.getDate();
+
+    const dayStart = new Date(targetYear, targetMonth, targetDay, 0, 0, 0);
+    const dayEnd = new Date(targetYear, targetMonth, targetDay, 23, 59, 59);
+
+    let matchedLogs = [];
+    logs.forEach(l => {
+      const start = new Date(l.startAt);
+      const end = l.endAt ? new Date(l.endAt) : new Date();
+      if (start <= dayEnd && end >= dayStart) {
+        matchedLogs.push(l);
+      }
+    });
+
+    if (matchedLogs.length === 0) {
+      alert(`指定日（${dateTitle}）の記録はありません`);
+      return;
+    }
+
+    const uniqueLogs = Array.from(new Set(matchedLogs.map(l => l.id)))
+      .map(id => matchedLogs.find(l => l.id === id));
+
+    const isSleep = (l) => l.name && (l.name.includes('Sleep') || l.name.includes('Sleepless'));
+
+    let morningSleeps = [];
+    let nightSleeps = [];
+    let otherLogs = [];
+
+    uniqueLogs.forEach(l => {
+      const start = new Date(l.startAt);
+      const end = l.endAt ? new Date(l.endAt) : new Date();
+
+      if (isSleep(l)) {
+        const startDateYMD = `${start.getFullYear()}/${start.getMonth() + 1}/${start.getDate()}`;
+        const endDateYMD = `${end.getFullYear()}/${end.getMonth() + 1}/${end.getDate()}`;
+        const targetYMD = `${targetYear}/${targetMonth + 1}/${targetDay}`;
+
+        const isMorningEnding = (start < dayStart && endDateYMD === targetYMD && end.getHours() < 14);
+        const isNightStarting = (startDateYMD === targetYMD && end > dayEnd && start.getHours() >= 17);
+
+        if (isMorningEnding) {
+          morningSleeps.push(l);
+        } else if (isNightStarting) {
+          nightSleeps.push(l);
+        } else {
+          otherLogs.push(l);
+        }
+      } else {
+        otherLogs.push(l);
+      }
+    });
+
+    otherLogs.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    morningSleeps.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    nightSleeps.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+
+    const tl = [...morningSleeps, ...otherLogs, ...nightSleeps];
+
+    const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
+
+    let html = `<div style="${FONT_STYLE}">`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 16px 0;${FONT_STYLE}">${dateTitle}</p>`;
+    let plain = `${dateTitle}\n\n`;
+
+    for (let index = 0; index < tl.length; index++) {
+      const l = tl[index];
+      const end = l.endAt || new Date().toISOString();
+      const totalSec = Math.max(0, Math.floor((new Date(end) - new Date(l.startAt)) / 1000));
+      const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(end)} (${formatSecToJP(totalSec)})`;
+      const p = l.photos || (l.photo ? [l.photo] : []);
+      const iconPng = emojiToPngDataUrl(l.icon);
+      
+      let logHtml = `
+        <div style="margin:0;padding:0;${FONT_STYLE}">
+          <p style="line-height:1;margin:0 0 4px 0;">
+            <img src="${iconPng}" width="44" height="44" style="width:44px;height:44px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
+          </p>
+          <p style="font-size:20px;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${l.name}</p>
+          <p style="font-size:15px;color:#00b4d8;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${tr}</p>
+      `;
+      plain += `${l.icon}\n${l.name}\n${tr}\n`;
+
+      if (l.memo && l.memo.trim() !== '') {
+        logHtml += `<p style="margin:0;padding:0;"><br></p>`;
+        const memoLines = l.memo.split('\n');
+        memoLines.forEach(line => {
+          const sanitizedLine = line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          logHtml += `<p style="font-size:15px;line-height:1.45;margin:0;padding:0;${FONT_STYLE}">${sanitizedLine === '' ? '<br>' : sanitizedLine}</p>`;
+        });
+        plain += `\n${l.memo}\n`;
+      }
+      
+      if (p.length > 0) {
+        p.forEach(photoSrc => {
+          logHtml += `<p style="margin:8px 0 0 0;padding:0;">
+            <img src="${photoSrc}" style="max-width:100%;height:auto;display:block;" />
+          </p>`;
+        });
+      }
+      
+      logHtml += '</div>';
+      html += logHtml;
+
+      if (index < tl.length - 1) {
+        html += '<p style="margin:0;padding:0;"><br></p>';
+        plain += '\n';
+      }
+    }
+    
+    html += '</div>';
+
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
+      alert(`【${dateTitle}】をコピーしました！\nEvernoteに貼り付けてください。`);
+    } else {
+      alert('クリップボードへのコピーに失敗しました。');
+    }
+  }
+
+  function exportBackupDataAll() {
+    const nowStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const data = { cats, logs, exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `lifelog_backup_all_${nowStr}.json`;
+    a.click();
+  }
+
+  function importBackupDataAll(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async evt => {
+      try {
+        const data = JSON.parse(evt.target.result);
+        if (data.cats && data.logs) {
+          if (confirm('現在のすべての記録・カテゴリを上書きしてバックアップから復元しますか？')) {
+            cats = data.cats;
+            logs = data.logs;
+            await save();
+            alert('データを復元しました！');
+            closeSettingModal();
+          }
+        } else {
+          alert('正しいバックアップファイルではありません。');
+        }
+      } catch (err) {
+        alert('ファイルの読み込みに失敗しました。');
+      }
+    };
+    reader.readAsText(file);
   }
 
   loadLogsFromDB().then(loaded => {
