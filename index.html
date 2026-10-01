@@ -1,45 +1,2399 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="screen-orientation" content="portrait">
+<title>ライフログ</title>
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="icon" href="logo.png">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  :root {
+    --bg: #070b14;
+    --card-bg: #151e2e;
+    --text: #f1f5f9;
+    --text-sub: #94a3b8;
+    --accent: #38bdf8;
+    --running: #00e5ff;
+    --running-bg: rgba(0, 229, 255, 0.16);
+    --border: #233249;
+    
+    --stone-highlight: inset 0 1px 1px 0 rgba(255, 255, 255, 0.18), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.5);
+    --stone-shadow: 0 4px 8px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --stone-texture: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08) 0%, rgba(0, 0, 0, 0.25) 100%);
+  }
 
-↓のように色を一部追加指定と変更して
-Work✅→緑
-仕事関連→緑
-自己啓発→コーラル
-Trade📈　→　鮮やかな黄緑
-抹茶　→　淡い黄緑
-筋トレ💪→コーラル
-Running👟→コーラル
-Walking→コーラル
-ゴルフ練習→黄色
-Golf🏌️ラウンド→黄色
-買い物等🛍リアル→青
-Net Shopping→青
-病院等→青
-食事🍴→青
-食事🍴 (家族)→ピンク
-家事🧺→青
-掃除→青
-Leisure→黄色
-旅行🚃Plan等→黄色
-Research→青
-Search→青
-動画編集→青
-所用 →青
-所用 (家族) →ピンク
-開封✂️ →青
-アイロン →青
-片付け→青
-移動→青 
-動画視聴→グレー
-Screen Time→グレー
-Sleepless→グレー
-Sweets🍪→黄色
-Waiting→グレー
-BM→青
-風呂🛁→青
-試し・メンテ→青
-設定🔧→青
-Shooting→青
-🍌→ピンク
+  * { 
+    box-sizing: border-box !important; 
+    margin: 0; 
+    padding: 0; 
+    font-family: "Meiryo", "メイリオ", "Hiragino Sans", -apple-system, BlinkMacSystemFont, sans-serif; 
+    -webkit-tap-highlight-color: transparent; 
+  }
 
-ログカテゴリの色指定は、コード一覧で、今のログ一覧の順番に並び替えて、コードを書いて
+  body { 
+    background: var(--bg); 
+    color: var(--text); 
+    padding: env(safe-area-inset-top, 12px) 10px env(safe-area-inset-bottom, 24px) 10px; 
+    max-width: 480px; 
+    margin: 0 auto; 
+    user-select: none;
+  }
+  
+  .control-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    width: 100%;
+    height: 42px;
+  }
+  .bar-left-icon {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .bar-left-icon img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    border-radius: 8px;
+    display: block;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+  .header-left-title {
+    flex: 1.2;
+    display: flex;
+    align-items: center;
+    height: 100%;
+  }
+  .header-left-title h1 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    white-space: nowrap;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+  }
+  
+  .bar-btn-group, .header-btn-group {
+    display: flex;
+    flex: 2;
+    gap: 6px;
+    height: 100%;
+  }
+  
+  .btn-stone {
+    position: relative;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.08s ease-out;
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+  }
+  .btn-stone::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
+  .btn-stone:active {
+    transform: translateY(2px) scale(0.98);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
 
-すべて同じように視認性の良い色合いにして。
+  .btn-header-add {
+    flex: 1.4;
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #e2e8f0;
+  }
+  .btn-header-gear {
+    flex: 0.8;
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #cbd5e1;
+    font-size: 1.1rem;
+  }
+  .btn-cal { 
+    flex: 1;
+    background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
+    color: #fff;
+    border-color: rgba(56, 189, 248, 0.3);
+  }
+  .btn-evernote { 
+    flex: 1;
+    background: linear-gradient(180deg, #3aa376 0%, #22704e 100%);
+    color: #fff;
+    border-color: rgba(52, 211, 153, 0.3);
+  }
+  .btn-report {
+    flex: 1;
+    background: linear-gradient(180deg, #8a78c2 0%, #635099 100%);
+    color: #fff;
+    border-color: rgba(167, 139, 250, 0.3);
+  }
+
+  .active-section { margin: 8px 0 12px; display: none; }
+  .active-card { 
+    position: relative;
+    background: linear-gradient(180deg, rgba(0, 229, 255, 0.22) 0%, rgba(11, 27, 44, 0.85) 100%);
+    border: 2px solid var(--running); 
+    box-shadow: 0 0 14px rgba(0, 229, 255, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+    border-radius: 12px; 
+    padding: 10px 12px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 6px; 
+  }
+  .active-left { display: flex; align-items: center; gap: 8px; flex: 1.8; min-width: 0; }
+  .active-icon { font-size: 1.3rem; flex-shrink: 0; }
+  .active-title { font-weight: 700; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+  .active-badge { font-size: 0.8rem; font-weight: 700; color: var(--running); margin-top: 1px; }
+  
+  .active-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .active-timer-col { 
+    display: flex; 
+    align-items: center; 
+    justify-content: flex-end; 
+    width: 62px; 
+    text-align: right; 
+    font-variant-numeric: tabular-nums;
+  }
+  .active-timer-text {
+    font-size: 0.85rem; 
+    font-weight: 800; 
+    color: var(--running); 
+    white-space: nowrap;
+  }
+  
+  .active-btn-group { display: flex; gap: 4px; align-items: center; }
+  .btn-active-stop { 
+    background: linear-gradient(180deg, #4da67c 0%, #357a5b 100%); 
+    color: #fff; 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    padding: 6px 9px; 
+    border-radius: 7px; 
+    font-size: 0.75rem; 
+    font-weight: 700; 
+    cursor: pointer; 
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .btn-active-stop::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
+  .btn-active-edit { 
+    background: linear-gradient(180deg, #42a5b3 0%, #2c7582 100%); 
+    color: #fff; 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    padding: 6px 9px; 
+    border-radius: 7px; 
+    font-size: 0.75rem; 
+    font-weight: 700; 
+    cursor: pointer; 
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    position: relative;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .btn-active-edit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
+
+  .grid { 
+    display: grid; 
+    grid-template-columns: repeat(2, minmax(0, 1fr)); 
+    gap: 7px; 
+    margin-bottom: 16px; 
+    width: 100%; 
+  }
+  .card { 
+    position: relative;
+    border-radius: 10px; 
+    padding: 9px 10px; 
+    cursor: pointer; 
+    display: flex; 
+    flex-direction: row; 
+    align-items: center; 
+    gap: 8px; 
+    min-width: 0; 
+    width: 100%; 
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    background: linear-gradient(180deg, #1c2637 0%, #111827 100%);
+    overflow: hidden;
+    transition: transform 0.06s ease-out, box-shadow 0.06s ease-out;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
+  .card:active { 
+    transform: translateY(2px) scale(0.98); 
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.6), inset 0 2px 5px rgba(0, 0, 0, 0.6);
+  }
+  .card.running { 
+    border: 2px solid var(--running) !important; 
+    background: linear-gradient(180deg, rgba(0, 229, 255, 0.25) 0%, rgba(15, 23, 42, 0.9) 100%) !important; 
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.4) !important;
+  }
+  .card-icon { font-size: 1.25rem; flex-shrink: 0; line-height: 1; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.4)); }
+  .card-name { font-weight: 600; font-size: 0.84rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; color: #f8fafc; z-index: 1; }
+  
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 2px; }
+  .history-header h2 { font-size: 0.9rem; color: var(--text-sub); font-weight: 700; }
+  .history-date-label { font-size: 0.85rem; font-weight: 800; color: var(--accent); }
+  .history-list { display: flex; flex-direction: column; gap: 7px; }
+  .history-item { 
+    background: linear-gradient(180deg, #182234 0%, #0f172a 100%); 
+    border: 1px solid rgba(255, 255, 255, 0.08); 
+    border-radius: 10px; 
+    padding: 9px 12px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    cursor: pointer; 
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+  }
+  .history-item:active { transform: scale(0.99); }
+  .history-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
+  .history-meta { font-size: 0.8rem; color: var(--accent); font-weight: 700; font-variant-numeric: tabular-nums; }
+  
+  .history-dur-col {
+    display: flex;
+    align-items: center;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .history-dur-text {
+    font-size: 0.92rem; 
+    font-weight: 800; 
+    color: var(--accent);
+    white-space: nowrap;
+  }
+  
+  .history-thumbs { display: flex; gap: 5px; flex-wrap: wrap; max-width: 90px; justify-content: flex-end; }
+  .history-img-thumb { width: 28px; height: 28px; border-radius: 5px; object-fit: cover; border: 1px solid rgba(255,255,255,0.2); }
+
+  /* モーダル一般 */
+  .modal { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.78); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 12px; z-index: 100; }
+  .modal-box { 
+    background: #151e2e; 
+    padding: 16px; 
+    border-radius: 14px; 
+    width: 100%; 
+    max-width: 380px; 
+    border: 1px solid var(--border); 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+    max-height: 90vh; 
+    display: flex; 
+    flex-direction: column; 
+    overflow-y: auto;
+  }
+  .form-group { width: 100% !important; margin-bottom: 10px; display: flex; flex-direction: column; }
+  .form-group label { font-size: 0.78rem; color: var(--text-sub); margin-bottom: 5px; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+  
+  .modal-input {
+    width: 100% !important; 
+    max-width: 100% !important; 
+    min-width: 100% !important; 
+    display: block !important;
+    padding: 10px 12px !important; 
+    background: #090e17 !important; 
+    border: 1px solid var(--border) !important; 
+    color: #fff !important; 
+    border-radius: 8px !important; 
+    font-size: 0.95rem !important; 
+    -webkit-appearance: none !important;
+    appearance: none !important;
+  }
+  
+  input[type="time"]::-webkit-clear-button { display: none !important; }
+  input[type="time"], input[type="date"] { min-height: 42px; }
+
+  .date-time-row {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .date-select-input {
+    flex: 1.2;
+    padding: 10px 8px !important;
+    font-size: 0.82rem !important;
+    background: #090e17 !important;
+    border: 1px solid var(--border) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+  }
+  .time-select-input {
+    flex: 1;
+    padding: 10px 8px !important;
+    font-size: 0.95rem !important;
+    background: #090e17 !important;
+    border: 1px solid var(--border) !important;
+    color: #fff !important;
+    border-radius: 8px !important;
+  }
+
+  .custom-file-upload-wrapper {
+    position: relative;
+    width: 100%;
+    background: linear-gradient(180deg, #1c2637 0%, #111827 100%);
+    border: 1px dashed var(--accent);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    transition: all 0.1s ease;
+  }
+  .custom-file-upload-wrapper:active {
+    transform: scale(0.98);
+  }
+  .custom-file-upload-wrapper input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+  .custom-file-upload-text {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--accent);
+    pointer-events: none;
+  }
+
+  .time-picker-custom-btns {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    align-items: stretch;
+  }
+  .btn-time-action {
+    flex: 1;
+    padding: 7px 1px;
+    border-radius: 8px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.72rem;
+    text-align: center;
+    white-space: nowrap;
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+  }
+  .btn-time-action::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
+  .btn-time-reset {
+    background: linear-gradient(180deg, #323e54 0%, #1c2536 100%);
+    color: #FFBF00;
+    font-size: 0.75rem;
+  }
+  .btn-time-now {
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #00E5FF;
+    border-color: rgba(0, 229, 255, 0.3);
+    font-size: 0.75rem;
+  }
+  .btn-time-original {
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #94a3b8;
+    border-color: rgba(148, 163, 184, 0.3);
+    font-size: 0.75rem;
+  }
+  .btn-time-prev-end {
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #7af578;
+    border-color: rgba(122, 245, 120, 0.3);
+    font-size: 0.62rem;
+    line-height: 1.25;
+  }
+  .btn-time-next-start {
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #fdfe55;
+    border-color: rgba(253, 254, 85, 0.35);
+    font-size: 0.62rem;
+    line-height: 1.25;
+  }
+  .btn-time-prev-saved {
+    background: linear-gradient(180deg, #2b3548 0%, #172030 100%);
+    color: #6ba391;
+    border-color: rgba(107, 163, 145, 0.4);
+    font-size: 0.62rem;
+    line-height: 1.25;
+  }
+  .time-hint-text-flex {
+    flex: 1;
+    font-size: 0.55rem;
+    font-weight: 700;
+    color: rgba(0, 229, 255, 0.65);
+    line-height: 1.35;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-left: 1em;
+    text-indent: -1em;
+  }
+
+  .modal-btns { display: flex; width: 100%; gap: 8px; margin-top: 12px; flex-shrink: 0; }
+  .btn-action { 
+    flex: 1; 
+    padding: 10px 0; 
+    border-radius: 8px; 
+    font-weight: 700; 
+    cursor: pointer; 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    font-size: 0.85rem; 
+    text-align: center; 
+    white-space: nowrap; 
+    box-shadow: var(--stone-shadow), var(--stone-highlight);
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-action::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--stone-texture);
+    pointer-events: none;
+  }
+  
+  .btn-modal-danger { background: linear-gradient(180deg, #d9538c 0%, #b5336e 100%); color: #fff; }
+  .btn-cancel-white { background: linear-gradient(180deg, #323e54 0%, #1c2536 100%) !important; color: #fff !important; }
+  .btn-modal-stop { background: linear-gradient(180deg, #4da67c 0%, #357a5b 100%); color: #fff; }
+  .btn-modal-save { background: linear-gradient(180deg, #42a5b3 0%, #2c7582 100%); color: #fff; }
+  .btn-modal-coral { background: linear-gradient(180deg, #ff945e 0%, #f46a36 100%); color: #fff; }
+
+  #settingList { overflow-y: auto; flex: 1; margin-bottom: 12px; padding-right: 2px; }
+  .sort-item { display: flex; align-items: center; gap: 6px; background: #0c1320; padding: 8px; border-radius: 8px; margin-bottom: 8px; border: 1px solid var(--border); }
+  .sort-item.dragging { opacity: 0.3; border: 1px dashed var(--accent); }
+  .drag-handle { color: var(--text-sub); font-size: 1.3rem; padding: 6px 8px; cursor: grab; touch-action: none; user-select: none; }
+  .sort-icon-input { width: 42px !important; text-align: center; margin: 0 !important; padding: 6px 2px !important; font-size: 1.1rem !important; }
+  .sort-name-input { flex: 1; margin: 0 !important; padding: 6px 8px !important; font-size: 0.85rem !important; }
+  .btn-del-cat { background: #ef4444; border: none; color: #fff; padding: 6px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+  
+  .preview-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px; width: 100%; }
+  .preview-img-wrap { position: relative; width: 100%; }
+  .preview-img-wrap img { width: 100%; border-radius: 6px; display: block; }
+  .preview-img-wrap button { position: absolute; top: 6px; right: 6px; background: rgba(0, 0, 0, 0.75); color: #fff; border: none; border-radius: 6px; padding: 5px 10px; font-size: 0.75rem; font-weight: bold; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+  
+  .backup-box { margin-top: 10px; padding: 10px; background: #0c1320; border-radius: 8px; border: 1px solid var(--border); display: flex; gap: 6px; }
+</style>
+</head>
+<body>
+
+<div class="control-bar-row">
+  <div class="bar-left-icon">
+    <img src="logo.png" alt="ロゴ" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'36\' height=\'36\'><rect width=\'36\' height=\'36\' fill=\'%231e293b\' rx=\'8\'/><text x=\'50%\' y=\'55%\' font-size=\'18\' fill=\'%23fff\' text-anchor=\'middle\' dominant-baseline=\'middle\'>⏱</text></svg>';">
+  </div>
+  <div class="header-left-title">
+    <h1>ライフログ</h1>
+  </div>
+  <div class="header-btn-group">
+    <button class="btn-stone btn-header-add" onclick="openCatModal()">カテゴリ追加</button>
+    <button class="btn-stone btn-header-gear" onclick="openSettingModal()">⚙</button>
+  </div>
+</div>
+
+<div class="control-bar-row">
+  <div class="bar-left-icon">
+    <img src="cal.png" alt="カレンダー" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📅</div>';">
+  </div>
+  <div class="bar-btn-group">
+    <button class="btn-stone btn-cal" onclick="setHistoryDate(getYesterdayStr())">前日ログ</button>
+    <button class="btn-stone btn-cal" onclick="setHistoryDate(getTodayStr())">当日ログ</button>
+    <button class="btn-stone btn-cal" onclick="openHistoryDateModal()">日付指定</button>
+  </div>
+</div>
+
+<div class="control-bar-row">
+  <div class="bar-left-icon">
+    <img src="evernote.png" alt="Evernote" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>🐘</div>';">
+  </div>
+  <div class="bar-btn-group">
+    <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getYesterdayStr())">前日出力</button>
+    <button class="btn-stone btn-evernote" onclick="exportEvernoteByDate(getTodayStr())">当日出力</button>
+    <button class="btn-stone btn-evernote" onclick="openExportDateModal()">日付指定</button>
+  </div>
+</div>
+
+<div class="control-bar-row">
+  <div class="bar-left-icon">
+    <img src="report-icon.png" alt="集計" onerror="this.onerror=null; this.outerHTML='<div class=\'bar-left-icon\' style=\'font-size:1.4rem;\'>📊</div>';">
+  </div>
+  <div class="bar-btn-group">
+    <button class="btn-stone btn-report" onclick="openReportModal('lastWeek')">先週(日-土)</button>
+    <button class="btn-stone btn-report" onclick="openReportModal('prevMonth')">先月</button>
+    <button class="btn-stone btn-report" onclick="openCustomRangeModal()">期間指定</button>
+  </div>
+</div>
+
+<div class="active-section" id="activeSection">
+  <div style="display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--running);font-weight:bold;margin-bottom:6px;">
+    <span>⚡ 現在記録中</span>
+  </div>
+  <div id="activeList"></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<div class="history-header">
+  <h2>履歴一覧</h2>
+  <div class="history-date-label" id="currentHistoryDateLabel"></div>
+</div>
+<div class="history-list" id="history"></div>
+
+<!-- カレンダー日付指定モーダル -->
+<div class="modal" id="historyDateModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">表示する日付の指定</h3>
+    <div class="form-group">
+      <label>日付を選択</label>
+      <input type="date" id="historyModalDate" class="modal-input">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeHistoryDateModal()">閉じる</button>
+      <button class="btn-action btn-modal-save" onclick="submitHistoryDateModal()">表示する</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="exportDateModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">Evernote出力日の指定</h3>
+    <div class="form-group">
+      <label>出力する日付</label>
+      <input type="date" id="exportModalDate" class="modal-input">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeExportDateModal()">閉じる</button>
+      <button class="btn-action btn-modal-save" onclick="submitExportDateModal()">出力する</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="customRangeModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">集計期間の指定</h3>
+    <div class="form-group">
+      <label>開始日</label>
+      <input type="date" id="customStartDate" class="modal-input">
+    </div>
+    <div class="form-group">
+      <label>終了日</label>
+      <input type="date" id="customEndDate" class="modal-input">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeCustomRangeModal()">閉じる</button>
+      <button class="btn-action btn-modal-save" onclick="submitCustomRange()">集計する</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="reportModal">
+  <div class="modal-box" style="max-width:420px;max-height:90vh;overflow-y:auto;">
+    <h3 style="margin-bottom:4px;font-size:1.05rem;" id="reportTitle">集計レポート</h3>
+    <div id="reportRangeInfo" style="font-size:0.85rem;color:#38bdf8;margin-bottom:10px;font-weight:bold;line-height:1.4;"></div>
+    
+    <div style="background:#0b1120;padding:12px;border-radius:10px;border:1px solid var(--border);display:flex;justify-content:center;align-items:center;margin-bottom:12px;position:relative;height:220px;">
+      <canvas id="reportChartCanvas"></canvas>
+    </div>
+
+    <div id="reportRankingList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:220px;overflow-y:auto;padding-right:2px;"></div>
+
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeReportModal()">閉じる</button>
+      <button class="btn-action btn-evernote" onclick="exportReportToEvernote()">Evernote出力</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="catModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;">カテゴリ追加</h3>
+    <div class="form-group">
+      <label>アイコン（絵文字）</label>
+      <input type="text" id="catIcon" class="modal-input" value="📌" maxlength="2">
+    </div>
+    <div class="form-group">
+      <label>カテゴリ名</label>
+      <input type="text" id="catName" class="modal-input">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-action btn-cancel-white" onclick="closeCatModal()">閉じる</button>
+      <button class="btn-action btn-modal-save" onclick="addCategory()">追加</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="settingModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:6px;font-size:1.05rem;">カテゴリ設定・並び替え</h3>
+    <div style="font-size:0.75rem;color:var(--text-sub);margin-bottom:10px;">「≡」を長押しドラッグで移動、文字を直接編集できます</div>
+    <div id="settingList"></div>
+    
+    <div style="font-size:0.8rem;color:var(--accent);font-weight:bold;margin-top:6px;">データ保護・復元 (全期間)</div>
+    <div class="backup-box">
+      <button class="btn-action" style="background:#243248;color:#fff;" onclick="exportBackupDataAll()">💾 保存 (JSON)</button>
+      <label class="btn-action" style="background:#243248;color:#fff;text-align:center;cursor:pointer;padding-top:10px;">
+        📂 復元
+        <input type="file" accept=".json" style="display:none;" onchange="importBackupDataAll(event)">
+      </label>
+    </div>
+
+    <div class="modal-btns">
+      <button class="btn-action btn-modal-save" onclick="closeSettingModal()">完了</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="editModal">
+  <div class="modal-box">
+    <h3 style="margin-bottom:12px;font-size:1.05rem;" id="editModalTitle">ログ編集</h3>
+    <input type="hidden" id="editLogId">
+    
+    <div class="form-group">
+      <label>
+        <span>開始時刻 <span id="startDayLabel" style="color:var(--accent);font-weight:bold;"></span></span>
+      </label>
+      <div class="date-time-row">
+        <input type="date" id="editStartDate" class="date-select-input" onchange="updateDayLabels(); updateModalDuration();">
+        <input type="time" id="editStartTime" class="time-select-input" onchange="updateModalDuration()">
+      </div>
+      <div class="time-picker-custom-btns">
+        <button type="button" class="btn-time-action btn-time-prev-end" onclick="setPrevLogEndTimePlusOne()">直近ログ<br>終了時刻</button>
+        <button type="button" class="btn-time-action btn-time-now" onclick="setCurrentTimeInput('editStartTime')">現在時刻</button>
+        <button type="button" class="btn-time-action btn-time-original" onclick="setOriginalStartTime()">初期時刻</button>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label>
+        <span>終了時刻 <span id="endDayLabel" style="color:var(--accent);font-weight:bold;"></span></span>
+        <span id="modalDurationLabel" style="font-size:0.8rem;color:var(--running);font-weight:bold;"></span>
+      </label>
+      <div class="date-time-row">
+        <input type="date" id="editEndDate" class="date-select-input" onchange="updateDayLabels(); updateModalDuration();">
+        <input type="time" id="editEndTime" class="time-select-input" onchange="updateModalDuration()">
+      </div>
+      <!-- 身支度・移動ログの重複控除インフォメーション表示用エリア -->
+      <div id="modalOverlapInfo" style="font-size:0.75rem;color:#ffb703;margin-top:4px;display:none;"></div>
+      <div class="time-picker-custom-btns" id="endTimeCustomBtns">
+        <div class="time-hint-text-flex" id="endHintText">※未入力で終了<br>すると現在時刻</div>
+        <button type="button" class="btn-time-action btn-time-next-start" id="btnEndTimeNextStart" onclick="setNextLogStartTimeMinusOne()">直後のログ<br>開始時刻</button>
+        <button type="button" class="btn-time-action btn-time-now" id="btnEndTimeNow" onclick="setCurrentTimeInput('editEndTime')">現在時刻</button>
+        <button type="button" class="btn-time-action btn-time-prev-saved" id="btnEndTimePrevSaved" onclick="setPreviousSavedEndTime()" style="display:none;">前回保存時刻</button>
+        <button type="button" class="btn-time-action btn-time-reset" id="btnEndTimeReset" onclick="clearTimeInput('editEndTime')">リセット</button>
+      </div>
+    </div>
+    
+    <div class="form-group">
+      <label>メモ</label>
+      <textarea id="editMemo" class="modal-input" rows="4" placeholder="メモを入力..."></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label>写真追加</label>
+      <div class="custom-file-upload-wrapper">
+        <span class="custom-file-upload-text" id="uploadButtonText">📷 写真を追加する (追加済み: 0枚)</span>
+        <input type="file" id="editPhoto" accept="image/*" multiple onchange="handlePhotoUpload(event)">
+      </div>
+    </div>
+    
+    <!-- プレビュー表示エリア -->
+    <div id="imagePreviewContainer" class="preview-grid"></div>
+
+    <div class="modal-btns">
+      <button class="btn-action btn-modal-danger" onclick="deleteCurrentLog()">削除</button>
+      <button class="btn-action btn-cancel-white" onclick="closeEditModal()">閉じる</button>
+      <button class="btn-action btn-modal-coral" id="btnCancelStop" style="display:none;" onclick="cancelLogStop()">終了取消</button>
+      <button class="btn-action btn-modal-stop" id="btnStopAndSave" style="display:none;" onclick="saveLogEdit(true)">終了</button>
+      <button class="btn-action btn-modal-save" onclick="saveLogEdit(false)">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const DEFAULT_CATS = [
+    { id: 'c1', name: 'Sleep💤', icon: '🛏', color: 'rgba(99, 102, 241, 0.22)' },
+    { id: 'c2', name: 'Power Nap💤', icon: '🔋', color: 'rgba(99, 102, 241, 0.22)' },
+    { id: 'c3', name: 'ストレッチ', icon: '🧘', color: 'rgba(234, 179, 8, 0.22)' },
+    { id: 'c4', name: '身支度等', icon: '🪞', color: 'rgba(56, 189, 248, 0.22)' },
+    { id: 'c5', name: 'BM', icon: '🚽', color: 'rgba(148, 163, 184, 0.22)' },
+    { id: 'c6', name: '風呂🛁', icon: '🛀', color: 'rgba(34, 211, 238, 0.22)' },
+    { id: 'c7', name: '読書📖', icon: '📚', color: 'rgba(180, 83, 9, 0.25)' },
+    { id: 'c8', name: '自己啓発', icon: '🌱', color: 'rgba(132, 204, 22, 0.22)' },
+    { id: 'c9', name: 'Tech Work', icon: '🖥', color: 'rgba(30, 41, 59, 0.7)' },
+    { id: 'c10', name: 'Trade📈', icon: '💹', color: 'rgba(22, 101, 52, 0.35)' },
+    { id: 'c11', name: 'Coffee', icon: '☕', color: 'rgba(120, 53, 15, 0.3)' },
+    { id: 'c12', name: '抹茶', icon: '🍵', color: 'rgba(22, 101, 52, 0.3)' },
+    { id: 'c13', name: 'Work✅', icon: '🏢', color: 'rgba(15, 118, 110, 0.3)' },
+    { id: 'c14', name: '移動 →', icon: '🧭', color: 'rgba(71, 85, 105, 0.3)' },
+    { id: 'c15', name: '食事🍴', icon: '🍽', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c16', name: '食事🍴 (家族)', icon: '👥', color: 'rgba(76, 29, 149, 0.25)' },
+    { id: 'c17', name: '家事🧺', icon: '🏠', color: 'rgba(15, 76, 129, 0.25)' },
+    { id: 'c18', name: '掃除', icon: '🧹', color: 'rgba(55, 65, 81, 0.35)' },
+    { id: 'c19', name: 'アイロン', icon: '👔', color: 'rgba(30, 58, 138, 0.28)' },
+    { id: 'c20', name: '片付け', icon: '🗄', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c21', name: '試し・メンテ', icon: '🪮', color: 'rgba(51, 65, 85, 0.5)' },
+    { id: 'c22', name: '設定🔧', icon: '⚙', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c23', name: '買い物等🛍リアル', icon: '🛒', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c24', name: 'Net Shopping', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c25', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c26', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
+    { id: 'c27', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c28', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c29', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
+    { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
+    { id: 'c31', name: '仕事関連', icon: '👥', color: 'rgba(6, 78, 59, 0.35)' },
+    { id: 'c32', name: 'Social👥', icon: '🤝', color: 'rgba(30, 58, 138, 0.3)' },
+    { id: 'c33', name: 'Cooking👨‍‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c34', name: 'Sweets🍪', icon: '🧁', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c35', name: 'Leisure', icon: '🎉', color: 'rgba(13, 148, 136, 0.3)' },
+    { id: 'c36', name: '旅行🚃Plan等', icon: '✈️', color: 'rgba(13, 148, 136, 0.3)' },
+    { id: 'c37', name: 'Research', icon: '🌐', color: 'rgba(2, 132, 199, 0.25)' },
+    { id: 'c38', name: 'Search', icon: '🔍', color: 'rgba(100, 116, 139, 0.25)' },
+    { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(71, 85, 105, 0.4)' },
+    { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(71, 85, 105, 0.4)' },
+    { id: 'c41', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
+    { id: 'c42', name: '筋トレ💪', icon: '🏋️️', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c43', name: 'Running👟', icon: '🏃', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c44', name: 'Walking', icon: '🚶', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c45', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c46', name: 'Golf🏌️ラウンド', icon: '⛳', color: 'rgba(6, 78, 59, 0.4)' },
+    { id: 'c47', name: '飲み会🍻仕事関連', icon: '🍻', color: 'rgba(6, 78, 59, 0.35)' },
+    { id: 'c48', name: '飲み会🍻Private', icon: '🍺', color: 'rgba(30, 64, 175, 0.25)' },
+    { id: 'c49', name: '🍌', icon: '🍑', color: 'rgba(131, 24, 67, 0.3)' },
+    { id: 'c50', name: 'Waiting', icon: '⏳', color: 'rgba(30, 41, 59, 0.6)' },
+    { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
+  ];
+
+  // ログ一覧の順番に並び替えたカテゴリカラー定義
+  const SPECIFIC_COLORS = {
+    'Sleep💤': '#a855f7',          // 紫
+    'Power Nap💤': '#c084fc',     // 薄紫
+    'ストレッチ': '#fb7185',        // ピンクコーラル
+    '身支度等': '#3b82f6',        // 青
+    'BM': '#3b82f6',              // 青
+    '風呂🛁': '#3b82f6',          // 青
+    '読書📖': '#f97316',          // コーラル
+    '自己啓発': '#f97316',        // コーラル
+    'Tech Work': '#38bdf8',       // 水色
+    'Trade📈': '#84cc16',         // 鮮やかな黄緑
+    'Coffee': '#a16207',          // 茶色
+    '抹茶': '#bef264',            // 淡い黄緑
+    'Work✅': '#22c55e',          // 緑
+    '仕事関連': '#22c55e',        // 緑
+    '移動 →': '#3b82f6',          // 青
+    '移動': '#3b82f6',            // 青
+    '食事🍴': '#3b82f6',          // 青
+    '食事🍴 (家族)': '#f472b6',   // ピンク
+    '家事🧺': '#3b82f6',          // 青
+    '掃除': '#3b82f6',            // 青
+    'アイロン': '#3b82f6',        // 青
+    '片付け': '#3b82f6',          // 青
+    '試し・メンテ': '#3b82f6',    // 青
+    '設定🔧': '#3b82f6',          // 青
+    '買い物等🛍リアル': '#3b82f6',// 青
+    'Net Shopping': '#3b82f6',    // 青
+    '開封✂️': '#3b82f6',          // 青
+    '病院等': '#3b82f6',          // 青
+    'Shooting': '#3b82f6',        // 青
+    '🖼️・🎬Editing': '#3b82f6',   // 青
+    '動画編集': '#3b82f6',        // 青
+    '所用': '#3b82f6',            // 青
+    '所用 (家族)': '#f472b6',     // ピンク
+    '筋トレ💪': '#fb7185',        // コーラル
+    'Running👟': '#fb7185',       // コーラル
+    'Walking': '#fb7185',         // コーラル
+    'ゴルフ練習': '#facc15',      // 黄色
+    'Golf🏌️ラウンド': '#facc15', // 黄色
+    'Leisure': '#facc15',         // 黄色
+    '旅行🚃Plan等': '#facc15',    // 黄色
+    'Sweets🍪': '#facc15',        // 黄色
+    'Research': '#3b82f6',        // 青
+    'Search': '#3b82f6',          // 青
+    '動画視聴': '#64748b',        // グレー
+    'Screen Time': '#64748b',     // グレー
+    'Sleepless': '#64748b',       // グレー
+    'Waiting': '#64748b',         // グレー
+    '🍌': '#f472b6'               // ピンク
+  };
+
+  const DEFAULT_PALETTE = ['#38bdf8', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c', '#94a3b8', '#00e5ff', '#a855f7', '#fb7185'];
+
+  function getCategoryColor(name, index) {
+    for (const key in SPECIFIC_COLORS) {
+      if (name.includes(key)) {
+        return SPECIFIC_COLORS[key];
+      }
+    }
+    return DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
+  }
+
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v68';
+  if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
+    let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
+    savedCats = savedCats.map(c => {
+      if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
+      if (c.name.includes('Work💼')) c.name = 'Work✅';
+      if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
+      if (c.name.includes('風呂')) { c.name = '風呂🛁'; c.icon = '🛀'; }
+      if (c.name.includes('飲み会🍻priv')) c.name = '飲み会🍻Private';
+      return c;
+    });
+    if (savedCats.length === 0) savedCats = DEFAULT_CATS;
+    localStorage.setItem('ll_cats', JSON.stringify(savedCats));
+    localStorage.setItem('ll_cats_ver', CURRENT_VER);
+  }
+
+  let cats = JSON.parse(localStorage.getItem('ll_cats') || JSON.stringify(DEFAULT_CATS));
+  cats = cats.map(c => {
+    if (c.name.includes('ストレッチ')) c.name = 'ストレッチ';
+    if (c.name.includes('Work💼')) c.name = 'Work✅';
+    if (c.name.includes('旅行等')) c.name = '旅行🚃Plan等';
+    if (c.name.includes('風呂')) { c.name = '風呂🛁'; c.icon = '🛀'; }
+    if (c.name.includes('飲み会🍻priv')) c.name = '飲み会🍻Private';
+    return c;
+  });
+
+  let logs = [];
+  let currentPhotos = [];
+  let currentViewingDateYMD = getTodayStr();
+  let currentReportData = null;
+  let reportChartInstance = null;
+  let editingOriginalStartAt = null;
+  let editingPreviousSavedEndAt = null;
+  let editingLogId = null;
+
+  const DB_NAME = 'LifelogDB';
+  const STORE_NAME = 'logs';
+
+  function initDB() {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(DB_NAME, 1);
+      request.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+        }
+      };
+      request.onsuccess = (e) => resolve(e.target.result);
+      request.onerror = (e) => reject(e);
+    });
+  }
+
+  async function loadLogsFromDB() {
+    const db = await initDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(STORE_NAME, 'readonly');
+      const store = tx.objectStore(STORE_NAME);
+      const req = store.getAll();
+      req.onsuccess = () => {
+        let result = req.result || [];
+        const localLogs = JSON.parse(localStorage.getItem('ll_logs') || '[]');
+        if (result.length === 0 && localLogs.length > 0) {
+          result = localLogs;
+          saveLogsToDB(result);
+        }
+        result = result.map(l => {
+          if (l.name && l.name.includes('ストレッチ')) l.name = 'ストレッチ';
+          if (l.name && l.name.includes('風呂')) { l.name = '風呂🛁'; l.icon = '🛀'; }
+          if (l.name && l.name.includes('飲み会🍻priv')) l.name = '飲み会🍻Private';
+          return l;
+        });
+        resolve(result);
+      };
+      req.onerror = () => resolve([]);
+    });
+  }
+
+  async function saveLogsToDB(newLogs) {
+    const db = await initDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      const store = tx.objectStore(STORE_NAME);
+      store.clear();
+      newLogs.forEach(item => store.put(item));
+      tx.oncomplete = () => resolve(true);
+      tx.onerror = (e) => reject(e);
+    });
+  }
+
+  function getYesterdayStr() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return formatDateYMD(d);
+  }
+
+  function getTodayStr() {
+    return formatDateYMD(new Date());
+  }
+
+  function formatDateYMD(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}/${m}/${day}`;
+  }
+
+  function formatDateYMDDash(d) {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function formatDateWithDay(d) {
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const w = days[d.getDay()];
+    return `${y}/${m}/${day}(${w})`;
+  }
+
+  function setHistoryDate(ymd) {
+    if (!ymd) return;
+    currentViewingDateYMD = ymd;
+    render();
+  }
+
+  function openHistoryDateModal() {
+    const [y, m, d] = currentViewingDateYMD.split('/');
+    document.getElementById('historyModalDate').value = `${y}-${m}-${d}`;
+    document.getElementById('historyDateModal').style.display = 'flex';
+  }
+
+  function closeHistoryDateModal() {
+    document.getElementById('historyDateModal').style.display = 'none';
+  }
+
+  function submitHistoryDateModal() {
+    const val = document.getElementById('historyModalDate').value;
+    if (!val) {
+      alert('日付を選択してください。');
+      return;
+    }
+    closeHistoryDateModal();
+    const parts = val.split('-');
+    if (parts.length === 3) {
+      setHistoryDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
+    }
+  }
+
+  function openExportDateModal() {
+    document.getElementById('exportModalDate').value = formatDateYMDDash(new Date());
+    document.getElementById('exportDateModal').style.display = 'flex';
+  }
+
+  function closeExportDateModal() {
+    document.getElementById('exportDateModal').style.display = 'none';
+  }
+
+  function submitExportDateModal() {
+    const val = document.getElementById('exportModalDate').value;
+    if (!val) {
+      alert('日付を選択してください。');
+      return;
+    }
+    closeExportDateModal();
+    const parts = val.split('-');
+    if (parts.length === 3) {
+      exportEvernoteByDate(`${parts[0]}/${parts[1]}/${parts[2]}`);
+    }
+  }
+
+  function openCustomRangeModal() {
+    const today = formatDateYMDDash(new Date());
+    document.getElementById('customStartDate').value = today;
+    document.getElementById('customEndDate').value = today;
+    document.getElementById('customRangeModal').style.display = 'flex';
+  }
+
+  function closeCustomRangeModal() {
+    document.getElementById('customRangeModal').style.display = 'none';
+  }
+
+  function submitCustomRange() {
+    const sVal = document.getElementById('customStartDate').value;
+    const eVal = document.getElementById('customEndDate').value;
+    if (!sVal || !eVal) {
+      alert('開始日と終了日を選択してください。');
+      return;
+    }
+    closeCustomRangeModal();
+    openReportModal('custom', sVal, eVal);
+  }
+
+  async function save() {
+    logs.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    localStorage.setItem('ll_cats', JSON.stringify(cats));
+    await saveLogsToDB(logs);
+    render();
+  }
+
+  async function toggleLog(c) {
+    const i = logs.findIndex(l => l.catId === c.id && !l.endAt);
+    if (i >= 0) {
+      await stopRunningLog(logs[i].id);
+    } else {
+      const [vy, vm, vd] = currentViewingDateYMD.split('/').map(Number);
+      const baseDate = new Date(vy, vm - 1, vd);
+      const now = new Date();
+      baseDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds());
+
+      logs.push({
+        id: Date.now().toString(),
+        catId: c.id,
+        name: c.name,
+        icon: c.icon,
+        startAt: baseDate.toISOString(),
+        endAt: null,
+        memo: '',
+        photos: []
+      });
+      await save();
+    }
+  }
+
+  function getDurationParts(s, e) {
+    const start = new Date(s);
+    const end = e ? new Date(e) : new Date();
+    const sec = Math.max(0, Math.floor((end - start) / 1000));
+    const totalMin = Math.floor(sec / 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    return { h, m };
+  }
+
+  function formatDurationEN(s, e) {
+    const { h, m } = getDurationParts(s, e);
+    if (h === 0) return `${m}m`;
+    return `${h}h ${String(m).padStart(2, '0')}m`;
+  }
+
+  function formatTimeSingleDigit(s) {
+    if (!s) return '';
+    const d = new Date(s);
+    return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+
+  function timeInputFormat(s) {
+    if (!s) return '';
+    const d = new Date(s);
+    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  }
+
+  function dateInputFormat(s) {
+    if (!s) return '';
+    const d = new Date(s);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  function getFormattedDayOfWeek(dateStr) {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    if (isNaN(d)) return '';
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    return `(${days[d.getDay()]})`;
+  }
+
+  function checkOverlapWarning(targetId, start, end) {
+    let hasOverlap = false;
+    logs.forEach(other => {
+      if (other.id === targetId || !other.endAt) return;
+      const oStart = new Date(other.startAt);
+      const oEnd = new Date(other.endAt);
+      const overlapStart = new Date(Math.max(start, oStart));
+      const overlapEnd = new Date(Math.min(end, oEnd));
+      const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
+      if (overlapSec >= 1800) {
+        hasOverlap = true;
+      }
+    });
+    return hasOverlap;
+  }
+
+  function updateDayLabels() {
+    const sDate = document.getElementById('editStartDate').value;
+    const eDate = document.getElementById('editEndDate').value;
+    
+    document.getElementById('startDayLabel').innerText = getFormattedDayOfWeek(sDate);
+    document.getElementById('endDayLabel').innerText = getFormattedDayOfWeek(eDate);
+    updateModalDuration();
+  }
+
+  function updateModalDuration() {
+    const sDateVal = document.getElementById('editStartDate').value;
+    const sTimeVal = document.getElementById('editStartTime').value;
+    const eDateVal = document.getElementById('editEndDate').value;
+    const eTimeVal = document.getElementById('editEndTime').value;
+
+    const durLabel = document.getElementById('modalDurationLabel');
+    const overlapInfoEl = document.getElementById('modalOverlapInfo');
+    if (!durLabel) return;
+
+    if (!sDateVal || !sTimeVal) {
+      durLabel.innerText = '';
+      if (overlapInfoEl) overlapInfoEl.style.display = 'none';
+      return;
+    }
+
+    const start = new Date(`${sDateVal}T${sTimeVal}:00`);
+    let end;
+    if (eDateVal && eTimeVal) {
+      end = new Date(`${eDateVal}T${eTimeVal}:00`);
+    } else {
+      end = new Date();
+    }
+
+    if (isNaN(start) || isNaN(end) || end <= start) {
+      durLabel.innerText = '⏱ 0分';
+      if (overlapInfoEl) overlapInfoEl.style.display = 'none';
+      return;
+    }
+
+    const l = logs.find(x => x.id === editingLogId);
+    const isMovableOrPrep = l && l.name && (l.name.includes('移動 →') || l.name.includes('身支度等'));
+
+    let netSec = Math.max(0, Math.floor((end - start) / 1000));
+    let deductionDetails = [];
+
+    if (isMovableOrPrep) {
+      logs.forEach(other => {
+        if (other.id === editingLogId || !other.endAt) return;
+        if (other.name && (other.name.includes('移動 →') || other.name.includes('身支度等'))) return;
+
+        const oStart = new Date(other.startAt);
+        const oEnd = new Date(other.endAt);
+
+        const overlapStart = new Date(Math.max(start, oStart));
+        const overlapEnd = new Date(Math.min(end, oEnd));
+        const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
+
+        if (overlapSec >= 120) {
+          netSec -= overlapSec;
+          const overlapMin = Math.round(overlapSec / 60);
+          if (overlapMin > 0) {
+            deductionDetails.push(`${other.name} ${overlapMin}分`);
+          }
+        }
+      });
+    }
+
+    netSec = Math.max(0, netSec);
+    const totalMin = Math.floor(netSec / 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+
+    if (h === 0) {
+      durLabel.innerText = `⏱ ${m}分`;
+    } else {
+      durLabel.innerText = `⏱ ${h}時間 ${m}分`;
+    }
+
+    if (overlapInfoEl) {
+      if (deductionDetails.length > 0) {
+        overlapInfoEl.style.display = 'block';
+        overlapInfoEl.innerText = `※集計控除: ${deductionDetails.join(', ')}含まれます`;
+      } else {
+        overlapInfoEl.style.display = 'none';
+      }
+    }
+  }
+
+  function clearTimeInput(elementId) {
+    document.getElementById(elementId).value = '';
+    updateModalDuration();
+  }
+
+  function setCurrentTimeInput(elementId) {
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    document.getElementById(elementId).value = timeStr;
+    
+    if (elementId === 'editStartTime') {
+      document.getElementById('editStartDate').value = dateInputFormat(now);
+    } else if (elementId === 'editEndTime') {
+      document.getElementById('editEndDate').value = dateInputFormat(now);
+    }
+    updateDayLabels();
+  }
+
+  function setOriginalStartTime() {
+    if (editingOriginalStartAt) {
+      document.getElementById('editStartTime').value = timeInputFormat(editingOriginalStartAt);
+      document.getElementById('editStartDate').value = dateInputFormat(editingOriginalStartAt);
+      updateDayLabels();
+    }
+  }
+
+  function setPreviousSavedEndTime() {
+    if (editingPreviousSavedEndAt) {
+      document.getElementById('editEndTime').value = timeInputFormat(editingPreviousSavedEndAt);
+      document.getElementById('editEndDate').value = dateInputFormat(editingPreviousSavedEndAt);
+      updateDayLabels();
+    }
+  }
+
+  function setPrevLogEndTimePlusOne() {
+    const sorted = [...logs].sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    const currentIndex = sorted.findIndex(l => l.id === editingLogId);
+    
+    let prevEndAt = null;
+    if (currentIndex > 0) {
+      for (let i = currentIndex - 1; i >= 0; i--) {
+        if (sorted[i].endAt) {
+          prevEndAt = sorted[i].endAt;
+          break;
+        }
+      }
+    }
+    
+    if (!prevEndAt) {
+      const currentStart = new Date(editingOriginalStartAt || Date.now());
+      let latestEnd = null;
+      sorted.forEach(l => {
+        if (l.id !== editingLogId && l.endAt) {
+          const eTime = new Date(l.endAt);
+          if (eTime <= currentStart) {
+            if (!latestEnd || eTime > latestEnd) {
+              latestEnd = eTime;
+            }
+          }
+        }
+      });
+      if (latestEnd) {
+        prevEndAt = latestEnd.toISOString();
+      }
+    }
+
+    if (prevEndAt) {
+      const d = new Date(prevEndAt);
+      d.setMinutes(d.getMinutes() + 1);
+      document.getElementById('editStartTime').value = timeInputFormat(d);
+      document.getElementById('editStartDate').value = dateInputFormat(d);
+      updateDayLabels();
+    } else {
+      alert('直近の終了しているログが見つかりませんでした。');
+    }
+  }
+
+  function setNextLogStartTimeMinusOne() {
+    const sorted = [...logs].sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    const currentIndex = sorted.findIndex(l => l.id === editingLogId);
+    
+    let nextStartAt = null;
+    
+    if (currentIndex >= 0 && currentIndex < sorted.length - 1) {
+      for (let i = currentIndex + 1; i < sorted.length; i++) {
+        if (sorted[i].startAt) {
+          nextStartAt = sorted[i].startAt;
+          break;
+        }
+      }
+    }
+    
+    if (!nextStartAt) {
+      const sDateVal = document.getElementById('editStartDate').value;
+      const sTimeVal = document.getElementById('editStartTime').value;
+      const currentStart = new Date(`${sDateVal}T${sTimeVal}:00`);
+      let earliestNext = null;
+      
+      sorted.forEach(l => {
+        if (l.id !== editingLogId && l.startAt) {
+          const sTime = new Date(l.startAt);
+          if (sTime > currentStart) {
+            if (!earliestNext || sTime < earliestNext) {
+              earliestNext = sTime;
+            }
+          }
+        }
+      });
+      if (earliestNext) {
+        nextStartAt = earliestNext.toISOString();
+      }
+    }
+
+    if (nextStartAt) {
+      const d = new Date(nextStartAt);
+      d.setMinutes(d.getMinutes() - 1);
+      document.getElementById('editEndTime').value = timeInputFormat(d);
+      document.getElementById('editEndDate').value = dateInputFormat(d);
+      updateDayLabels();
+    } else {
+      alert('直後のログが見つかりませんでした。');
+    }
+  }
+
+  function calculateNetSeconds(log, startDate, endDate) {
+    const start = new Date(log.startAt);
+    const end = log.endAt ? new Date(log.endAt) : new Date();
+    
+    const effStart = start < startDate ? startDate : start;
+    const effEnd = end > endDate ? endDate : end;
+    let sec = Math.max(0, Math.floor((effEnd - effStart) / 1000));
+    if (sec <= 0) return 0;
+
+    if (log.name && (log.name.includes('移動 →') || log.name.includes('身支度等'))) {
+      logs.forEach(other => {
+        if (other.id === log.id || !other.endAt) return;
+        if (other.name && (other.name.includes('移動 →') || other.name.includes('身支度等'))) return;
+
+        const oStart = new Date(other.startAt);
+        const oEnd = new Date(other.endAt);
+
+        const overlapStart = new Date(Math.max(effStart, oStart));
+        const overlapEnd = new Date(Math.min(effEnd, oEnd));
+        const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
+
+        if (overlapSec >= 120) {
+          sec -= overlapSec;
+        }
+      });
+    }
+
+    return Math.max(0, sec);
+  }
+
+  function getDeductionDetailsForLog(targetLog, startDate, endDate) {
+    if (!targetLog.name || (!targetLog.name.includes('移動 →') && !targetLog.name.includes('身支度等'))) {
+      return [];
+    }
+    const start = new Date(targetLog.startAt);
+    const end = targetLog.endAt ? new Date(targetLog.endAt) : new Date();
+    const effStart = start < startDate ? startDate : start;
+    const effEnd = end > endDate ? endDate : end;
+
+    let details = [];
+    logs.forEach(other => {
+      if (other.id === targetLog.id || !other.endAt) return;
+      if (other.name && (other.name.includes('移動 →') || other.name.includes('身支度等'))) return;
+
+      const oStart = new Date(other.startAt);
+      const oEnd = new Date(other.endAt);
+
+      const overlapStart = new Date(Math.max(effStart, oStart));
+      const overlapEnd = new Date(Math.min(effEnd, oEnd));
+      const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
+
+      if (overlapSec >= 120) {
+        const min = Math.round(overlapSec / 60);
+        if (min > 0) {
+          details.push(`${other.name} ${min}分`);
+        }
+      }
+    });
+    return details;
+  }
+
+  function openReportModal(mode, param1, param2) {
+    let startDate, endDate, titleStr;
+    const now = new Date();
+
+    if (mode === 'lastWeek') {
+      const dayOfWeek = now.getDay();
+      const lastSun = new Date(now);
+      lastSun.setDate(now.getDate() - dayOfWeek - 7);
+      const lastSat = new Date(lastSun);
+      lastSat.setDate(lastSun.getDate() + 6);
+      
+      startDate = new Date(lastSun.getFullYear(), lastSun.getMonth(), lastSun.getDate(), 0, 0, 0);
+      endDate = new Date(lastSat.getFullYear(), lastSat.getMonth(), lastSat.getDate(), 23, 59, 59);
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+      titleStr = `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
+    } else if (mode === 'prevMonth') {
+      const prevYear = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+      const prevMonthNum = now.getMonth() === 0 ? 11 : now.getMonth() - 1;
+      startDate = new Date(prevYear, prevMonthNum, 1, 0, 0, 0);
+      endDate = new Date(prevYear, prevMonthNum + 1, 0, 23, 59, 59);
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+      titleStr = `${prevYear}/${String(prevMonthNum + 1).padStart(2, '0')}（Month・${diffDays}Day）`;
+    } else if (mode === 'custom' && param1 && param2) {
+      const sDate = new Date(param1);
+      const eDate = new Date(param2);
+      startDate = new Date(sDate.getFullYear(), sDate.getMonth(), sDate.getDate(), 0, 0, 0);
+      endDate = new Date(eDate.getFullYear(), eDate.getMonth(), eDate.getDate(), 23, 59, 59);
+      if (startDate > endDate) {
+        const temp = startDate;
+        startDate = endDate;
+        endDate = temp;
+      }
+      const diffDays = Math.round((endDate - startDate) / (1000 * 60 * 60 * 24));
+      titleStr = param1 === param2 ? `${formatDateWithDay(startDate)}（1Day）` : `${formatDateWithDay(startDate)} 〜 ${formatDateWithDay(endDate)}（${diffDays}Day）`;
+    }
+
+    const totalPeriodHours = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60)));
+    const totalDaysCount = Math.max(1, Math.round((endDate - startDate) / (1000 * 60 * 60 * 24)));
+
+    const statsMap = {};
+    let totalSecAll = 0;
+
+    logs.forEach(l => {
+      if (!l.endAt) return;
+      const start = new Date(l.startAt);
+      const end = new Date(l.endAt);
+      
+      if (end >= startDate && start <= endDate) {
+        const sec = calculateNetSeconds(l, startDate, endDate);
+        if (sec > 0) {
+          if (!statsMap[l.catId]) {
+            statsMap[l.catId] = { name: l.name, icon: l.icon, sec: 0, count: 0 };
+          }
+          statsMap[l.catId].sec += sec;
+          statsMap[l.catId].count += 1;
+          totalSecAll += sec;
+        }
+      }
+    });
+
+    const sortedStats = Object.values(statsMap).sort((a, b) => b.sec - a.sec);
+    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, totalDaysCount, sortedStats };
+
+    document.getElementById('reportTitle').innerText = titleStr;
+    document.getElementById('reportRangeInfo').innerHTML = `総記録時間: <span style="color:#38bdf8;font-weight:bold;">${formatSecToJP(totalSecAll)}</span><br><span style="font-size:0.78rem;color:var(--text-sub);font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）</span>`;
+
+    const rankContainer = document.getElementById('reportRankingList');
+    if (sortedStats.length === 0) {
+      rankContainer.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:12px;">この期間の記録はありません</div>`;
+    } else {
+      const avgTimeTargetNames = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
+      const countTargetNames = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', 'ゴルフ練習', '飲み会🍻仕事関連', '飲み会🍻Private', '🍌'];
+
+      rankContainer.innerHTML = sortedStats.map((item, idx) => {
+        const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
+        const catColor = getCategoryColor(item.name, idx);
+        
+        let subNoteHtml = '';
+        if (item.name.includes('移動 →') || item.name.includes('身支度等')) {
+          let allDetails = [];
+          logs.forEach(l => {
+            if (l.catId && statsMap[l.catId] && l.name === item.name && l.endAt) {
+              const start = new Date(l.startAt);
+              const end = new Date(l.endAt);
+              if (end >= startDate && start <= endDate) {
+                const dets = getDeductionDetailsForLog(l, startDate, endDate);
+                dets.forEach(d => allDetails.push(d));
+              }
+            }
+          });
+          const uniqueDetails = Array.from(new Set(allDetails));
+          if (uniqueDetails.length > 0) {
+            let formattedList = `※重複ログ<br>` + uniqueDetails.map(det => `・${det}`).join('<br>');
+            subNoteHtml = `<div style="font-size:0.7rem;color:#ffb703;margin-top:3px;line-height:1.3;font-weight:bold;">${formattedList}</div>`;
+          }
+        }
+
+        let badgesHtml = '';
+        if (avgTimeTargetNames.some(target => item.name.includes(target))) {
+          const avgSec = item.sec / totalDaysCount;
+          badgesHtml += `<span style="font-size:0.73rem;color:#00ff7f;background:rgba(0,255,127,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;font-weight:bold;">1日平均: ${formatSecToJP(avgSec)}</span>`;
+        }
+        if (countTargetNames.some(target => item.name.includes(target))) {
+          badgesHtml += `<span style="font-size:0.73rem;color:#ff6b81;background:rgba(255,107,129,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;font-weight:bold;">${item.count}回</span>`;
+        }
+
+        return `
+          <div style="background:#0b1120;padding:9px 10px;border-radius:8px;border:1px solid var(--border);display:flex;flex-direction:column;gap:5px;font-size:0.82rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+              <div style="display:flex;align-items:center;gap:7px;min-width:0;flex:1;">
+                <span style="font-size:1.1rem;flex-shrink:0;">${item.icon}</span>
+                <span style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;flex:1;">${item.name}</span>
+              </div>
+              <div style="text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums;white-space:nowrap;">
+                <span style="font-weight:800;color:#38bdf8;">${formatSecToJP(item.sec)}</span>
+                <span style="font-size:0.75rem;color:${catColor};margin-left:4px;font-weight:bold;">(${ratio}%)</span>
+              </div>
+            </div>
+            ${subNoteHtml}
+            ${badgesHtml ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:1px;">${badgesHtml}</div>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    document.getElementById('reportModal').style.display = 'flex';
+    renderReportChart(sortedStats, totalSecAll);
+  }
+
+  function closeReportModal() {
+    document.getElementById('reportModal').style.display = 'none';
+    if (reportChartInstance) {
+      reportChartInstance.destroy();
+      reportChartInstance = null;
+    }
+  }
+
+  function formatSecToJP(sec) {
+    const totalMin = Math.floor(sec / 60);
+    const h = Math.floor(totalMin / 60);
+    const m = totalMin % 60;
+    if (h === 0) return `${m}分`;
+    return `${h}時間 ${m}分`;
+  }
+
+  function renderReportChart(stats, totalSec) {
+    const ctx = document.getElementById('reportChartCanvas').getContext('2d');
+    if (reportChartInstance) {
+      reportChartInstance.destroy();
+    }
+
+    if (totalSec === 0 || stats.length === 0) {
+      reportChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['データなし'],
+          datasets: [{ data: [1], backgroundColor: ['#334155'] }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+      return;
+    }
+
+    const topItems = stats.slice(0, 6);
+    const otherSec = stats.slice(6).reduce((acc, cur) => acc + cur.sec, 0);
+
+    const labels = topItems.map(i => `${i.icon} ${i.name}`);
+    const data = topItems.map(i => i.sec);
+    const colors = topItems.map((i, idx) => getCategoryColor(i.name, idx));
+
+    if (otherSec > 0) {
+      labels.push('その他');
+      data.push(otherSec);
+      colors.push('#64748b');
+    }
+
+    reportChartInstance = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: colors,
+          borderWidth: 1,
+          borderColor: '#151e2e'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { color: '#f8fafc', boxWidth: 12, font: { size: 11 } }
+          }
+        }
+      }
+    });
+  }
+
+  function render() {
+    const runningLogs = logs.filter(l => !l.endAt);
+    const activeSection = document.getElementById('activeSection');
+    const activeList = document.getElementById('activeList');
+
+    if (runningLogs.length > 0) {
+      activeSection.style.display = 'block';
+      activeList.innerHTML = runningLogs.map(r => {
+        const timeStr = formatDurationEN(r.startAt, null);
+        return `
+          <div class="active-card">
+            <div class="active-left">
+              <span class="active-icon">${r.icon}</span>
+              <div style="min-width:0;">
+                <div class="active-title">${r.name}</div>
+                <div class="active-badge">${formatTimeSingleDigit(r.startAt)}〜</div>
+              </div>
+            </div>
+            <div class="active-right">
+              <div class="active-btn-group">
+                <button class="btn-active-stop" onclick="stopRunningLog('${r.id}')">終了</button>
+              </div>
+              <div class="active-timer-col">
+                <span class="active-timer-text">${timeStr}</span>
+              </div>
+              <div class="active-btn-group">
+                <button class="btn-active-edit" onclick="openEditModal('${r.id}')">編集</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    } else {
+      activeSection.style.display = 'none';
+    }
+
+    const g = document.getElementById('grid');
+    g.innerHTML = cats.map(c => {
+      const r = logs.find(l => l.catId === c.id && !l.endAt);
+      const bg = c.color ? `background:${c.color};` : '';
+      return `
+        <div class="card ${r ? 'running' : ''}" style="${bg}" onclick="toggleLog(${JSON.stringify(c).replace(/"/g, '&quot;')})">
+          <div class="card-icon">${c.icon}</div>
+          <div class="card-name">${c.name}</div>
+        </div>
+      `;
+    }).join('');
+
+    const h = document.getElementById('history');
+    const [vy, vm, vd] = currentViewingDateYMD.split('/').map(Number);
+    const viewDate = new Date(vy, vm - 1, vd);
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const w = days[viewDate.getDay()];
+    
+    document.getElementById('currentHistoryDateLabel').innerText = `${vy}/${String(vm).padStart(2, '0')}/${String(vd).padStart(2, '0')}(${w})`;
+
+    const viewDateStr = viewDate.toDateString();
+    
+    const tl = logs.filter(l => l.endAt && (new Date(l.startAt).toDateString() === viewDateStr || new Date(l.endAt).toDateString() === viewDateStr))
+                   .sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    
+    if (tl.length === 0) {
+      h.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:16px 0;">${vy}/${vm}/${vd} の記録はありません</div>`;
+    } else {
+      h.innerHTML = tl.map(l => {
+        const p = l.photos || (l.photo ? [l.photo] : []);
+        const durStr = formatDurationEN(l.startAt, l.endAt);
+        return `
+          <div class="history-item" onclick="openEditModal('${l.id}')">
+            <div class="history-left">
+              <span style="font-size:1.2rem;flex-shrink:0;">${l.icon}</span>
+              <div style="min-width:0;">
+                <div style="font-weight:700;font-size:0.86rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${l.name}</div>
+                <div class="history-meta">${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(l.endAt)}</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+              <div class="history-thumbs">
+                ${p.map(x => `<img src="${x}" class="history-img-thumb">`).join('')}
+              </div>
+              <div class="history-dur-col">
+                <span class="history-dur-text">${durStr}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  }
+
+  async function stopRunningLog(id) {
+    const i = logs.findIndex(l => l.id === id && !l.endAt);
+    if (i < 0) return;
+    
+    const l = logs[i];
+    const start = new Date(l.startAt);
+    const end = new Date();
+
+    const durationMs = end - start;
+    if (durationMs >= 10 * 60 * 60 * 1000) {
+      const totalMin = Math.floor(durationMs / (1000 * 60));
+      const hours = Math.floor(totalMin / 60);
+      const mins = totalMin % 60;
+      const timeStr = `${hours}時間${mins > 0 ? mins + '分' : ''}`;
+      if (!confirm(`⚠ 記録時間が長時間（${timeStr}）になっています。このまま終了しますか？`)) {
+        return;
+      }
+    }
+
+    if (checkOverlapWarning(l.id, start, end)) {
+      if (!confirm(`⚠️ 他のログと30分以上の時間重複があります。このまま終了してもよろしいですか？`)) {
+        return;
+      }
+    }
+
+    l.endAt = end.toISOString();
+    await save();
+  }
+
+  function openCatModal() { document.getElementById('catModal').style.display = 'flex'; }
+  function closeCatModal() { document.getElementById('catModal').style.display = 'none'; }
+  async function addCategory() {
+    const n = document.getElementById('catName').value.trim();
+    const i = document.getElementById('catIcon').value.trim() || '📌';
+    if (!n) return;
+    cats.push({ id: Date.now().toString(), name: n, icon: i, color: 'rgba(30, 41, 59, 0.6)' });
+    document.getElementById('catName').value = '';
+    closeCatModal();
+    await save();
+  }
+
+  function openSettingModal() {
+    renderSettingList();
+    document.getElementById('settingModal').style.display = 'flex';
+  }
+  function closeSettingModal() { 
+    document.getElementById('settingModal').style.display = 'none'; 
+    render();
+  }
+  
+  let draggedIndex = null;
+  let touchActiveHandle = null;
+
+  function renderSettingList() {
+    const el = document.getElementById('settingList');
+    el.innerHTML = cats.map((c, i) => `
+      <div class="sort-item" data-index="${i}">
+        <span class="drag-handle" data-index="${i}">≡</span>
+        <input type="text" class="sort-icon-input" value="${c.icon}" maxlength="2" onchange="updateCatItem('${c.id}', 'icon', this.value)">
+        <input type="text" class="sort-name-input" value="${c.name}" onchange="updateCatItem('${c.id}', 'name', this.value)">
+        <button type="button" class="btn-del-cat" onclick="deleteCat('${c.id}')">✕</button>
+      </div>
+    `).join('');
+
+    const handles = el.querySelectorAll('.drag-handle');
+    handles.forEach(handle => {
+      handle.addEventListener('touchstart', onHandleTouchStart, {passive: false});
+      handle.addEventListener('touchmove', onHandleTouchMove, {passive: false});
+      handle.addEventListener('touchend', onHandleTouchEnd);
+    });
+  }
+
+  function onHandleTouchStart(e) {
+    touchActiveHandle = this;
+    draggedIndex = parseInt(this.getAttribute('data-index'));
+    const item = this.closest('.sort-item');
+    if (item) item.classList.add('dragging');
+    e.stopPropagation();
+  }
+
+  function onHandleTouchMove(e) {
+    if (!touchActiveHandle) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+    const item = elem ? elem.closest('.sort-item') : null;
+    if (item) {
+      const targetIndex = parseInt(item.getAttribute('data-index'));
+      if (draggedIndex !== null && targetIndex !== draggedIndex) {
+        const movedItem = cats.splice(draggedIndex, 1)[0];
+        cats.splice(targetIndex, 0, movedItem);
+        draggedIndex = targetIndex;
+        localStorage.setItem('ll_cats', JSON.stringify(cats));
+        renderSettingList();
+      }
+    }
+  }
+
+  function onHandleTouchEnd() {
+    if (touchActiveHandle) {
+      const item = touchActiveHandle.closest('.sort-item');
+      if (item) item.classList.remove('dragging');
+    }
+    touchActiveHandle = null;
+    draggedIndex = null;
+    render();
+  }
+  
+  function updateCatItem(id, key, val) {
+    const cat = cats.find(c => c.id === id);
+    if (!cat) return;
+    cat[key] = val.trim();
+    localStorage.setItem('ll_cats', JSON.stringify(cats));
+    render();
+  }
+  
+  function deleteCat(id) {
+    cats = cats.filter(c => c.id !== id);
+    localStorage.setItem('ll_cats', JSON.stringify(cats));
+    renderSettingList();
+    render();
+  }
+
+  function openEditModal(id) {
+    const l = logs.find(x => x.id === id);
+    if (!l) return;
+    editingLogId = l.id;
+    document.getElementById('editLogId').value = l.id;
+    document.getElementById('editModalTitle').innerText = `${l.icon} ${l.name} の編集`;
+    
+    editingOriginalStartAt = l.startAt;
+    editingPreviousSavedEndAt = l.endAt || null;
+
+    document.getElementById('editStartTime').value = timeInputFormat(l.startAt);
+    document.getElementById('editStartDate').value = dateInputFormat(l.startAt);
+    
+    const btnStopAndSave = document.getElementById('btnStopAndSave');
+    const btnCancelStop = document.getElementById('btnCancelStop');
+    const endHintText = document.getElementById('endHintText');
+    const btnEndTimeNow = document.getElementById('btnEndTimeNow');
+    const btnEndTimePrevSaved = document.getElementById('btnEndTimePrevSaved');
+    const btnEndTimeReset = document.getElementById('btnEndTimeReset');
+    
+    if (l.endAt) {
+      btnStopAndSave.style.display = 'none';
+      btnCancelStop.style.display = 'block';
+      document.getElementById('editEndTime').value = timeInputFormat(l.endAt);
+      document.getElementById('editEndDate').value = dateInputFormat(l.endAt);
+      if (endHintText) endHintText.style.display = 'none';
+      if (btnEndTimeNow) btnEndTimeNow.style.display = 'flex';
+      if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'flex';
+      if (btnEndTimeReset) btnEndTimeReset.style.display = 'none';
+    } else {
+      btnStopAndSave.style.display = 'block';
+      btnCancelStop.style.display = 'none';
+      document.getElementById('editEndTime').value = l.tempEndAt ? timeInputFormat(l.tempEndAt) : '';
+      document.getElementById('editEndDate').value = l.tempEndAt ? dateInputFormat(l.tempEndAt) : dateInputFormat(l.startAt);
+      if (endHintText) endHintText.style.display = 'block';
+      if (btnEndTimeNow) btnEndTimeNow.style.display = 'none';
+      if (btnEndTimePrevSaved) btnEndTimePrevSaved.style.display = 'none';
+      if (btnEndTimeReset) btnEndTimeReset.style.display = 'flex';
+    }
+    
+    updateDayLabels();
+    
+    document.getElementById('editMemo').value = l.memo || '';
+    
+    currentPhotos = l.photos ? [...l.photos] : (l.photo ? [l.photo] : []);
+    
+    document.getElementById('editModal').style.display = 'flex';
+    renderPreviewPhotos();
+    
+    document.getElementById('editPhoto').value = '';
+  }
+
+  function renderPreviewPhotos() {
+    const container = document.getElementById('imagePreviewContainer');
+    if (!container) return;
+    
+    const uploadText = document.getElementById('uploadButtonText');
+    if (uploadText) {
+      uploadText.innerText = `📷 写真を追加する (追加済み: ${currentPhotos.length}枚)`;
+    }
+
+    if (!currentPhotos || currentPhotos.length === 0) {
+      container.innerHTML = '';
+      return;
+    }
+
+    container.innerHTML = currentPhotos.map((p, i) => `
+      <div class="preview-img-wrap">
+        <img src="${p}">
+        <button type="button" onclick="removePhoto(${i})">削除</button>
+      </div>
+    `).join('');
+  }
+
+  function removePhoto(i) {
+    currentPhotos.splice(i, 1);
+    renderPreviewPhotos();
+  }
+
+  function compressImage(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxDim = 1000;
+          let w = img.width;
+          let h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) {
+              h = Math.round((h * maxDim) / w);
+              w = maxDim;
+            } else {
+              w = Math.round((w * maxDim) / h);
+              h = maxDim;
+            }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.8));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function handlePhotoUpload(e) {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+    
+    for (const f of files) {
+      const compressed = await compressImage(f);
+      currentPhotos.push(compressed);
+    }
+    renderPreviewPhotos();
+    e.target.value = '';
+  }
+
+  function closeEditModal() { document.getElementById('editModal').style.display = 'none'; }
+
+  async function saveLogEdit(isStopBtn = false) {
+    const id = document.getElementById('editLogId').value;
+    const l = logs.find(x => x.id === id);
+    if (!l) return;
+    
+    const sDateVal = document.getElementById('editStartDate').value;
+    const sTimeVal = document.getElementById('editStartTime').value;
+    const eDateVal = document.getElementById('editEndDate').value;
+    const eTimeVal = document.getElementById('editEndTime').value;
+    
+    let newStart = new Date(l.startAt);
+    if (sDateVal && sTimeVal) {
+      newStart = new Date(`${sDateVal}T${sTimeVal}:00`);
+    } else if (sTimeVal) {
+      const [sh, sm] = sTimeVal.split(':');
+      newStart.setHours(parseInt(sh, 10), parseInt(sm, 10), 0, 0);
+    }
+    
+    let newEnd = l.endAt ? new Date(l.endAt) : null;
+    
+    if (isStopBtn) {
+      if (eDateVal && eTimeVal) {
+        newEnd = new Date(`${eDateVal}T${eTimeVal}:00`);
+      } else if (eTimeVal) {
+        const [eh, em] = eTimeVal.split(':');
+        newEnd = new Date(newStart);
+        newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
+        if (newEnd < newStart) newEnd.setDate(newEnd.getDate() + 1);
+      } else {
+        newEnd = new Date();
+      }
+      l.tempEndAt = null;
+    } else {
+      if (l.endAt) {
+        if (eDateVal && eTimeVal) {
+          newEnd = new Date(`${eDateVal}T${eTimeVal}:00`);
+        } else if (eTimeVal) {
+          const [eh, em] = eTimeVal.split(':');
+          newEnd = new Date(newStart);
+          newEnd.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
+          if (newEnd < newStart) {
+            newEnd.setDate(newEnd.getDate() + 1);
+          }
+        }
+      } else {
+        if (eDateVal && eTimeVal) {
+          l.tempEndAt = new Date(`${eDateVal}T${eTimeVal}:00`).toISOString();
+        } else if (eTimeVal) {
+          const [eh, em] = eTimeVal.split(':');
+          let tempEndDate = new Date(newStart);
+          tempEndDate.setHours(parseInt(eh, 10), parseInt(em, 10), 0, 0);
+          if (tempEndDate < newStart) tempEndDate.setDate(tempEndDate.getDate() + 1);
+          l.tempEndAt = tempEndDate.toISOString();
+        } else {
+          l.tempEndAt = null;
+        }
+      }
+    }
+
+    const checkEnd = newEnd || (l.tempEndAt ? new Date(l.tempEndAt) : null);
+    if (checkEnd && checkEnd <= newStart) {
+      alert('エラー: 終了時刻を開始時刻より後の時間に設定してください。');
+      return;
+    }
+
+    if (checkEnd) {
+      const durationMs = checkEnd - newStart;
+      if (durationMs >= 10 * 60 * 60 * 1000) {
+        const totalMin = Math.floor(durationMs / (1000 * 60));
+        const hours = Math.floor(totalMin / 60);
+        const mins = totalMin % 60;
+        const timeStr = `${hours}時間${mins > 0 ? mins + '分' : ''}`;
+        if (!confirm(`⚠ 記録時間が長時間（${timeStr}）になっています。このまま保存しますか？`)) {
+          return;
+        }
+      }
+
+      if (checkOverlapWarning(l.id, newStart, checkEnd)) {
+        if (!confirm(`⚠️ 他のログと30分以上の時間重複があります。このまま保存してもよろしいですか？`)) {
+          return;
+        }
+      }
+    }
+    
+    l.startAt = newStart.toISOString();
+    if (newEnd) {
+      l.endAt = newEnd.toISOString();
+    }
+    
+    l.memo = document.getElementById('editMemo').value;
+    l.photos = currentPhotos;
+    delete l.photo;
+    
+    closeEditModal();
+    await save();
+  }
+
+  async function cancelLogStop() {
+    const id = document.getElementById('editLogId').value;
+    const l = logs.find(x => x.id === id);
+    if (!l) return;
+    
+    l.endAt = null;
+    l.tempEndAt = null;
+    
+    const sDateVal = document.getElementById('editStartDate').value;
+    const sTimeVal = document.getElementById('editStartTime').value;
+    if (sDateVal && sTimeVal) {
+      l.startAt = new Date(`${sDateVal}T${sTimeVal}:00`).toISOString();
+    } else if (sTimeVal) {
+      const [sh, sm] = sTimeVal.split(':');
+      let newStart = new Date(l.startAt);
+      newStart.setHours(parseInt(sh, 10), parseInt(sm, 10), 0, 0);
+      l.startAt = newStart.toISOString();
+    }
+    
+    l.memo = document.getElementById('editMemo').value;
+    l.photos = currentPhotos;
+    delete l.photo;
+    
+    closeEditModal();
+    await save();
+  }
+
+  async function deleteCurrentLog() {
+    logs = logs.filter(l => l.id !== document.getElementById('editLogId').value);
+    closeEditModal();
+    await save();
+  }
+
+  function copyToClipboard(html, plain) {
+    return new Promise(resolve => {
+      const handler = e => {
+        e.clipboardData.setData('text/html', html);
+        e.clipboardData.setData('text/plain', plain);
+        e.preventDefault();
+      };
+      document.addEventListener('copy', handler);
+      const success = document.execCommand('copy');
+      document.removeEventListener('copy', handler);
+
+      if (success) {
+        resolve(true);
+        return;
+      }
+
+      if (navigator.clipboard && window.ClipboardItem) {
+        const bh = new Blob([html], { type: 'text/html' });
+        const bp = new Blob([plain], { type: 'text/plain' });
+        navigator.clipboard.write([new ClipboardItem({ 'text/html': bh, 'text/plain': bp })])
+          .then(() => resolve(true))
+          .catch(() => {
+            navigator.clipboard.writeText(plain)
+              .then(() => resolve(true))
+              .catch(() => resolve(false));
+          });
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(plain)
+          .then(() => resolve(true))
+          .catch(() => resolve(false));
+      } else {
+        resolve(false);
+      }
+    });
+  }
+
+  function emojiToPngDataUrl(emoji) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 96;
+    canvas.height = 96;
+    const ctx = canvas.getContext('2d');
+    ctx.font = '72px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(emoji, 48, 54);
+    return canvas.toDataURL('image/png');
+  }
+
+  async function exportReportToEvernote() {
+    if (!currentReportData) return;
+    const { titleStr, totalSecAll, totalPeriodHours, totalDaysCount, sortedStats } = currentReportData;
+
+    let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important; background-color: #0b1120; color: #f1f5f9; padding: 12px;">`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0; color: #fff;">${titleStr}</p>`;
+    html += `<p style="font-size:16px;font-weight:bold;color:#38bdf8;margin:0 0 4px 0;">総記録時間: <span style="color:#38bdf8;">${formatSecToJP(totalSecAll)}</span></p>`;
+    html += `<p style="font-size:13px;color:#94a3b8;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）</p>`;
+
+    if (reportChartInstance) {
+      const chartBase64 = reportChartInstance.toBase64Image();
+      html += `<p style="margin:0 0 16px 0;"><img src="${chartBase64}" width="320" style="max-width:320px;width:100%;height:auto;display:block;" /></p>`;
+    }
+
+    html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0; color: #fff;">【カテゴリ別内訳】</p>`;
+    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）\n\n【カテゴリ別内訳】\n`;
+
+    const avgTimeTargetNames = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
+    const countTargetNames = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', 'ゴルフ練習', '飲み会🍻仕事関連', '飲み会🍻Private', '🍌'];
+
+    sortedStats.forEach((item, idx) => {
+      const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
+      const catColor = getCategoryColor(item.name, idx);
+      
+      let extraHtml = '';
+      let extraPlain = '';
+
+      if (avgTimeTargetNames.some(target => item.name.includes(target))) {
+        const avgSec = item.sec / totalDaysCount;
+        extraHtml += ` <span style="color:#00ff7f;font-weight:bold;">(1日平均: ${formatSecToJP(avgSec)})</span>`;
+        extraPlain += ` (1日平均: ${formatSecToJP(avgSec)})`;
+      }
+      if (countTargetNames.some(target => item.name.includes(target))) {
+        extraHtml += ` <span style="color:#ff6b81;font-weight:bold;">(${item.count}回)</span>`;
+        extraPlain += ` (${item.count}回)`;
+      }
+
+      const lineHtml = `${item.icon} ${item.name} ―― <span style="color:#38bdf8;font-weight:bold;">${formatSecToJP(item.sec)}</span> <span style="color:${catColor};font-weight:bold;">（${ratio}%）</span>${extraHtml}`;
+      const linePlain = `${item.icon} ${item.name} ―― ${formatSecToJP(item.sec)}（${ratio}%）${extraPlain}`;
+
+      html += `<p style="font-size:15px;margin:0 0 4px 0;">${lineHtml}</p>`;
+      
+      if (item.name.includes('移動 →') || item.name.includes('身支度等')) {
+        let allDetails = [];
+        logs.forEach(l => {
+          if (l.catId && item.name === l.name && l.endAt) {
+            const start = new Date(l.startAt);
+            const end = new Date(l.endAt);
+            if (end >= currentReportData.startDate && start <= currentReportData.endDate) {
+              const dets = getDeductionDetailsForLog(l, currentReportData.startDate, currentReportData.endDate);
+              dets.forEach(d => allDetails.push(d));
+            }
+          }
+        });
+        const uniqueDetails = Array.from(new Set(allDetails));
+        if (uniqueDetails.length > 0) {
+          html += `<p style="font-size:13px;color:#ffb703;margin:0 0 4px 16px;font-weight:bold;">※重複ログ<br>` + uniqueDetails.map(d => `・${d}`).join('<br>') + `</p>`;
+          plain += `${linePlain}\n   ※重複ログ\n` + uniqueDetails.map(d => `   ・${d}`).join('\n') + `\n`;
+          return;
+        }
+      }
+
+      plain += `${linePlain}\n`;
+    });
+
+    html += `</div>`;
+
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
+      alert(`【${titleStr}】の集計レポートをコピーしました！\nEvernoteに貼り付けてください。`);
+      closeReportModal();
+    } else {
+      alert('クリップボードへのコピーに失敗しました。');
+    }
+  }
+
+  async function exportEvernoteByDate(dateStringYMD) {
+    if (!dateStringYMD) return;
+    const [y, m, d] = dateStringYMD.split('/').map(Number);
+    if (!y || !m || !d) return;
+    const targetDate = new Date(y, m - 1, d);
+
+    const days = ['日', '月', '火', '水', '木', '金', '土'];
+    const w = days[targetDate.getDay()];
+    const dateTitle = `${y}/${String(m).padStart(2, '0')}/${String(d).padStart(2, '0')}(${w})のログ`;
+
+    const targetYear = targetDate.getFullYear();
+    const targetMonth = targetDate.getMonth();
+    const targetDay = targetDate.getDate();
+
+    const dayStart = new Date(targetYear, targetMonth, targetDay, 0, 0, 0);
+    const dayEnd = new Date(targetYear, targetMonth, targetDay, 23, 59, 59);
+
+    let matchedLogs = [];
+    logs.forEach(l => {
+      const start = new Date(l.startAt);
+      const end = l.endAt ? new Date(l.endAt) : new Date();
+      if (start <= dayEnd && end >= dayStart) {
+        matchedLogs.push(l);
+      }
+    });
+
+    if (matchedLogs.length === 0) {
+      alert(`指定日（${dateTitle}）の記録はありません`);
+      return;
+    }
+
+    const uniqueLogs = Array.from(new Set(matchedLogs.map(l => l.id)))
+      .map(id => matchedLogs.find(l => l.id === id));
+
+    const isSleep = (l) => l.name && (l.name.includes('Sleep') || l.name.includes('Sleepless'));
+
+    let morningSleeps = [];
+    let nightSleeps = [];
+    let otherLogs = [];
+
+    uniqueLogs.forEach(l => {
+      const start = new Date(l.startAt);
+      const end = l.endAt ? new Date(l.endAt) : new Date();
+
+      if (isSleep(l)) {
+        const startDateYMD = `${start.getFullYear()}/${start.getMonth() + 1}/${start.getDate()}`;
+        const endDateYMD = `${end.getFullYear()}/${end.getMonth() + 1}/${end.getDate()}`;
+        const targetYMD = `${targetYear}/${targetMonth + 1}/${targetDay}`;
+
+        const isMorningEnding = (start < dayStart && endDateYMD === targetYMD && end.getHours() < 14);
+        const isNightStarting = (startDateYMD === targetYMD && end > dayEnd && start.getHours() >= 17);
+
+        if (isMorningEnding) {
+          morningSleeps.push(l);
+        } else if (isNightStarting) {
+          nightSleeps.push(l);
+        } else {
+          otherLogs.push(l);
+        }
+      } else {
+        otherLogs.push(l);
+      }
+    });
+
+    otherLogs.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    morningSleeps.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+    nightSleeps.sort((a, b) => new Date(a.startAt) - new Date(b.startAt));
+
+    const tl = [...morningSleeps, ...otherLogs, ...nightSleeps];
+
+    const FONT_STYLE = "font-family: 'Meiryo', 'メイリオ', 'Hiragino Sans', sans-serif !important;";
+
+    let html = `<div style="${FONT_STYLE} background-color: #0b1120; color: #f1f5f9; padding: 12px;">`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 16px 0; color: #fff; ${FONT_STYLE}">${dateTitle}</p>`;
+    let plain = `${dateTitle}\n\n`;
+
+    for (let index = 0; index < tl.length; index++) {
+      const l = tl[index];
+      const end = l.endAt || new Date().toISOString();
+      const totalSec = Math.max(0, Math.floor((new Date(end) - new Date(l.startAt)) / 1000));
+      const tr = `${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(end)} (<span style="color:#38bdf8;">${formatSecToJP(totalSec)}</span>)`;
+      const p = l.photos || (l.photo ? [l.photo] : []);
+      const iconPng = emojiToPngDataUrl(l.icon);
+      
+      let logHtml = `
+        <div style="margin:0;padding:0;${FONT_STYLE}">
+          <p style="line-height:1;margin:0 0 4px 0;">
+            <img src="${iconPng}" width="44" height="44" style="width:44px;height:44px;vertical-align:middle;display:inline-block;" alt="${l.icon}">
+          </p>
+          <p style="font-size:20px;font-weight:bold;line-height:1.3;margin:0;padding:0;color:#fff;${FONT_STYLE}">${l.name}</p>
+          <p style="font-size:15px;color:#38bdf8;font-weight:bold;line-height:1.3;margin:0;padding:0;${FONT_STYLE}">${tr}</p>
+      `;
+      plain += `${l.icon}\n${l.name}\n${formatTimeSingleDigit(l.startAt)} - ${formatTimeSingleDigit(end)} (${formatSecToJP(totalSec)})\n`;
+
+      if (l.memo && l.memo.trim() !== '') {
+        logHtml += `<p style="margin:0;padding:0;"><br></p>`;
+        const memoLines = l.memo.split('\n');
+        memoLines.forEach(line => {
+          const sanitizedLine = line.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+          logHtml += `<p style="font-size:15px;line-height:1.45;margin:0;padding:0;color:#f1f5f9;${FONT_STYLE}">${sanitizedLine === '' ? '<br>' : sanitizedLine}</p>`;
+        });
+        plain += `\n${l.memo}\n`;
+      }
+      
+      if (p.length > 0) {
+        p.forEach(photoSrc => {
+          logHtml += `<p style="margin:8px 0 0 0;padding:0;">
+            <img src="${photoSrc}" style="max-width:100%;height:auto;display:block;" />
+          </p>`;
+        });
+      }
+      
+      logHtml += '</div>';
+      html += logHtml;
+
+      if (index < tl.length - 1) {
+        html += '<p style="margin:0;padding:0;"><br></p>';
+        plain += '\n';
+      }
+    }
+    
+    html += '</div>';
+
+    const ok = await copyToClipboard(html, plain);
+    if (ok) {
+      alert(`【${dateTitle}】をコピーしました！\nEvernoteに貼り付けてください。`);
+    } else {
+      alert('クリップボードへのコピーに失敗しました。');
+    }
+  }
+
+  function exportBackupDataAll() {
+    const nowStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const data = { cats, logs, exportedAt: new Date().toISOString() };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `lifelog_backup_all_${nowStr}.json`;
+    a.click();
+  }
+
+  function importBackupDataAll(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async evt => {
+      try {
+        const data = JSON.parse(evt.target.result);
+        if (data.cats && data.logs) {
+          if (confirm('現在のすべての記録・カテゴリを上書きしてバックアップから復元しますか？')) {
+            cats = data.cats;
+            logs = data.logs;
+            await save();
+            alert('データを復元しました！');
+            closeSettingModal();
+          }
+        } else {
+          alert('正しいバックアップファイルではありません。');
+        }
+      } catch (err) {
+        alert('ファイルの読み込みに失敗しました。');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  loadLogsFromDB().then(loaded => {
+    logs = loaded;
+    render();
+  });
+
+  setInterval(render, 1000);
+</script>
+</body>
+</html>
