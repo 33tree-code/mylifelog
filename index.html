@@ -638,7 +638,7 @@
       <canvas id="reportChartCanvas"></canvas>
     </div>
 
-    <div id="reportRankingList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:200px;overflow-y:auto;padding-right:2px;"></div>
+    <div id="reportRankingList" style="display:flex;flex-direction:column;gap:6px;margin-bottom:14px;max-height:220px;overflow-y:auto;padding-right:2px;"></div>
 
     <div class="modal-btns">
       <button class="btn-action btn-cancel-white" onclick="closeReportModal()">閉じる</button>
@@ -808,7 +808,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v64';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v65';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1013,7 +1013,6 @@
   async function toggleLog(c) {
     const i = logs.findIndex(l => l.catId === c.id && !l.endAt);
     if (i >= 0) {
-      // メイン画面の「終了」ボタン経由の終了処理（共通関数へ集約）
       await stopRunningLog(logs[i].id);
     } else {
       const [vy, vm, vd] = currentViewingDateYMD.split('/').map(Number);
@@ -1080,18 +1079,16 @@
     return `(${days[d.getDay()]})`;
   }
 
-  // 重複チェック用ヘルパー（他の確定済みログと30分（1800秒）以上の重複があるかチェック）
   function checkOverlapWarning(targetId, start, end) {
     let hasOverlap = false;
     logs.forEach(other => {
       if (other.id === targetId || !other.endAt) return;
-      // 移動・身支度ログ同士の重複判定は除外する場合はここで調整可能ですが基本仕様通り全ログ対象
       const oStart = new Date(other.startAt);
       const oEnd = new Date(other.endAt);
       const overlapStart = new Date(Math.max(start, oStart));
       const overlapEnd = new Date(Math.min(end, oEnd));
       const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
-      if (overlapSec >= 1800) { // 30分（1800秒）以上
+      if (overlapSec >= 1800) {
         hasOverlap = true;
       }
     });
@@ -1155,7 +1152,7 @@
         const overlapEnd = new Date(Math.min(end, oEnd));
         const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
-        if (overlapSec >= 120) { // 2分未満は控除しない
+        if (overlapSec >= 120) {
           netSec -= overlapSec;
           const overlapMin = Math.round(overlapSec / 60);
           if (overlapMin > 0) {
@@ -1332,7 +1329,7 @@
         const overlapEnd = new Date(Math.min(effEnd, oEnd));
         const overlapSec = Math.max(0, Math.floor((overlapEnd - overlapStart) / 1000));
 
-        if (overlapSec >= 120) { // 2分未満の重複は控除しない
+        if (overlapSec >= 120) {
           sec -= overlapSec;
         }
       });
@@ -1341,10 +1338,10 @@
     return Math.max(0, sec);
   }
 
-  // 集計時に対象ログの控除内訳テキストを生成するヘルパー（2分未満の重複は表示しない）
-  function getDeductionNoteForLog(targetLog, startDate, endDate) {
+  // 集計時に対象ログの控除内訳リスト（配列）を生成するヘルパー
+  function getDeductionDetailsForLog(targetLog, startDate, endDate) {
     if (!targetLog.name || (!targetLog.name.includes('移動 →') && !targetLog.name.includes('身支度等'))) {
-      return '';
+      return [];
     }
     const start = new Date(targetLog.startAt);
     const end = targetLog.endAt ? new Date(targetLog.endAt) : new Date();
@@ -1370,11 +1367,7 @@
         }
       }
     });
-
-    if (details.length > 0) {
-      return `※重複時間（${details.join(', ')}）控除`;
-    }
-    return '';
+    return details;
   }
 
   function openReportModal(mode, param1, param2) {
@@ -1455,45 +1448,55 @@
         
         let subNoteHtml = '';
         if (item.name.includes('移動 →') || item.name.includes('身支度等')) {
-          let notesSet = new Set();
+          let allDetails = [];
           logs.forEach(l => {
             if (l.catId && statsMap[l.catId] && l.name === item.name && l.endAt) {
               const start = new Date(l.startAt);
               const end = new Date(l.endAt);
               if (end >= startDate && start <= endDate) {
-                const note = getDeductionNoteForLog(l, startDate, endDate);
-                if (note) notesSet.add(note);
+                const dets = getDeductionDetailsForLog(l, startDate, endDate);
+                dets.forEach(d => allDetails.push(d));
               }
             }
           });
-          if (notesSet.size > 0) {
-            subNoteHtml = `<div style="font-size:0.7rem;color:#facc15;margin-top:2px;">${Array.from(notesSet).join(' / ')}</div>`;
+          // 重複を除去
+          const uniqueDetails = Array.from(new Set(allDetails));
+          if (uniqueDetails.length > 0) {
+            // 最初だけに「※重複時間」、後はログと時間だけ並べる
+            const formattedList = uniqueDetails.map((det, dIdx) => {
+              if (dIdx === 0) {
+                return `※重複時間 (${det})`;
+              } else {
+                return `・${det}`;
+              }
+            }).join('<br>');
+            subNoteHtml = `<div style="font-size:0.7rem;color:#facc15;margin-top:2px;line-height:1.3;">${formattedList}</div>`;
           }
         }
 
-        let extraInfoHtml = '';
+        let badgesHtml = '';
         if (avgTimeTargetNames.some(target => item.name.includes(target))) {
           const avgSec = item.sec / totalDaysCount;
-          extraInfoHtml += `<span style="font-size:0.75rem;color:var(--accent);margin-left:6px;">(1日平均: ${formatSecToJP(avgSec)})</span>`;
+          badgesHtml += `<span style="font-size:0.73rem;color:var(--accent);background:rgba(56,189,248,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;">1日平均: ${formatSecToJP(avgSec)}</span>`;
         }
         if (countTargetNames.some(target => item.name.includes(target))) {
-          extraInfoHtml += `<span style="font-size:0.75rem;color:#f472b6;margin-left:6px;">(${item.count}回)</span>`;
+          badgesHtml += `<span style="font-size:0.73rem;color:#f472b6;background:rgba(244,114,182,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;">${item.count}回</span>`;
         }
 
         return `
-          <div style="background:#0b1120;padding:8px 10px;border-radius:8px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;">
-            <div style="display:flex;align-items:center;gap:8px;min-width:0;flex:1;">
-              <span>${item.icon}</span>
-              <div style="min-width:0;flex:1;">
-                <span style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;">${item.name}</span>
-                ${subNoteHtml}
+          <div style="background:#0b1120;padding:9px 10px;border-radius:8px;border:1px solid var(--border);display:flex;flex-direction:column;gap:5px;font-size:0.82rem;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+              <div style="display:flex;align-items:center;gap:7px;min-width:0;flex:1;">
+                <span style="font-size:1.1rem;flex-shrink:0;">${item.icon}</span>
+                <span style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;flex:1;">${item.name}</span>
+              </div>
+              <div style="text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums;white-space:nowrap;">
+                <span style="font-weight:800;color:var(--accent);">${formatSecToJP(item.sec)}</span>
+                <span style="font-size:0.75rem;color:var(--text-sub);margin-left:4px;">(${ratio}%)</span>
               </div>
             </div>
-            <div style="text-align:right;flex-shrink:0;font-variant-numeric:tabular-nums;">
-              <span style="font-weight:700;color:var(--accent);">${formatSecToJP(item.sec)}</span>
-              <span style="font-size:0.75rem;color:var(--text-sub);margin-left:4px;">(${ratio}%)</span>
-              ${extraInfoHtml}
-            </div>
+            ${subNoteHtml}
+            ${badgesHtml ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:1px;">${badgesHtml}</div>` : ''}
           </div>
         `;
       }).join('');
@@ -1671,19 +1674,17 @@
     const start = new Date(l.startAt);
     const end = new Date();
 
-    // 1. 長時間（10時間以上）の警告チェック
     const durationMs = end - start;
     if (durationMs >= 10 * 60 * 60 * 1000) {
       const totalMin = Math.floor(durationMs / (1000 * 60));
       const hours = Math.floor(totalMin / 60);
       const mins = totalMin % 60;
       const timeStr = `${hours}時間${mins > 0 ? mins + '分' : ''}`;
-      if (!confirm(`⚠️ 記録時間が長時間（${timeStr}）になっています。このまま終了しますか？`)) {
+      if (!confirm(`⚠️️ 記録時間が長時間（${timeStr}）になっています。このまま終了しますか？`)) {
         return;
       }
     }
 
-    // 2. 30分以上の重複警告チェック
     if (checkOverlapWarning(l.id, start, end)) {
       if (!confirm(`⚠️ 他のログと30分以上の時間重複があります。このまま終了してもよろしいですか？`)) {
         return;
@@ -1984,7 +1985,7 @@
         const hours = Math.floor(totalMin / 60);
         const mins = totalMin % 60;
         const timeStr = `${hours}時間${mins > 0 ? mins + '分' : ''}`;
-        if (!confirm(`⚠️ 記録時間が長時間（${timeStr}）になっています。このまま保存しますか？`)) {
+        if (!confirm(`⚠️️ 記録時間が長時間（${timeStr}）になっています。このまま保存しますか？`)) {
           return;
         }
       }
