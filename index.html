@@ -788,7 +788,7 @@
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
     { id: 'c31', name: '仕事関連', icon: '👥', color: 'rgba(6, 78, 59, 0.35)' },
     { id: 'c32', name: 'Social👥', icon: '🤝', color: 'rgba(30, 58, 138, 0.3)' },
-    { id: 'c33', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c33', name: 'Cooking👨‍‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c34', name: 'Sweets🍪', icon: '🧁', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c35', name: 'Leisure', icon: '🎉', color: 'rgba(13, 148, 136, 0.3)' },
     { id: 'c36', name: '旅行🚃Plan等', icon: '✈️', color: 'rgba(13, 148, 136, 0.3)' },
@@ -821,7 +821,7 @@
     '自己啓発': '#f97316',        // オレンジ (コーラル)
     'Tech Work': '#38bdf8',       // 水色
     'Trade📈': '#84cc16',         // 鮮やかな黄緑
-    'Coffee': '#b45309',          // しっかりした茶色
+    'Coffee': '#b45309',          // 鮮やかな茶色
     '抹茶': '#bef264',            // 淡い黄緑
     'Work✅': '#22c55e',          // 緑
     '仕事関連': '#22c55e',        // 緑
@@ -844,22 +844,27 @@
     '動画編集': '#3b82f6',        // 青
     '所用': '#3b82f6',            // 青
     '所用 (家族)': '#f472b6',     // ピンク
+    'Family': '#3b82f6',          // 青
+    'Social👥': '#3b82f6',        // 青
+    'Cooking👨‍🍳': '#facc15',      // 蛍光黄色
+    'Sweets🍪': '#facc15',        // 蛍光黄色
+    'Leisure': '#facc15',         // 蛍光黄色
+    '旅行🚃Plan等': '#facc15',    // 蛍光黄色
+    'Research': '#3b82f6',        // 青
+    'Search': '#3b82f6',          // 青
+    'Screen Time': '#94a3b8',     // グレー
+    '動画視聴': '#94a3b8',        // グレー
+    'Money💰関連': '#3b82f6',     // 青
     '筋トレ💪': '#fb7185',        // コーラル
     'Running👟': '#fb7185',       // コーラル
     'Walking': '#fb7185',         // コーラル
-    'ゴルフ練習': '#fde047',      // 鮮やかな黄色
-    'Golf🏌️ラウンド': '#fde047', // 鮮やかな黄色
-    'Leisure': '#fde047',         // 鮮やかな黄色
-    '旅行🚃Plan等': '#fde047',    // 鮮やかな黄色
-    'Sweets🍪': '#fde047',        // 鮮やかな黄色
-    'Cooking👨‍🍳': '#fde047',      // 鮮やかな黄色
-    'Research': '#3b82f6',        // 青
-    'Search': '#3b82f6',          // 青
-    '動画視聴': '#94a3b8',        // グレー
-    'Screen Time': '#94a3b8',     // グレー
-    'Sleepless': '#c084fc',       // 薄紫
+    'ゴルフ練習': '#84cc16',      // 鮮やかな黄緑
+    'Golf🏌️ラウンド': '#84cc16', // 鮮やかな黄緑
+    '飲み会🍻仕事関連': '#3b82f6',// 青
+    '飲み会🍻Private': '#38bdf8',  // 水色
+    '🍌': '#f472b6',              // ピンク
     'Waiting': '#94a3b8',         // グレー
-    '🍌': '#f472b6'               // ピンク
+    'Sleepless': '#c084fc'        // 薄紫
   };
 
   const DEFAULT_PALETTE = ['#38bdf8', '#34d399', '#f472b6', '#fbbf24', '#a78bfa', '#fb923c', '#94a3b8', '#00e5ff', '#a855f7', '#fb7185'];
@@ -873,7 +878,7 @@
     return DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
   }
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v69';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v70';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
