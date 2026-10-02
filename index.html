@@ -631,7 +631,8 @@
 
 <div class="modal" id="reportModal">
   <div class="modal-box" style="max-width:420px;max-height:90vh;overflow-y:auto;">
-    <h3 style="margin-bottom:4px;font-size:1.05rem;" id="reportTitle">集計レポート</h3>
+    <h3 style="margin-bottom:2px;font-size:1.15rem;font-weight:800;color:#fff;" id="reportMainTitle">ライフログ集計</h3>
+    <div style="font-size:0.95rem;font-weight:700;color:var(--accent);margin-bottom:2px;" id="reportTitle">集計レポート</div>
     <div id="reportRangeInfo" style="font-size:0.85rem;color:#38bdf8;margin-bottom:10px;font-weight:bold;line-height:1.4;"></div>
     
     <div style="background:#0b1120;padding:12px;border-radius:10px;border:1px solid var(--border);display:flex;justify-content:center;align-items:center;margin-bottom:12px;position:relative;height:220px;">
@@ -787,7 +788,7 @@
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
     { id: 'c31', name: '仕事関連', icon: '👥', color: 'rgba(6, 78, 59, 0.35)' },
     { id: 'c32', name: 'Social👥', icon: '🤝', color: 'rgba(30, 58, 138, 0.3)' },
-    { id: 'c33', name: 'Cooking👨‍‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c33', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c34', name: 'Sweets🍪', icon: '🧁', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c35', name: 'Leisure', icon: '🎉', color: 'rgba(13, 148, 136, 0.3)' },
     { id: 'c36', name: '旅行🚃Plan等', icon: '✈️', color: 'rgba(13, 148, 136, 0.3)' },
@@ -796,7 +797,7 @@
     { id: 'c39', name: 'Screen Time', icon: '📱', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c40', name: '動画視聴', icon: '📺', color: 'rgba(71, 85, 105, 0.4)' },
     { id: 'c41', name: 'Money💰関連', icon: '💵', color: 'rgba(113, 63, 18, 0.3)' },
-    { id: 'c42', name: '筋トレ💪', icon: '🏋️️', color: 'rgba(194, 65, 12, 0.3)' },
+    { id: 'c42', name: '筋トレ💪', icon: '🏋️', color: 'rgba(194, 65, 12, 0.3)' },
     { id: 'c43', name: 'Running👟', icon: '🏃', color: 'rgba(194, 65, 12, 0.3)' },
     { id: 'c44', name: 'Walking', icon: '🚶', color: 'rgba(194, 65, 12, 0.3)' },
     { id: 'c45', name: 'ゴルフ練習', icon: '🏌️', color: 'rgba(19, 78, 74, 0.35)' },
@@ -808,19 +809,19 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  // ログ一覧の順番に並び替えたカテゴリカラー定義
+  // ログ一覧の順番に並び替えたカテゴリカラー定義（ダークモードで視認性の高い鮮やかな色合い）
   const SPECIFIC_COLORS = {
     'Sleep💤': '#a855f7',          // 紫
-    'Power Nap💤': '#c084fc',     // 薄紫
+    'Power Nap💤': '#a855f7',     // 紫 (Sleepと同じ)
     'ストレッチ': '#fb7185',        // ピンクコーラル
     '身支度等': '#3b82f6',        // 青
     'BM': '#3b82f6',              // 青
     '風呂🛁': '#3b82f6',          // 青
-    '読書📖': '#f97316',          // コーラル
-    '自己啓発': '#f97316',        // コーラル
+    '読書📖': '#f97316',          // オレンジ (コーラル)
+    '自己啓発': '#f97316',        // オレンジ (コーラル)
     'Tech Work': '#38bdf8',       // 水色
     'Trade📈': '#84cc16',         // 鮮やかな黄緑
-    'Coffee': '#a16207',          // 茶色
+    'Coffee': '#b45309',          // しっかりした茶色
     '抹茶': '#bef264',            // 淡い黄緑
     'Work✅': '#22c55e',          // 緑
     '仕事関連': '#22c55e',        // 緑
@@ -846,17 +847,18 @@
     '筋トレ💪': '#fb7185',        // コーラル
     'Running👟': '#fb7185',       // コーラル
     'Walking': '#fb7185',         // コーラル
-    'ゴルフ練習': '#facc15',      // 黄色
-    'Golf🏌️ラウンド': '#facc15', // 黄色
-    'Leisure': '#facc15',         // 黄色
-    '旅行🚃Plan等': '#facc15',    // 黄色
-    'Sweets🍪': '#facc15',        // 黄色
+    'ゴルフ練習': '#fde047',      // 鮮やかな黄色
+    'Golf🏌️ラウンド': '#fde047', // 鮮やかな黄色
+    'Leisure': '#fde047',         // 鮮やかな黄色
+    '旅行🚃Plan等': '#fde047',    // 鮮やかな黄色
+    'Sweets🍪': '#fde047',        // 鮮やかな黄色
+    'Cooking👨‍🍳': '#fde047',      // 鮮やかな黄色
     'Research': '#3b82f6',        // 青
     'Search': '#3b82f6',          // 青
-    '動画視聴': '#64748b',        // グレー
-    'Screen Time': '#64748b',     // グレー
-    'Sleepless': '#64748b',       // グレー
-    'Waiting': '#64748b',         // グレー
+    '動画視聴': '#94a3b8',        // グレー
+    'Screen Time': '#94a3b8',     // グレー
+    'Sleepless': '#c084fc',       // 薄紫
+    'Waiting': '#94a3b8',         // グレー
     '🍌': '#f472b6'               // ピンク
   };
 
@@ -871,7 +873,7 @@
     return DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
   }
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v68';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v69';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1502,7 +1504,7 @@
       rankContainer.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:12px;">この期間の記録はありません</div>`;
     } else {
       const avgTimeTargetNames = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
-      const countTargetNames = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', 'ゴルフ練習', '飲み会🍻仕事関連', '飲み会🍻Private', '🍌'];
+      const countTargetNames = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', 'Golf🏌️ラウンド', '飲み会🍻仕事関連', '飲み会🍻Private', '🍌'];
 
       rankContainer.innerHTML = sortedStats.map((item, idx) => {
         const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
@@ -2151,7 +2153,8 @@
     const { titleStr, totalSecAll, totalPeriodHours, totalDaysCount, sortedStats } = currentReportData;
 
     let html = `<div style="font-family: 'Meiryo', 'メイリオ', sans-serif !important; background-color: #0b1120; color: #f1f5f9; padding: 12px;">`;
-    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 12px 0; color: #fff;">${titleStr}</p>`;
+    html += `<p style="font-size:24px;font-weight:bold;margin:0 0 4px 0; color: #fff;">ライフログ集計</p>`;
+    html += `<p style="font-size:16px;font-weight:bold;color:#38bdf8;margin:0 0 12px 0;">${titleStr}</p>`;
     html += `<p style="font-size:16px;font-weight:bold;color:#38bdf8;margin:0 0 4px 0;">総記録時間: <span style="color:#38bdf8;">${formatSecToJP(totalSecAll)}</span></p>`;
     html += `<p style="font-size:13px;color:#94a3b8;margin:0 0 14px 0;">（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）</p>`;
 
@@ -2161,10 +2164,10 @@
     }
 
     html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0; color: #fff;">【カテゴリ別内訳】</p>`;
-    let plain = `${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）\n\n【カテゴリ別内訳】\n`;
+    let plain = `ライフログ集計\n${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）\n\n【カテゴリ別内訳】\n`;
 
     const avgTimeTargetNames = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
-    const countTargetNames = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', 'ゴルフ練習', '飲み会🍻仕事関連', '飲み会🍻Private', '🍌'];
+    const countTargetNames = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', 'Golf🏌️ラウンド', '飲み会🍻仕事関連', '飲み会🍻Private', '🍌'];
 
     sortedStats.forEach((item, idx) => {
       const ratio = totalSecAll > 0 ? ((item.sec / totalSecAll) * 100).toFixed(1) : 0;
@@ -2215,7 +2218,7 @@
 
     const ok = await copyToClipboard(html, plain);
     if (ok) {
-      alert(`【${titleStr}】の集計レポートをコピーしました！\nEvernoteに貼り付けてください。`);
+      alert(`【ライフログ集計 / ${titleStr}】をコピーしました！\nEvernoteに貼り付けてください。`);
       closeReportModal();
     } else {
       alert('クリップボードへのコピーに失敗しました。');
