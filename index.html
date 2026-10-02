@@ -788,7 +788,7 @@
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
     { id: 'c31', name: '仕事関連', icon: '👥', color: 'rgba(6, 78, 59, 0.35)' },
     { id: 'c32', name: 'Social👥', icon: '🤝', color: 'rgba(30, 58, 138, 0.3)' },
-    { id: 'c33', name: 'Cooking👨‍‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
+    { id: 'c33', name: 'Cooking👨‍🍳', icon: '🍳', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c34', name: 'Sweets🍪', icon: '🧁', color: 'rgba(146, 64, 14, 0.3)' },
     { id: 'c35', name: 'Leisure', icon: '🎉', color: 'rgba(13, 148, 136, 0.3)' },
     { id: 'c36', name: '旅行🚃Plan等', icon: '✈️', color: 'rgba(13, 148, 136, 0.3)' },
@@ -812,16 +812,16 @@
   // ログ一覧の順番に並び替えたカテゴリカラー定義（ダークモードで視認性の高い鮮やかな色合い）
   const SPECIFIC_COLORS = {
     'Sleep💤': '#a855f7',          // 紫
-    'Power Nap💤': '#a855f7',     // 紫 (Sleepと同じ)
+    'Power Nap💤': '#a855f7',     // 紫
     'ストレッチ': '#fb7185',        // ピンクコーラル
     '身支度等': '#3b82f6',        // 青
     'BM': '#3b82f6',              // 青
     '風呂🛁': '#3b82f6',          // 青
-    '読書📖': '#f97316',          // オレンジ (コーラル)
-    '自己啓発': '#f97316',        // オレンジ (コーラル)
+    '読書📖': '#fb923c',          // 明るいオレンジ
+    '自己啓発': '#fb923c',        // 明るいオレンジ
     'Tech Work': '#38bdf8',       // 水色
     'Trade📈': '#84cc16',         // 鮮やかな黄緑
-    'Coffee': '#b45309',          // 鮮やかな茶色
+    'Coffee': '#d97706',          // 発色の良い鮮やかな茶色
     '抹茶': '#bef264',            // 淡い黄緑
     'Work✅': '#22c55e',          // 緑
     '仕事関連': '#22c55e',        // 緑
@@ -844,7 +844,7 @@
     '動画編集': '#3b82f6',        // 青
     '所用': '#3b82f6',            // 青
     '所用 (家族)': '#f472b6',     // ピンク
-    'Family': '#3b82f6',          // 青
+    'Family': '#f472b6',          // ピンク
     'Social👥': '#3b82f6',        // 青
     'Cooking👨‍🍳': '#facc15',      // 蛍光黄色
     'Sweets🍪': '#facc15',        // 蛍光黄色
@@ -878,7 +878,7 @@
     return DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
   }
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v70';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v71';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
