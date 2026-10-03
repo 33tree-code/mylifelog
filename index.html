@@ -809,7 +809,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  // ログ一覧の順番に並び替えたカテゴリカラー定義（Evernoteの自動白飛び対策として安全な同系色に変更）
+  // ログ一覧の順番に並び替えたカテゴリカラー定義
   const SPECIFIC_COLORS = {
     'Sleep💤': '#a855f7',          // 紫
     'Power Nap💤': '#a855f7',     // 紫
@@ -817,11 +817,11 @@
     '身支度等': '#3b82f6',        // 青
     'BM': '#3b82f6',              // 青
     '風呂🛁': '#3b82f6',          // 青
-    '読書📖': '#ff7c24',          // Evernoteで白飛びしない鮮やかなオレンジ
+    '読書📖': '#ea580c',          // 鮮やかなオレンジ
     '自己啓発': '#84cc16',        // ボタンと同じ明るい黄緑色
     'Tech Work': '#2dd4bf',       // 青緑色（ターコイズ）
     'Trade📈': '#84cc16',         // 鮮やかな黄緑
-    'Coffee': '#d97706',          // 鮮やかな茶色（オレンジ系黄土色）
+    'Coffee': '#b45309',          // 鮮やかな茶色
     '抹茶': '#bef264',            // 淡い黄緑
     'Work✅': '#22c55e',          // 緑（変更なし）
     '仕事関連': '#22c55e',        // 緑
@@ -878,7 +878,7 @@
     return DEFAULT_PALETTE[index % DEFAULT_PALETTE.length];
   }
 
-  const CURRENT_VER = '2026_08_exact_cats_and_stone_v73';
+  const CURRENT_VER = '2026_08_exact_cats_and_stone_v74';
   if (localStorage.getItem('ll_cats_ver') !== CURRENT_VER) {
     let savedCats = JSON.parse(localStorage.getItem('ll_cats') || '[]');
     savedCats = savedCats.map(c => {
@@ -1479,8 +1479,6 @@
 
     const statsMap = {};
     let totalSecAll = 0;
-
-    // 各Workログが記録された日（YYYY/MM/DD）をユニークに集計するためのセット
     const workActiveDates = new Set();
 
     logs.forEach(l => {
@@ -1550,9 +1548,8 @@
           const avgSec = item.sec / totalDaysCount;
           badgesHtml += `<span style="font-size:0.73rem;color:#00ff7f;background:rgba(0,255,127,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;font-weight:bold;">1日平均: ${formatSecToJP(avgSec)}</span>`;
         } else if (item.name.includes('Work✅')) {
-          // Workは稼働日（記録された日数）での1日平均
           const avgSecWork = item.sec / workActiveDaysCount;
-          badgesHtml += `<span style="font-size:0.73rem;color:#00ff7f;background:rgba(0,255,127,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;font-weight:bold;">1日平均: ${formatSecToJP(avgSecWork)}</span>`;
+          badgesHtml += `<span style="font-size:0.73rem;color:#00ff7f;background:rgba(0,255,127,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;font-weight:bold;">稼働日平均: ${formatSecToJP(avgSecWork)} (稼働日${workActiveDaysCount}日)</span>`;
         }
 
         if (countTargetNames.some(target => item.name.includes(target))) {
@@ -2202,8 +2199,8 @@
         extraPlain += ` (1日平均: ${formatSecToJP(avgSec)})`;
       } else if (item.name.includes('Work✅')) {
         const avgSecWork = item.sec / workActiveDaysCount;
-        extraHtml += ` <span style="color:#00ff7f;font-weight:bold;">(1日平均: ${formatSecToJP(avgSecWork)})</span>`;
-        extraPlain += ` (1日平均: ${formatSecToJP(avgSecWork)})`;
+        extraHtml += ` <span style="color:#00ff7f;font-weight:bold;">(稼働日平均: ${formatSecToJP(avgSecWork)} / 稼働日${workActiveDaysCount}日)</span>`;
+        extraPlain += ` (稼働日平均: ${formatSecToJP(avgSecWork)} / 稼働日${workActiveDaysCount}日)`;
       }
 
       if (countTargetNames.some(target => item.name.includes(target))) {
