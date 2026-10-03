@@ -782,7 +782,7 @@
     { id: 'c25', name: '開封✂️', icon: '📦', color: 'rgba(30, 64, 175, 0.25)' },
     { id: 'c26', name: '病院等', icon: '🏥', color: 'rgba(30, 58, 138, 0.3)' },
     { id: 'c27', name: 'Shooting', icon: '📷', color: 'rgba(19, 78, 74, 0.35)' },
-    { id: 'c_edit', name: '🖼️️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
+    { id: 'c_edit', name: '🖼️・🎬Editing', icon: '🛠️', color: 'rgba(19, 78, 74, 0.35)' },
     { id: 'c28', name: '所用', icon: '📋', color: 'rgba(30, 41, 59, 0.6)' },
     { id: 'c29', name: '所用 (家族)', icon: '👥', color: 'rgba(88, 28, 135, 0.25)' },
     { id: 'c30', name: 'Family', icon: '👥', color: 'rgba(88, 28, 135, 0.28)' },
@@ -809,7 +809,7 @@
     { id: 'c51', name: 'Sleepless', icon: '🦉', color: 'rgba(30, 41, 59, 0.6)' }
   ];
 
-  // ログ一覧の順番に並び替えたカテゴリカラー定義（Evernoteでも確実に高発色する鮮やかなカラー）
+  // ログ一覧の順番に並び替えたカテゴリカラー定義（Evernoteの自動白飛び対策として安全な同系色に変更）
   const SPECIFIC_COLORS = {
     'Sleep💤': '#a855f7',          // 紫
     'Power Nap💤': '#a855f7',     // 紫
@@ -817,13 +817,13 @@
     '身支度等': '#3b82f6',        // 青
     'BM': '#3b82f6',              // 青
     '風呂🛁': '#3b82f6',          // 青
-    '読書📖': '#ff781f',          // 高視認性オレンジ
-    '自己啓発': '#84cc16',        // ボタンに合わせた明るい黄緑
+    '読書📖': '#ff7c24',          // Evernoteで白飛びしない鮮やかなオレンジ
+    '自己啓発': '#84cc16',        // ボタンと同じ明るい黄緑色
     'Tech Work': '#2dd4bf',       // 青緑色（ターコイズ）
     'Trade📈': '#84cc16',         // 鮮やかな黄緑
-    'Coffee': '#d97706',          // 鮮やかな茶色
+    'Coffee': '#d97706',          // 鮮やかな茶色（オレンジ系黄土色）
     '抹茶': '#bef264',            // 淡い黄緑
-    'Work✅': '#22c55e',          // 緑
+    'Work✅': '#22c55e',          // 緑（変更なし）
     '仕事関連': '#22c55e',        // 緑
     '移動 →': '#3b82f6',          // 青
     '移動': '#3b82f6',            // 青
@@ -1480,8 +1480,8 @@
     const statsMap = {};
     let totalSecAll = 0;
 
-    // Workが記録された日付をカウントするためのセット
-    const workActiveDaysSet = new Set();
+    // 各Workログが記録された日（YYYY/MM/DD）をユニークに集計するためのセット
+    const workActiveDates = new Set();
 
     logs.forEach(l => {
       if (!l.endAt) return;
@@ -1498,17 +1498,18 @@
           statsMap[l.catId].count += 1;
           totalSecAll += sec;
 
-          // Work✅の稼働日判定（日付ごとにセットに蓄積）
           if (l.name.includes('Work✅')) {
             const dStr = `${start.getFullYear()}/${start.getMonth()+1}/${start.getDate()}`;
-            workActiveDaysSet.add(dStr);
+            workActiveDates.add(dStr);
           }
         }
       }
     });
 
+    const workActiveDaysCount = Math.max(1, workActiveDates.size);
+
     const sortedStats = Object.values(statsMap).sort((a, b) => b.sec - a.sec);
-    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, totalDaysCount, workActiveDaysCount: workActiveDaysSet.size, sortedStats };
+    currentReportData = { titleStr, startDate, endDate, totalSecAll, totalPeriodHours, totalDaysCount, workActiveDaysCount, sortedStats };
 
     document.getElementById('reportTitle').innerText = titleStr;
     document.getElementById('reportRangeInfo').innerHTML = `総記録時間: <span style="color:#38bdf8;font-weight:bold;">${formatSecToJP(totalSecAll)}</span><br><span style="font-size:0.78rem;color:var(--text-sub);font-weight:normal;">（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）</span>`;
@@ -1517,7 +1518,7 @@
     if (sortedStats.length === 0) {
       rankContainer.innerHTML = `<div style="color:var(--text-sub);font-size:0.8rem;text-align:center;padding:12px;">この期間の記録はありません</div>`;
     } else {
-      const avgTimeTargetNames = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
+      const avgTimeTargetNames = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Trade📈'];
       const countTargetNames = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', 'Golf🏌️ラウンド', '飲み会🍻仕事関連', '飲み会🍻Private', '🍌', 'Coffee', '抹茶', 'BM'];
 
       rankContainer.innerHTML = sortedStats.map((item, idx) => {
@@ -1546,12 +1547,14 @@
 
         let badgesHtml = '';
         if (avgTimeTargetNames.some(target => item.name.includes(target))) {
-          // Work✅の場合は稼働日数基準、その他は総日数基準
-          const divisor = item.name.includes('Work✅') ? Math.max(1, workActiveDaysSet.size) : totalDaysCount;
-          const avgSec = item.sec / divisor;
-          const avgLabel = item.name.includes('Work✅') ? `1日平均(稼働日): ${formatSecToJP(avgSec)}` : `1日平均: ${formatSecToJP(avgSec)}`;
-          badgesHtml += `<span style="font-size:0.73rem;color:#00ff7f;background:rgba(0,255,127,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;font-weight:bold;">${avgLabel}</span>`;
+          const avgSec = item.sec / totalDaysCount;
+          badgesHtml += `<span style="font-size:0.73rem;color:#00ff7f;background:rgba(0,255,127,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;font-weight:bold;">1日平均: ${formatSecToJP(avgSec)}</span>`;
+        } else if (item.name.includes('Work✅')) {
+          // Workは稼働日（記録された日数）での1日平均
+          const avgSecWork = item.sec / workActiveDaysCount;
+          badgesHtml += `<span style="font-size:0.73rem;color:#00ff7f;background:rgba(0,255,127,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;font-weight:bold;">1日平均: ${formatSecToJP(avgSecWork)}</span>`;
         }
+
         if (countTargetNames.some(target => item.name.includes(target))) {
           badgesHtml += `<span style="font-size:0.73rem;color:#f472b6;background:rgba(244,114,182,0.12);padding:1px 5px;border-radius:4px;white-space:nowrap;font-weight:bold;">${item.count}回</span>`;
         }
@@ -2183,7 +2186,7 @@
     html += `<p style="font-size:18px;font-weight:bold;margin:0 0 8px 0; color: #ffffff;">【カテゴリ別内訳】</p>`;
     let plain = `ライフログ集計\n${titleStr}\n総記録時間: ${formatSecToJP(totalSecAll)}\n（対象期間の合計時間：${totalPeriodHours}時間 / ${totalDaysCount}日間）\n\n【カテゴリ別内訳】\n`;
 
-    const avgTimeTargetNames = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Work✅', 'Trade📈'];
+    const avgTimeTargetNames = ['Sleep💤', 'Power Nap💤', 'ストレッチ', '読書📖', 'Trade📈'];
     const countTargetNames = ['筋トレ💪', 'Running👟', 'Walking', 'ゴルフ練習', 'Golf🏌️ラウンド', '飲み会🍻仕事関連', '飲み会🍻Private', '🍌', 'Coffee', '抹茶', 'BM'];
 
     sortedStats.forEach((item, idx) => {
@@ -2194,19 +2197,21 @@
       let extraPlain = '';
 
       if (avgTimeTargetNames.some(target => item.name.includes(target))) {
-        const divisor = item.name.includes('Work✅') ? Math.max(1, workActiveDaysCount) : totalDaysCount;
-        const avgSec = item.sec / divisor;
-        const avgLabel = item.name.includes('Work✅') ? `1日平均(稼働日): ${formatSecToJP(avgSec)}` : `1日平均: ${formatSecToJP(avgSec)}`;
-        extraHtml += ` <span style="color:#00ff7f;font-weight:bold;">(${avgLabel})</span>`;
-        extraPlain += ` (${avgLabel})`;
+        const avgSec = item.sec / totalDaysCount;
+        extraHtml += ` <span style="color:#00ff7f;font-weight:bold;">(1日平均: ${formatSecToJP(avgSec)})</span>`;
+        extraPlain += ` (1日平均: ${formatSecToJP(avgSec)})`;
+      } else if (item.name.includes('Work✅')) {
+        const avgSecWork = item.sec / workActiveDaysCount;
+        extraHtml += ` <span style="color:#00ff7f;font-weight:bold;">(1日平均: ${formatSecToJP(avgSecWork)})</span>`;
+        extraPlain += ` (1日平均: ${formatSecToJP(avgSecWork)})`;
       }
+
       if (countTargetNames.some(target => item.name.includes(target))) {
         extraHtml += ` <span style="color:#ff6b81;font-weight:bold;">(${item.count}回)</span>`;
         extraPlain += ` (${item.count}回)`;
       }
 
-      // Evernote貼付時にもカラーが強制適用されるよう、spanにstyleを確実に付与
-      const lineHtml = `${item.icon} <span style="color:#ffffff;">${item.name}</span> ―― <span style="color:#38bdf8;font-weight:bold;">${formatSecToJP(item.sec)}</span> <span style="color:${catColor} !important; font-weight:bold;">（${ratio}%）</span>${extraHtml}`;
+      const lineHtml = `${item.icon} <span style="color:#ffffff;">${item.name}</span> ―― <span style="color:#38bdf8;font-weight:bold;">${formatSecToJP(item.sec)}</span> <span style="color:${catColor};font-weight:bold;">（${ratio}%）</span>${extraHtml}`;
       const linePlain = `${item.icon} ${item.name} ―― ${formatSecToJP(item.sec)}（${ratio}%）${extraPlain}`;
 
       html += `<p style="font-size:15px;margin:0 0 4px 0; color: #f1f5f9;">${lineHtml}</p>`;
